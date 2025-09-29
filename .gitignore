@@ -1,0 +1,18 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Maven
+/target/
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+#doc
+doc/
