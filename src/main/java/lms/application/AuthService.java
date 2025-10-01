@@ -28,7 +28,7 @@ public class AuthService {
     private final UserRepo userRepo;
 
     /** Currently logged-in user, or null if no user is logged in */
-    private User currentUser;
+    private static User currentUser;
 
     /**
      * Constructs an {@code AuthService} with the specified user repository.
@@ -81,7 +81,7 @@ public class AuthService {
      * 
      * @return the {@link User} object of the current user, or {@code null} if no user is logged in
      */
-    public User getCurrentUser() {
+    public static User getCurrentUser() {
         return currentUser;
     }
 }
