@@ -55,6 +55,7 @@ public class AuthService {
         if (user == null) {
             throw new UserNotFoundException("User '" + userName + "' does not exist.");
         }
+        
 
         if (!user.verifyPassword(rawPassword)) {
             throw new InvalidPasswordException("Incorrect password.");
