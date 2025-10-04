@@ -71,6 +71,8 @@ public class User {
         this.username = username;
         this.hashedPassword = hashedPassword;
         this.role = role;
+        
+        
 
         this.registrationDate = LocalDate.now();
         this.userID = UUID.randomUUID();
@@ -106,9 +108,9 @@ public class User {
      * @return {@code true} if the password matches, {@code false} otherwise
      */
     public boolean verifyPassword(String rawPassword) {
-        String hashedPassword = PasswordUtils.hashPassword(rawPassword);
-        return PasswordUtils.verifyPassword(hashedPassword, this.hashedPassword);
+        return PasswordUtils.verifyPassword(rawPassword, this.hashedPassword);
     }
+
 
     /** @return the user's first name */
     public String getFirstName() { return firstName; }
