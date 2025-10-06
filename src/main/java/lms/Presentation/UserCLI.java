@@ -1,33 +1,58 @@
-package lms.Presentation;
+package lms.presentation;
 
 import java.util.Scanner;
 
 /**
- * Command Line Interface (CLI) for library users.
+ * Command-Line Interface (CLI) for regular library users.
  *
- * <p>The {@code UserCLI} class provides a simple text-based
- * menu for regular users to interact with the Library Management System.
- * Users can search for books, borrow, return, and pay fines.</p>
+ * <p>
+ * The {@code UserCLI} provides a text-based interface where
+ * non-admin users can interact with the Library Management System.
+ * It presents a role-specific menu after login and allows
+ * typical user operations.
+ * </p>
  *
- * <p>Currently, the implementation is a simulation with console messages,
- * and should later be connected with real services in the application layer.</p>
+ * <h2>Responsibilities:</h2>
+ * <ul>
+ *   <li>Display the user menu with available operations</li>
+ *   <li>Allow searching for books</li>
+ *   <li>Allow borrowing and returning of books</li>
+ *   <li>Allow users to pay fines</li>
+ *   <li>Provide a logout option</li>
+ * </ul>
  *
- * <p><b>Example usage:</b></p>
- * <pre>
+ * <h2>Current Status:</h2>
+ * <p>
+ * The current implementation is a <b>simulation</b>:
+ * operations only print console messages. Later, these
+ * handlers should be connected with real services
+ * (e.g. {@code BookService}, {@code UserService}) in the
+ * application layer.
+ * </p>
+ *
+ * <h2>Example Usage:</h2>
+ * <pre>{@code
  * UserCLI userCLI = new UserCLI();
  * userCLI.start();
- * </pre>
+ * }</pre>
  *
- * @author أحمد
- * @version 1.0
+ * <p>
+ * This class belongs to the <b>presentation layer</b>.
+ * It does not directly interact with persistence or
+ * domain objects, ensuring separation of concerns.
+ * </p>
+ *
+ * @author Majd Awwad
+ * @version 2.0
  */
-public class UserCLI {
+public class UserCLI implements CLI {
 
     /** Scanner for reading user input from the console */
     private final Scanner scanner = new Scanner(System.in);
 
     /**
      * Starts the user menu loop.
+     *
      * <p>Options available:</p>
      * <ul>
      *   <li>1 - Search for a Book</li>
@@ -36,13 +61,14 @@ public class UserCLI {
      *   <li>4 - Pay Fine</li>
      *   <li>5 - Logout</li>
      * </ul>
-     * The loop continues until the user chooses to logout.
+     *
+     * The loop continues until the user chooses to log out.
      */
     public void start() {
         while (true) {
             showUserMenu();
             int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -66,9 +92,7 @@ public class UserCLI {
         }
     }
 
-    /**
-     * Displays the menu options for the user.
-     */
+    /** Displays the menu options for the user.*/
     private void showUserMenu() {
         System.out.println("\n===== User Menu =====");
         System.out.println("1. Search for a Book");
@@ -84,6 +108,8 @@ public class UserCLI {
      * <p>Currently simulated by printing a message with the keyword entered.</p>
      */
     private void handleSearchBook() {
+		// TODO: write the implementation of this method
+
         System.out.print("Enter keyword to search: ");
         String keyword = scanner.nextLine();
         System.out.println("Searching for books with keyword: " + keyword + " (simulation).");
@@ -94,6 +120,8 @@ public class UserCLI {
      * <p>Currently simulated by printing a message with the entered book ID.</p>
      */
     private void handleBorrowBook() {
+		// TODO: write the implementation of this method
+
         System.out.print("Enter book ID to borrow: ");
         String bookId = scanner.nextLine();
         System.out.println("Book with ID " + bookId + " borrowed successfully (simulation).");
@@ -104,6 +132,8 @@ public class UserCLI {
      * <p>Currently simulated by printing a message with the entered book ID.</p>
      */
     private void handleReturnBook() {
+		// TODO: write the implementation of this method
+
         System.out.print("Enter book ID to return: ");
         String bookId = scanner.nextLine();
         System.out.println("Book with ID " + bookId + " returned successfully (simulation).");
@@ -114,6 +144,8 @@ public class UserCLI {
      * <p>Currently simulated by printing a confirmation message with the entered amount.</p>
      */
     private void handlePayFine() {
+		// TODO: write the implementation of this method
+
         System.out.print("Enter amount to pay: ");
         double amount = scanner.nextDouble();
         scanner.nextLine(); // consume newline

@@ -44,13 +44,26 @@ public class StaticUserRepo implements UserRepo
 	// 🔹 Initialize with demo users
 	static
 	{
-		users.add(new User("Admin", "System", "admin@test.com",
-		        "admin", PasswordUtils.hashPassword("admi123"), Role.ADMIN));
+		users.add(new User(
+				"Admin", "System",
+				"admin@test.com",
+		        "admin",
+		        PasswordUtils.hashPassword("admi123"), 
+		        Role.ADMIN));
 
-		users.add(new User("John", "Doe", "user@test.com",
-		        "user", PasswordUtils.hashPassword("user123"), Role.LIBRARIAN));
+		users.add(new User(
+				"John", "Doe",
+				"user@test.com",
+		        "user",
+		        PasswordUtils.hashPassword("user123"),
+		        Role.LIBRARIAN));
 
-
+		users.add(new User(
+				"Majd", "Awwad",
+				"majdawwad@gmail.com",
+				"majd04",
+				PasswordUtils.hashPassword("majd123"),
+				Role.ADMIN));
 	}
 
 	/**
@@ -69,15 +82,16 @@ public class StaticUserRepo implements UserRepo
 	 * Retrieves a user by their username.
 	 * 
 	 * @param userName the username of the user
-	 * @return the {@link User} object if found, or {@code null} if not found
+	 * @return An {@code Optional} containing the {@link User} object if found, or
+	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
 	@Override
-	public User getUserByUserName(String userName)
+	public Optional<User> getUserByUserName(String userName)
 	{
 		Optional<User> user = users.stream()
 				.filter(u -> u.getUsername().equalsIgnoreCase(userName))
 				.findFirst();
-		return user.orElse(null);
+		return user;
 	}
 	
 	/**
@@ -148,12 +162,13 @@ public class StaticUserRepo implements UserRepo
 	 * Finds a user by their unique ID.
 	 * 
 	 * @param userID the {@link UUID} of the user
-	 * @return the {@link User} object if found, or {@code null} if not found
+	 * @return An {@code Optional} containing the {@link User} object if found, or
+	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
 	@Override
-	public User getUserByID(UUID userID) 
+	public Optional<User> getUserByID(UUID userID) 
 	{
 		
-		return users.stream().filter(u -> u.getUserID().equals(userID)).findFirst().orElse(null);
+		return Optional.of(users.stream().filter(u -> u.getUserID().equals(userID)).findFirst().orElse(null));
 	}
 }

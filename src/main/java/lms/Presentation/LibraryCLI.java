@@ -1,115 +1,152 @@
-package lms.Presentation;
-
-import lms.application.AuthService;
-import lms.domain.Role;
-import lms.domain.User;
-import lms.domain.exception.InvalidPasswordException;
-import lms.domain.exception.UserNotFoundException;
+package lms.presentation;
 
 import java.util.Scanner;
 
+import lms.application.AuthService;
+import lms.application.BookService;
+import lms.application.UserDTO;
+import lms.application.UserService;
+import lms.domain.exception.InvalidPasswordException;
+import lms.domain.exception.UserNotFoundException;
+
 /**
- * Command Line Interface (CLI) for the Library Management System.
+ * Command-Line Interface (CLI) entry menu for the Library Management System.
  *
- * <p>The {@code LibraryCLI} class represents the main entry point
- * for the user to interact with the system. It provides options
- * to log in or exit the system.</p>
+ * <p>
+ * The {@code LibraryCLI} class represents the main user-facing entry point. It
+ * provides the first menu displayed after the program starts, allowing users to
+ * log in or exit the system.
+ * </p>
  *
- * <p>When the user logs in successfully, the system redirects them
- * to either the {@link AdminCLI} or the {@link UserCLI} depending
- * on their assigned {@link Role}.</p>
+ * <h2>Responsibilities:</h2>
+ * <ul>
+ * <li>Display the initial system menu (login, exit)</li>
+ * <li>Delegate login handling to {@link AuthService}</li>
+ * <li>Redirect authenticated users to the correct role-specific menu:
+ * <ul>
+ * <li>{@link AdminCLI} for administrators</li>
+ * <li>{@link UserCLI} for regular users</li>
+ * </ul>
+ * </li>
+ * <li>Report login errors caused by invalid credentials</li>
+ * </ul>
  *
- * <p><b>Example usage:</b></p>
- * <pre>
- * AuthService authService = new AuthService(repo);
- * LibraryCLI cli = new LibraryCLI(authService);
+ * <h2>Usage Example:</h2>
+ * 
+ * <pre>{@code
+ * UserRepo userRepo = new StaticUserRepo();
+ * AuthService authService = new AuthService(userRepo);
+ * UserService userService = new UserService(userRepo);
+ * BookService bookService = new BookService(new StaticBookRepo());
+ *
+ * LibraryCLI cli = new LibraryCLI(authService, userService, bookService);
  * cli.start();
- * </pre>
+ * }</pre>
  *
- * @author أحمد
- * @version 1.0
+ * <h2>Exceptions:</h2>
+ * <ul>
+ * <li>{@link UserNotFoundException} – thrown if the username is unknown</li>
+ * <li>{@link InvalidPasswordException} – thrown if the password is
+ * incorrect</li>
+ * <li>{@link IllegalAccessException} – thrown if the user has no valid
+ * role</li>
+ * </ul>
+ *
+ * <p>
+ * This class belongs to the <b>presentation layer</b> of the LMS architecture.
+ * It depends on services from the application layer but has no knowledge of
+ * persistence or domain internals.
+ * </p>
+ *
+ * @author Majd Awwad
+ * @version 2.0
  */
-public class LibraryCLI {
+public class LibraryCLI implements CLI {
 
-    /** Scanner for reading user input from the console */
-    private final Scanner scanner = new Scanner(System.in);
+	/** Scanner for reading user input from the console */
+	private final Scanner scanner = new Scanner(System.in);
 
-    /** Service responsible for handling authentication */
-    private final AuthService authService;
+	/** Service responsible for handling authentication. */
+	private final AuthService authService;
+	/** Service for managing users (delegated to sub-menus). */
+	private final UserService userService;
+	/** Service for managing books (delegated to sub-menus). */
+	private final BookService bookService;
 
-    /**
-     * Constructs a {@code LibraryCLI} with the given authentication service.
-     *
-     * @param authService the authentication service used to manage login/logout
-     */
-    public LibraryCLI(AuthService authService) {
-        this.authService = authService;
-    }
+	/**
+	 * Constructs a {@code LibraryCLI} with required services.
+	 *
+	 * @param authService the authentication service used for login/logout
+	 * @param userService the service for user-related operations
+	 * @param bookService the service for book-related operations
+	 */
+	public LibraryCLI(AuthService authService, UserService userService, BookService bookService) {
+		this.authService = authService;
+		this.bookService = bookService;
+		this.userService = userService;
+	}
 
-    /**
-     * Starts the main menu loop of the system.
-     * <p>Options available:</p>
-     * <ul>
-     *   <li>1 - Login</li>
-     *   <li>2 - Exit the system</li>
-     * </ul>
-     * The loop continues until the user chooses to exit.
-     */
-    public void start() {
-        while (true) {
-            System.out.println("\n=== Library Management System ===");
-            System.out.println("1. Login");
-            System.out.println("2. Exit the system");
-            System.out.print("Choose the option: ");
+	/**
+	 * Starts the main system menu loop.
+	 *
+	 * <p>
+	 * Options available:
+	 * </p>
+	 * <ul>
+	 * <li>1 - Login</li>
+	 * <li>2 - Exit the system</li>
+	 * </ul>
+	 *
+	 * The loop continues until the user chooses to exit.
+	 */
+	public void start() {
+		while (true) {
+			System.out.println("\n=== Library Management System ===");
+			System.out.println("1. Login");
+			System.out.println("2. Exit the system");
+			System.out.print("Choose the option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+			int choice = scanner.nextInt();
+			scanner.nextLine();
 
-            switch (choice) {
-                case 1:
-                    handleLogin();
-                    break;
-                case 2:
-                    System.out.println("Thank you for using the system!");
-                    return;
-                default:
-                    System.out.println("Invalid choice!");
-            }
-        }
-    }
+			switch (choice) {
+			case 1:
+				handleLogin();
+				break;
+			case 2:
+				System.out.println("Thank you for using the system!");
+				return;
+			default:
+				System.out.println("Invalid choice!");
+			}
+		}
+	}
 
-    /**
-     * Handles the login process by asking the user to enter
-     * their username and password. If authentication is successful,
-     * the user is redirected to the correct menu based on their role.
-     *
-     * <p>Possible exceptions:</p>
-     * <ul>
-     *   <li>{@link UserNotFoundException} - if the username does not exist</li>
-     *   <li>{@link InvalidPasswordException} - if the password is incorrect</li>
-     * </ul>
-     */
-    private void handleLogin() {
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
+	/**
+	 * Handles the login process by prompting the user for credentials and
+	 * delegating authentication to {@link AuthService}.
+	 *
+	 * <p>
+	 * If authentication succeeds, the user is redirected to the appropriate CLI
+	 * menu based on their {@link Role}.
+	 * </p>
+	 */
+	private void handleLogin() {
+		// TODO: try to solve .nextLine() issue, convert to .next()
+		System.out.print("Enter username: ");
+		String username = scanner.nextLine();
 
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
+		System.out.print("Enter password: \n");
+		String password = scanner.nextLine();
 
-        try {
-            if (authService.login(username, password)) {
-                User current = authService.getCurrentUser();
-                System.out.println("Login successful! Welcome, " + current.getUsername());
-
-                // open the right menu based on role
-                if (current.getRole() == Role.ADMIN) {
-                    new AdminCLI().start();
-                } else {
-                    new UserCLI().start();
-                }
-            }
-        } catch (UserNotFoundException | InvalidPasswordException e) {
-            System.out.println("Login failed: " + e.getMessage());
-        }
-    }
+		try {
+			if (authService.login(username, password)) {
+				UserDTO current = AuthService.getCurrentUser();
+				System.out.println("Login successful! Welcome, " + current.username());
+				CLIFactory.getCLI(this.authService, this.userService, this.bookService).start();
+			}
+		} catch (UserNotFoundException | InvalidPasswordException | IllegalAccessException e) {
+			System.out.println("Login failed: " + e.getMessage());
+		}
+	}
 }
