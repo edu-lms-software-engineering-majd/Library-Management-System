@@ -194,6 +194,7 @@ public class User {
         this.email = newEmail;
     }
 
+
     /** @return the user's first name */
     public String getFirstName() { return firstName; }
 
