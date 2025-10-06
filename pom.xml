@@ -8,6 +8,12 @@
   <description>A Java-based project for managing library operations including books, users, and borrowing.</description>
   
   
+  <properties>
+    <maven.compiler.source>23</maven.compiler.source>
+    <maven.compiler.target>23</maven.compiler.target>
+</properties>
+
+  
   
    <dependencies>
     
