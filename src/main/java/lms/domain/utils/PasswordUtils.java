@@ -22,7 +22,9 @@ import java.util.Base64;
  * @version 1.0
  */
 public class PasswordUtils {
+	
 
+	
     /**
      * Hashes a raw password using SHA-512 and encodes it in Base64.
      * 
@@ -38,6 +40,7 @@ public class PasswordUtils {
             throw new RuntimeException(e);
         }
     }
+    
 
     /**
      * Verifies if a raw password matches a previously hashed password.
