@@ -7,7 +7,7 @@ import lms.domain.exception.PermissionDeniedException;
 /**
  * Utility class providing authorization checks for the application.
  *
- * <p>
+ *  * <p>
  * This class contains static methods to enforce role-based access control
  * (RBAC) across services. It is not intended to be instantiated or extended.
  * </p>

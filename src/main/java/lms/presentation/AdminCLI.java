@@ -92,12 +92,12 @@ public class AdminCLI implements CLI {
             switch (choice) {
                 case "1": handleAddBook(); break;
                 case "2": handleViewAllBooks(); break;
-                case "3": handleUpdateBook(); break;
-                case "4": handleDeleteBook(); break;
+               // case "3": handleUpdateBook(); break;
+              //  case "4": handleDeleteBook(); break;
                 case "5": handleAddUser(); break;
                 case "6": handleViewAllUsers(); break;
                 case "7": handleUpdateUser(); break;
-                case "8": handleDeleteUser(); break;
+                //case "8": handleDeleteUser(); break;
                 case "9": handleViewReports(); break;
                 case "10":
                     authService.logout();
