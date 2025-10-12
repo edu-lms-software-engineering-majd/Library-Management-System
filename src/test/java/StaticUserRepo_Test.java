@@ -1,18 +1,10 @@
-import static org.junit.jupiter.api.Assertions.*;
- 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
- 
-
 class StaticUserRepo_Test {
-	
-
-    
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -31,52 +23,52 @@ class StaticUserRepo_Test {
 	}
 
 	@Test
-    void testAddUserSuccess() {
-        
-    }
+	void testAddUserSuccess() {
 
-    @Test
-    void testAddUserDuplicate() {
-       
-    }
+	}
 
-    @Test
-    void testIsExist() {
-        
-    }
+	@Test
+	void testAddUserDuplicate() {
 
-    @Test
-    void testGetUserByUserName() {
-         
-    }
+	}
 
-    @Test
-    void testUpdateUserSuccess() {
-        
-    }
+	@Test
+	void testIsExist() {
 
-    @Test
-    void testUpdateUserNotExist() {
-       
-    }
+	}
 
-    @Test
-    void testDeleteUserSuccess() {
-        
-    }
+	@Test
+	void testGetUserByUserName() {
 
-    @Test
-    void testDeleteUserNotFound() {
-        
-    }
+	}
 
-    @Test
-    void testGetAllUsers() {
-       
-    }
+	@Test
+	void testUpdateUserSuccess() {
 
-    @Test
-    void testGetUserByID() {
-         
-    }
+	}
+
+	@Test
+	void testUpdateUserNotExist() {
+
+	}
+
+	@Test
+	void testDeleteUserSuccess() {
+
+	}
+
+	@Test
+	void testDeleteUserNotFound() {
+
+	}
+
+	@Test
+	void testGetAllUsers() {
+
+	}
+
+	@Test
+	void testGetUserByID() {
+
+	}
 }

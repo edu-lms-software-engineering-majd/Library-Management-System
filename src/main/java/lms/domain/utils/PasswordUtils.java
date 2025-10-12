@@ -23,6 +23,8 @@ import java.util.Base64;
  */
 public class PasswordUtils {
 	
+	
+	
 
 	
     /**
@@ -31,7 +33,8 @@ public class PasswordUtils {
      * @param password the raw password to hash
      * @return the Base64-encoded hash of the password
      */
-    public static String hashPassword(String password) {
+    public static String hashPassword(String password) 
+    {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             byte[] hashedBytes = md.digest(password.getBytes());
@@ -42,6 +45,7 @@ public class PasswordUtils {
     }
     
 
+    
     /**
      * Verifies if a raw password matches a previously hashed password.
      * 

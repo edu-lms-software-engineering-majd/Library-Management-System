@@ -4,51 +4,74 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class AuthServise_Test {
+class UserTest {
+
+	 
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-
 	}
 
 	@BeforeEach
 	void setUp() throws Exception {
-
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-
 	}
 
 	@Test
-	void loginSuccess() throws Exception {
-
+	void testValidUserCreation() {
+		 
 	}
 
 	@Test
-	void loginWrongPassword() {
-
+	void testVerifyPassword() {
+		 
 	}
 
 	@Test
-	void loginUserNotFound() {
-
+	void testChangePasswordValid() {
+		 
 	}
 
 	@Test
-	void logoutSuccess() throws Exception {
-
+	void testChangePasswordInvalid() {
+		 
 	}
 
 	@Test
-	void logoutWithoutLogin() {
-
+	void testChangeRoleValid() {
+		 
 	}
 
+	@Test
+	void testChangeRoleInvalid() {
+		 
+	}
+
+	@Test
+	void testChangeEmailValid() {
+		 
+	}
+
+	@Test
+	void testChangeEmailInvalid() {
+		 
+	}
+
+	
+	@Test
+	void testSettersAndGetters() {
+		 
+	}
+
+	@Test
+	void testRegistrationDate() {
+		 
+	}
 }
