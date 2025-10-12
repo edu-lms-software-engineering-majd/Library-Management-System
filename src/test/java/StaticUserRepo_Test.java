@@ -21,6 +21,7 @@ class StaticUserRepo_Test {
 	@AfterEach
 	void tearDown() throws Exception {
 	}
+	
 
 	@Test
 	void testAddUserSuccess() {

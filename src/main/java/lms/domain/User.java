@@ -118,7 +118,7 @@ public class User {
 
 		this.loans = new ArrayList<>();
 		this.account = new Account();
-		
+
 	}
 
 	/**
