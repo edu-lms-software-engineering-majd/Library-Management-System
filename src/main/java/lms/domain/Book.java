@@ -87,6 +87,7 @@ public class Book {
 		if (shelfLocation == null || shelfLocation.isBlank()) {
 			throw new IllegalArgumentException("Book shelf location cannot be empty");//the new updet shelf
 		}
+		
 
 		this.title = title;
 		this.author = author;

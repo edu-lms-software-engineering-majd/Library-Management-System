@@ -143,6 +143,7 @@ public class User {
 	}
 
 	/**
+	 * 
 	 * Verifies whether the given raw password matches the stored hashed password.
 	 *
 	 * @param rawPassword plain text password
