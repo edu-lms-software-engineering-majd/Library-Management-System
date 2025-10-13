@@ -1,10 +1,13 @@
+package lms.domain;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class StaticUserRepo_Test {
+class UserTest {
+
+	 
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -21,55 +24,56 @@ class StaticUserRepo_Test {
 	@AfterEach
 	void tearDown() throws Exception {
 	}
+
+	@Test
+	void testValidUserCreation() {
+		 
+	}
+
+	@Test
+	void testVerifyPassword() {
+		 
+	}
+
+	@Test
+	void testChangePasswordValid() {
+		 
+	}
+
 	
-
 	@Test
-	void testAddUserSuccess() {
-
+	void testChangePasswordInvalid() {
+		 
 	}
 
 	@Test
-	void testAddUserDuplicate() {
-
+	void testChangeRoleValid() {
+		 
 	}
 
 	@Test
-	void testIsExist() {
-
+	void testChangeRoleInvalid() {
+		 
 	}
 
 	@Test
-	void testGetUserByUserName() {
-
+	void testChangeEmailValid() {
+		 
 	}
 
 	@Test
-	void testUpdateUserSuccess() {
+	void testChangeEmailInvalid() {
+		 
+	}
 
+	
+	@Test
+	void testSettersAndGetters() {
+		 
 	}
 
 	@Test
-	void testUpdateUserNotExist() {
-
-	}
-
-	@Test
-	void testDeleteUserSuccess() {
-
-	}
-
-	@Test
-	void testDeleteUserNotFound() {
-
-	}
-
-	@Test
-	void testGetAllUsers() {
-
-	}
-
-	@Test
-	void testGetUserByID() {
-
+	void testRegistrationDate() {
+		 
 	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.application.UserDTO;
+import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
 
 /**
@@ -166,10 +167,15 @@ public class User {
 	 * @throws IllegalArgumentException if password is too weak
 	 */
 
-	public void changePassword(String newPassword) {
+	public void changePassword(String newPassword) throws IllegalArgumentException, PasswordReuseException {
 		if (newPassword == null || newPassword.length() < 8) {
-			throw new IllegalArgumentException("Password too weak");
+			throw new IllegalArgumentException("Password too weak.");
 		}
+				
+		if(this.verifyPassword(newPassword)) {
+			throw new PasswordReuseException("New password cannot be the same as the old password.");
+		}
+		
 		this.hashedPassword = PasswordUtils.hashPassword(newPassword);
 	}
 
