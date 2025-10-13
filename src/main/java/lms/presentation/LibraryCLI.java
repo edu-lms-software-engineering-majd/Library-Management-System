@@ -132,13 +132,14 @@ public class LibraryCLI implements CLI {
 	 * </p>
 	 */
 	private void handleLogin() {
-		// TODO: try to solve .nextLine() issue, convert to .next()
 		System.out.print("Enter username: ");
-		String username = scanner.nextLine();
+		String username = scanner.next();
+		
+		scanner.nextLine();
 
-		System.out.print("Enter password: \n");
+		System.out.print("Enter password:");
 		String password = scanner.nextLine();
-
+		
 		try {
 			if (authService.login(username, password)) {
 				UserDTO current = AuthService.getCurrentUser();

@@ -109,6 +109,47 @@ public class AdminCLI implements CLI {
         }
     }
 
+    private void handleDeleteUser() {
+        System.out.print("Enter the username of the user to delete: ");
+        String username = scanner.nextLine().trim();
+
+        try {
+            UserDTO user = userService.getUserByUsername(username);
+
+            System.out.println("User found: ");
+            System.out.println(user);
+
+            System.out.print("Are you sure you want to delete this user? (y/n): ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+
+            if ("y".equals(confirmation)) {
+                boolean deleted = userService.deleteUserByUsername(user.username());
+                if (deleted) {
+                    System.out.println("✅ User deleted successfully.");
+                } else {
+                    System.out.println("⚠️ Failed to delete user (user may not exist anymore).");
+                }
+            } else {
+                System.out.println("❎ Deletion cancelled.");
+            }
+
+        } catch (UserNotFoundException e) {
+            System.out.println("❌ No user found with username: " + username);
+        } catch (Exception e) {
+            System.out.println("⚠️ An error occurred: " + e.getMessage());
+        }
+    }
+
+	private void handleDeleteBook() {
+		// TODO Implement this method
+		
+	}
+
+	private void handleUpdateBook() {
+		// TODO Implement this method
+		
+	}
+
 	/**
 	 * Displays the administrator menu options.
 	 */
@@ -311,9 +352,14 @@ public class AdminCLI implements CLI {
 				System.out.println("Failed to update user.");
 			}
 
-		} catch (UserNotFoundException | IllegalAccessException e) {
-			// TODO: handle exception
-		}
+		} catch (UserNotFoundException e) {
+	        System.out.println("❌ No user found with username: " + username);
+	    } catch (IllegalAccessException e) {
+	        System.out.println("⛔ You do not have permission to update this user.");
+	    } catch (Exception e) {
+	        System.out.println("⚠️ An unexpected error occurred: " + e.getMessage());
+	    }
+
 
 		
 	}

@@ -1,6 +1,11 @@
 package lms.presentation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+
+import lms.domain.Book;
 
 /**
  * Command-Line Interface (CLI) for regular library users.
@@ -108,12 +113,80 @@ public class UserCLI implements CLI {
      * <p>Currently simulated by printing a message with the keyword entered.</p>
      */
     private void handleSearchBook() {
-		// TODO: write the implementation of this method
+        System.out.println("\n=== Search Book Menu ===");
+        System.out.println("1. Search by Title");
+        System.out.println("2. Search by Author");
+        System.out.println("3. Search by ISBN");
+        System.out.println("4. Search by Publisher");
+        System.out.println("5. Search by Publishing Year");
+        System.out.print("Choose an option (1-5): ");
 
-        System.out.print("Enter keyword to search: ");
-        String keyword = scanner.nextLine();
-        System.out.println("Searching for books with keyword: " + keyword + " (simulation).");
+        String choice = scanner.nextLine().trim();
+        System.out.print("Enter keyword: ");
+        String keyword = scanner.nextLine().trim().toLowerCase();
+
+        // Defensive check
+        if (keyword.isEmpty()) {
+            System.out.println("⚠️ Keyword cannot be empty. Please try again.");
+            return;
+        }
+
+        List<Book> allBooks = bookService.getAllBooks();
+        List<Book> results = new ArrayList<>();
+
+        switch (choice) {
+            case "1": // Title
+                results = allBooks.stream()
+                        .filter(b -> b.getTitle().toLowerCase().contains(keyword))
+                        .collect(Collectors.toList());
+                break;
+
+            case "2": // Author
+                results = allBooks.stream()
+                        .filter(b -> b.getAuthor().toLowerCase().contains(keyword))
+                        .collect(Collectors.toList());
+                break;
+
+            case "3": // ISBN
+                results = allBooks.stream()
+                        .filter(b -> b.getIsbn().toLowerCase().contains(keyword))
+                        .collect(Collectors.toList());
+                break;
+
+            case "4": // Publisher
+                results = allBooks.stream()
+                        .filter(b -> b.getPublisher().toLowerCase().contains(keyword))
+                        .collect(Collectors.toList());
+                break;
+
+            case "5": // Publishing Year
+                try {
+                    int year = Integer.parseInt(keyword);
+                    results = allBooks.stream()
+                            .filter(b -> b.getPublicationYear() == year)
+                            .collect(Collectors.toList());
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠️ Invalid year format. Please enter a numeric year.");
+                    return;
+                }
+                break;
+
+            default:
+                System.out.println("❌ Invalid choice. Please select a number between 1 and 5.");
+                return;
+        }
+
+        if (results.isEmpty()) {
+            System.out.println("❌ No books found matching your search.");
+        } else {
+            System.out.println("\n✅ Found " + results.size() + " book(s):");
+            results.forEach(book -> {
+                System.out.println("- " + book.getTitle() + " by " + book.getAuthor()
+                        + " (" + book.getPublicationYear() + "), ISBN: " + book.getIsbn());
+            });
+        }
     }
+
 
     /**
      * Handles the borrow book process.
