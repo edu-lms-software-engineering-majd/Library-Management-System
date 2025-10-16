@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.application.UserDTO;
+import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
 
 /**
@@ -143,7 +144,10 @@ public class User {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * 
+=======
+>>>>>>> origin/majd
 	 * Verifies whether the given raw password matches the stored hashed password.
 	 *
 	 * @param rawPassword plain text password
@@ -167,12 +171,19 @@ public class User {
 	 * @throws IllegalArgumentException if password is too weak
 	 */
 
-	public void changePassword(String newPassword) {
-		if (newPassword == null || newPassword.length() < 8) {
-			throw new IllegalArgumentException("Password too weak");
-		}
-		this.hashedPassword = PasswordUtils.hashPassword(newPassword);
+ 
+	public void changePassword(String newPassword) throws IllegalArgumentException, PasswordReuseException {
+	    if (newPassword == null || newPassword.length() < 8) {
+	        throw new IllegalArgumentException("Password too weak.");
+	    }
+
+	    if (this.verifyPassword(newPassword)) {
+	        throw new PasswordReuseException("New password cannot be the same as the old password.");
+	    }
+
+	    this.hashedPassword = PasswordUtils.hashPassword(newPassword);
 	}
+
 
 	/**
 	 * Updates the user's role.

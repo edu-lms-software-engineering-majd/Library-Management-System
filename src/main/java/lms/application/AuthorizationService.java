@@ -1,7 +1,6 @@
 package lms.application;
 
 import lms.domain.Role;
-import lms.domain.User;
 import lms.domain.exception.PermissionDeniedException;
 
 /**
