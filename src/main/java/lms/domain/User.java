@@ -118,7 +118,7 @@ public class User {
 		this.userID = UUID.randomUUID();
 
 		this.loans = new ArrayList<>();
-		this.account = new Account();
+		this.account = new Account(this.userID);
 
 	}
 
@@ -144,11 +144,10 @@ public class User {
 	}
 
 	/**
-<<<<<<< HEAD
+	 * <<<<<<< HEAD
 	 * 
-=======
->>>>>>> origin/majd
-	 * Verifies whether the given raw password matches the stored hashed password.
+	 * ======= >>>>>>> origin/majd Verifies whether the given raw password matches
+	 * the stored hashed password.
 	 *
 	 * @param rawPassword plain text password
 	 * @return {@code true} if valid, {@code false} otherwise
@@ -171,19 +170,17 @@ public class User {
 	 * @throws IllegalArgumentException if password is too weak
 	 */
 
- 
 	public void changePassword(String newPassword) throws IllegalArgumentException, PasswordReuseException {
-	    if (newPassword == null || newPassword.length() < 8) {
-	        throw new IllegalArgumentException("Password too weak.");
-	    }
+		if (newPassword == null || newPassword.length() < 8) {
+			throw new IllegalArgumentException("Password too weak.");
+		}
 
-	    if (this.verifyPassword(newPassword)) {
-	        throw new PasswordReuseException("New password cannot be the same as the old password.");
-	    }
+		if (this.verifyPassword(newPassword)) {
+			throw new PasswordReuseException("New password cannot be the same as the old password.");
+		}
 
-	    this.hashedPassword = PasswordUtils.hashPassword(newPassword);
+		this.hashedPassword = PasswordUtils.hashPassword(newPassword);
 	}
-
 
 	/**
 	 * Updates the user's role.

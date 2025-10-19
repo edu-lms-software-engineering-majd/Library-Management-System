@@ -71,21 +71,22 @@ public class AuthService {
 	 * 
 	 * @param userRepo the repository used to retrieve user data
 	 */
-	
+
 	public AuthService(UserRepo userRepo) {
 		this.userRepo = userRepo;
+		
 	}
 
-	
 	/**
-     * Attempts to log in a user with the given username and password.
-     *
-     * @param userName the username of the user
-     * @param rawPassword the plain-text password to verify
-     * @return {@code true} if login is successful
-     * @throws UserNotFoundException if no user exists with the specified username
-     * @throws InvalidPasswordException if the password is incorrect
-     */
+	 * Attempts to log in a user with the given username and password.
+	 *
+	 * @param userName    the username of the user
+	 * @param rawPassword the plain-text password to verify
+	 * @return {@code true} if login is successful
+	 * @throws UserNotFoundException    if no user exists with the specified
+	 *                                  username
+	 * @throws InvalidPasswordException if the password is incorrect
+	 */
 
 	public boolean login(String userName, String rawPassword) throws UserNotFoundException, InvalidPasswordException {
 
@@ -96,7 +97,7 @@ public class AuthService {
 		}
 
 		User user = userOptional.get();
-		
+
 		if (!user.verifyPassword(rawPassword)) {
 			throw new InvalidPasswordException("Incorrect password.");
 		}
@@ -108,11 +109,11 @@ public class AuthService {
 	}
 
 	/**
-     * Logs out the currently logged-in user.
-     *
-     * @throws IllegalStateException if no user is currently logged in
-     */
-	
+	 * Logs out the currently logged-in user.
+	 *
+	 * @throws IllegalStateException if no user is currently logged in
+	 */
+
 	public void logout() throws IllegalStateException {
 		if (currentUser == null) {
 			throw new IllegalStateException("No user is logged in");
@@ -121,12 +122,12 @@ public class AuthService {
 	}
 
 	/**
-     * Returns the currently logged-in user as a DTO.
-     *
-     * @return the {@link UserDTO} of the current user,
-     *         or {@code null} if no user is logged in
-     */
-	
+	 * Returns the currently logged-in user as a DTO.
+	 *
+	 * @return the {@link UserDTO} of the current user, or {@code null} if no user
+	 *         is logged in
+	 */
+
 	public static UserDTO getCurrentUser() {
 		return currentUser;
 	}
