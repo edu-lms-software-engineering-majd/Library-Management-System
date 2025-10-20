@@ -1,6 +1,7 @@
 package lms.domain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,13 +33,13 @@ public interface BookRepo {
 	 */
 	boolean addBook(Book book);
 
-	/**
-	 * Retrieves a book by its unique ID.
-	 *
-	 * @param bookId the {@link UUID} of the book
-	 * @return the {@link Book} if found, otherwise {@code null}
-	 */
-	Book getBookById(UUID bookId);
+    /**
+     * Retrieves a book by its unique ID.
+     *
+     * @param bookId the {@link UUID} of the book
+     * @return the {@link Book} if found, otherwise {@code null}
+     */
+    Optional<Book> getBookById(UUID bookId);
 
 	/**
 	 * Retrieves a book by its ISBN.

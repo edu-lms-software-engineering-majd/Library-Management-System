@@ -158,4 +158,12 @@ public class UserService {
 		 */
 	}
 
+	public boolean canBorrow(UUID userID) throws UserNotFoundException {
+		
+		User user = userRepo.getUserByID(userID)
+				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
+
+		return user.canBorrow();
+	}
+
 }

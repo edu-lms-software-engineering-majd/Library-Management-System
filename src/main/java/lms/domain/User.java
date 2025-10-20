@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.application.UserDTO;
+import lms.domain.exception.BookNotAvailableException;
+import lms.domain.exception.BorrowNotAllowedException;
 import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
 
@@ -84,10 +86,16 @@ public class User {
 	private Role role;
 
 	/** List of items the user has borrowed */
-	private List<Loan> loans;
+	private List<UUID> loans;
 
 	/** User's financial account for fines and payments */
 	private Account account;
+
+	private static final int MAX_BORROW_LIMIT = 10;
+	
+	private List<Notification> newNotifications;
+	
+	private List<Notification> oldNotifications;
 
 	/**
 	 * Constructs a new user with the given personal details, hashed password, and
@@ -117,8 +125,9 @@ public class User {
 		this.registrationDate = LocalDate.now();
 		this.userID = UUID.randomUUID();
 
-		this.loans = new ArrayList<>();
-		this.account = new Account(this.userID);
+
+		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
+		this.account = new Account();
 
 	}
 
@@ -137,7 +146,7 @@ public class User {
 	 */
 
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role,
-			List<Loan> loans, Account account) {
+			List<UUID> loans, Account account) {
 		this(firstName, lastName, email, username, hashedPassword, role);
 		this.loans = loans;
 		this.account = account;
@@ -210,6 +219,24 @@ public class User {
 		this.email = newEmail;
 	}
 
+	public void borrowBook(Book book) throws BorrowNotAllowedException, BookNotAvailableException, IllegalStateException {
+
+		if (loans.size() >= MAX_BORROW_LIMIT) {
+			throw new BorrowNotAllowedException("Borrow limit reached for user: " + username);
+		}
+		
+		if(!canBorrow()) {
+			throw new BorrowNotAllowedException("User " + this.userID + " cannot borrow more books.");
+		}
+
+		if (!book.isAvailable()) {
+			throw new BookNotAvailableException("Book " + book.getTitle() + " is not available.");
+		}
+
+		loans.add(book.getBookId());
+		book.decreaseAvailableCopies();
+	}
+
 	/** @return the user's first name */
 	public String getFirstName() {
 		return firstName;
@@ -256,7 +283,7 @@ public class User {
 	}
 
 	/** @return an unmodifiable list of user's loans */
-	public List<Loan> getLoans() {
+	public List<UUID> getLoans() {
 		return Collections.unmodifiableList(loans);
 	}
 
@@ -268,5 +295,15 @@ public class User {
 	/** @return the user's role */
 	public Role getRole() {
 		return role;
+	}
+
+	public boolean hasFine() {
+
+		return (account.getTotalFine() != 0);
+	}
+
+	public boolean canBorrow() {
+
+		return (account.getTotalFine() != 0);
 	}
 }

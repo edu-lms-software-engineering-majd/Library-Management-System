@@ -1,10 +1,17 @@
 package lms.application;
 
 import java.util.List;
+import java.util.UUID;
 
 import lms.domain.Book;
 import lms.domain.BookRepo;
+import lms.domain.User;
+import lms.domain.UserRepo;
+import lms.domain.exception.BookNotAvailableException;
+import lms.domain.exception.BookNotFoundException;
+import lms.domain.exception.BorrowNotAllowedException;
 import lms.domain.exception.PermissionDeniedException;
+import lms.domain.exception.UserNotFoundException;
 
 /**
  * Application service for coordinating book management use cases.
@@ -38,6 +45,13 @@ import lms.domain.exception.PermissionDeniedException;
 public class BookService {
 
 	private final BookRepo bookRepo;
+	private final UserRepo userRepo;
+
+	private BookService() {
+		// Prevent instantiation without dependencies
+		bookRepo = null;
+		userRepo = null;
+	}
 
 	/**
 	 * Creates a new {@code BookService} with the given repository.
@@ -45,8 +59,9 @@ public class BookService {
 	 * @param bookRepo the repository used for persisting and retrieving books
 	 */
 
-	public BookService(BookRepo bookRepo) {
+	public BookService(BookRepo bookRepo, UserRepo userService) {
 		this.bookRepo = bookRepo;
+		this.userRepo = userService;
 	}
 
 	/**
@@ -102,5 +117,32 @@ public class BookService {
 
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
+	}
+
+	public boolean borrowBook(UserDTO userDTO, UUID bookID) throws IllegalStateException, BorrowNotAllowedException, UserNotFoundException, BookNotAvailableException, BookNotFoundException {
+				
+		User user = userRepo.getUserByID(userDTO.userID())
+	            .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userDTO.userID()));
+		
+        Book book = bookRepo.getBookById(bookID)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + bookID));
+
+        user.borrowBook(book);
+        
+        userRepo.updateUser(user);
+        bookRepo.updateBook(book);
+
+        return true;
+        
+	}
+
+	private boolean isAvailableBook(UUID bookID) {
+
+		return bookRepo.getBookById(bookID).get().getAvailableCopies() > 0;
+	}
+
+	public boolean isValidBook(UUID bookID) {
+
+		return this.bookRepo.getBookById(bookID).isPresent();
 	}
 }

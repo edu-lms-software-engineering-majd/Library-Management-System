@@ -121,6 +121,18 @@ public class Book {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);
 		this.description = description;
 	}
+	
+	public boolean isAvailable() {
+        return availableCopies > 0;
+    }
+	
+	public void decreaseAvailableCopies() throws IllegalStateException {
+        if (availableCopies <= 0) {
+            throw new IllegalStateException("No copies available to borrow.");
+        }
+        availableCopies--;
+    }
+	
 
 	/** @return the unique identifier of the book */
 	public UUID getBookId() {

@@ -1,7 +1,5 @@
 package lms.application;
 
-import java.util.Optional;
-
 import lms.domain.User;
 import lms.domain.UserRepo;
 import lms.domain.exception.InvalidPasswordException;
@@ -90,13 +88,8 @@ public class AuthService {
 
 	public boolean login(String userName, String rawPassword) throws UserNotFoundException, InvalidPasswordException {
 
-		Optional<User> userOptional = userRepo.getUserByUserName(userName);
-
-		if (userOptional.isEmpty()) {
-			throw new UserNotFoundException("User '" + userName + "' does not exist.");
-		}
-
-		User user = userOptional.get();
+		User user = userRepo.getUserByUserName(userName)
+				.orElseThrow(() -> new UserNotFoundException("User '" + userName + "' does not exist."));
 
 		if (!user.verifyPassword(rawPassword)) {
 			throw new InvalidPasswordException("Incorrect password.");
