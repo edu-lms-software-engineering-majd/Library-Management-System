@@ -143,4 +143,19 @@ public class UserService {
 		return userRepo.updateUser(user);
 	}
 
+	public boolean deleteUserByUsername(String username) throws UserNotFoundException {
+		userRepo.deleteUser(username);
+		return false;
+
+		/*
+		 * التصحيح بس بدي اتاكد من مجد public boolean deleteUserByUsername(String
+		 * username) throws UserNotFoundException { return
+		 * userRepo.deleteUser(username);
+		 * المفروض يا مجد  لازم يرجع اسم امستخدم مش فولس
+		 * 
+		 * 
+		 * 
+		 */
+	}
+
 }

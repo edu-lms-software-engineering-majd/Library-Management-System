@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lms.domain.exception.UserNotFoundException;
+
 /**
  * Repository interface for managing {@link User} entities.
  * 
@@ -65,8 +67,9 @@ public interface UserRepo {
 	 * @param userName the username of the user to delete
 	 * @return {@code true} if deletion was successful, {@code false} if the user
 	 *         was not found
+	 * @throws {@link UserNotFoundException} if the username is not exist.
 	 */
-	boolean deleteUser(String userName);
+	boolean deleteUser(String userName) throws UserNotFoundException;
 
 	/**
 	 * Retrieves a user by their unique identifier.

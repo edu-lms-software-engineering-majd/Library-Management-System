@@ -1,13 +1,14 @@
 package lms.persistence;
 
-import lms.domain.Book;
-import lms.domain.BookRepo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import lms.domain.Book;
+import lms.domain.BookRepo;
 
 /**
  * In-memory implementation of {@link BookRepo} for simple usage, testing, or
@@ -57,14 +58,14 @@ public class StaticBookRepo implements BookRepo {
 				"Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides", "9780201633610", "Addison-Wesley", 1994,
 				"Software Design", 2, "English", "Shelf C3"));
 	}
-	
+
 	/**
-     * Adds a new book to the repository if the ISBN is unique.
-     *
-     * @param book the {@link Book} to add
-     * @return {@code true} if the book was added successfully, {@code false} if a book with
-     *         the same ISBN already exists
-     */
+	 * Adds a new book to the repository if the ISBN is unique.
+	 *
+	 * @param book the {@link Book} to add
+	 * @return {@code true} if the book was added successfully, {@code false} if a
+	 *         book with the same ISBN already exists
+	 */
 
 	@Override
 	public boolean addBook(Book book) {
@@ -73,39 +74,40 @@ public class StaticBookRepo implements BookRepo {
 		}
 		return books.add(book);
 	}
-	
+
 	/**
-     * Retrieves a book by its unique identifier.
-     *
-     * @param bookId the {@link UUID} of the book
-     * @return the {@link Book} if found, or {@code null} otherwise
-     */
+	 * Retrieves a book by its unique identifier.
+	 *
+	 * @param bookId the {@link UUID} of the book
+	 * @return the {@link Book} if found, or {@code null} otherwise
+	 */
 
 	@Override
 	public Book getBookById(UUID bookId) {
 		Optional<Book> book = books.stream().filter(b -> b.getBookId().equals(bookId)).findFirst();
 		return book.orElse(null);
 	}
-	
+
 	/**
-     * Retrieves a book by its ISBN.
-     *
-     * @param isbn the ISBN of the book
-     * @return the {@link Book} if found, or {@code null} otherwise
-     */
+	 * Retrieves a book by its ISBN.
+	 *
+	 * @param isbn the ISBN of the book
+	 * @return the {@link Book} if found, or {@code null} otherwise
+	 */
 
 	@Override
 	public Book getBookByIsbn(String isbn) {
 		Optional<Book> book = books.stream().filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
 		return book.orElse(null);
 	}
-	
+
 	/**
-     * Updates an existing book in the repository.
-     *
-     * @param updatedBook the {@link Book} with updated information
-     * @return {@code true} if the update was successful, {@code false} if the book does not exist
-     */
+	 * Updates an existing book in the repository.
+	 *
+	 * @param updatedBook the {@link Book} with updated information
+	 * @return {@code true} if the update was successful, {@code false} if the book
+	 *         does not exist
+	 */
 
 	@Override
 	public boolean updateBook(Book updatedBook) {
@@ -117,24 +119,25 @@ public class StaticBookRepo implements BookRepo {
 		}
 		return false;
 	}
-	
+
 	/**
-     * Deletes a book from the repository by its unique identifier.
-     *
-     * @param bookId the {@link UUID} of the book to delete
-     * @return {@code true} if deletion was successful, {@code false} if the book was not found
-     */
+	 * Deletes a book from the repository by its unique identifier.
+	 *
+	 * @param bookId the {@link UUID} of the book to delete
+	 * @return {@code true} if deletion was successful, {@code false} if the book
+	 *         was not found
+	 */
 
 	@Override
 	public boolean deleteBook(UUID bookId) {
 		return books.removeIf(b -> b.getBookId().equals(bookId));
 	}
-	
+
 	/**
-     * Returns an unmodifiable list of all books in the repository.
-     *
-     * @return a list of all {@link Book} objects
-     */
+	 * Returns an unmodifiable list of all books in the repository.
+	 *
+	 * @return a list of all {@link Book} objects
+	 */
 
 	@Override
 	public List<Book> getAllBooks() {

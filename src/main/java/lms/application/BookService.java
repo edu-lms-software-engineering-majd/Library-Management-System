@@ -39,11 +39,6 @@ public class BookService {
 
 	private final BookRepo bookRepo;
 
-	private BookService() {
-		// Prevent instantiation without dependencies
-		bookRepo = null;
-	}
-
 	/**
 	 * Creates a new {@code BookService} with the given repository.
 	 *

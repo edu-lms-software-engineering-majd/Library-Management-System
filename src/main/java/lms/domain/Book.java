@@ -52,6 +52,7 @@ public class Book {
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
 		this.bookId = UUID.randomUUID();
+		
 
 		if (title == null || title.isBlank()) {
 			throw new IllegalArgumentException("Book title cannot be empty");
@@ -74,7 +75,7 @@ public class Book {
 		}
 
 		if (category == null || category.isBlank()) {
-			throw new IllegalArgumentException("Book publisher cannot be empty");
+			throw new IllegalArgumentException("Book category cannot be empty");// the new updet category
 		}
 
 		if (totalCopies < 0) {
@@ -83,9 +84,9 @@ public class Book {
 		if (language == null || language.isBlank()) {
 			throw new IllegalArgumentException("Book language cannot be empty");
 		}
-		
+
 		if (shelfLocation == null || shelfLocation.isBlank()) {
-			throw new IllegalArgumentException("Book language cannot be empty");
+			throw new IllegalArgumentException("Book shelf location cannot be empty");// the new updet shelf
 		}
 
 		this.title = title;

@@ -1,12 +1,12 @@
 package lms.application;
 
 import lms.domain.Role;
-import lms.domain.User;
 import lms.domain.exception.PermissionDeniedException;
 
 /**
  * Utility class providing authorization checks for the application.
  *
+ * *
  * <p>
  * This class contains static methods to enforce role-based access control
  * (RBAC) across services. It is not intended to be instantiated or extended.
@@ -54,4 +54,5 @@ public final class AuthorizationService {
 			throw new PermissionDeniedException("Action requires admin privileges.");
 		}
 	}
+
 }
