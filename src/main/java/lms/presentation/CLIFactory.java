@@ -3,6 +3,7 @@ package lms.presentation;
 import lms.application.AuthService;
 import lms.application.BookService;
 import lms.application.UserService;
+import lms.application.LoanService;
 
 /**
  * Factory class for creating the appropriate {@link CLI} implementation based
@@ -45,13 +46,14 @@ public class CLIFactory {
 	 * @return a {@link CLI} instance for the current user
 	 * @throws IllegalStateException if the user's role is unsupported
 	 */
-	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService) {
+	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService) {
 		switch (AuthService.getCurrentUser().role()) {
 		case ADMIN:
-			return new AdminCLI(userService, bookService, authService);
+			return new AdminCLI(userService, bookService, authService,loanService);
 		case MEMBER:
 		case LIBRARIAN:
-			return new UserCLI();
+			return new UserCLI(bookService, loanService);
+			
 		default:
 			throw new IllegalStateException("Unsupported role: " + AuthService.getCurrentUser().role());
 		}

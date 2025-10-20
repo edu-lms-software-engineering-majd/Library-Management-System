@@ -4,8 +4,10 @@ import java.util.Scanner;
 
 import lms.application.AuthService;
 import lms.application.BookService;
+import lms.application.LoanService;
 import lms.application.UserDTO;
 import lms.application.UserService;
+import lms.domain.Role;
 import lms.domain.exception.InvalidPasswordException;
 import lms.domain.exception.UserNotFoundException;
 
@@ -66,12 +68,15 @@ public class LibraryCLI implements CLI {
 	/** Scanner for reading user input from the console */
 	private final Scanner scanner = new Scanner(System.in);
 
+	
 	/** Service responsible for handling authentication. */
 	private final AuthService authService;
 	/** Service for managing users (delegated to sub-menus). */
 	private final UserService userService;
 	/** Service for managing books (delegated to sub-menus). */
 	private final BookService bookService;
+	/** Service for managing loans and borrowing operations (delegated to sub-menus). */
+	private final LoanService loanService;
 
 	/**
 	 * Constructs a {@code LibraryCLI} with required services.
@@ -79,11 +84,13 @@ public class LibraryCLI implements CLI {
 	 * @param authService the authentication service used for login/logout
 	 * @param userService the service for user-related operations
 	 * @param bookService the service for book-related operations
+	 * @param loanService 
 	 */
-	public LibraryCLI(AuthService authService, UserService userService, BookService bookService) {
+	public LibraryCLI(AuthService authService, UserService userService, BookService bookService, LoanService loanService) {
 		this.authService = authService;
 		this.bookService = bookService;
 		this.userService = userService;
+		 this.loanService = loanService;
 	}
 
 	/**
@@ -134,17 +141,17 @@ public class LibraryCLI implements CLI {
 	private void handleLogin() {
 		System.out.print("Enter username: ");
 		String username = scanner.next();
-		
+
 		scanner.nextLine();
 
 		System.out.print("Enter password:");
 		String password = scanner.nextLine();
-		
+
 		try {
 			if (authService.login(username, password)) {
 				UserDTO current = AuthService.getCurrentUser();
 				System.out.println("Login successful! Welcome, " + current.username());
-				CLIFactory.getCLI(this.authService, this.userService, this.bookService).start();
+				CLIFactory.getCLI(this.authService, this.userService, this.bookService, this.loanService).start();
 			}
 		} catch (UserNotFoundException | InvalidPasswordException | IllegalAccessException e) {
 			System.out.println("Login failed: " + e.getMessage());

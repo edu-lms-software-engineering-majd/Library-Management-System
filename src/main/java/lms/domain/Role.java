@@ -26,7 +26,6 @@ package lms.domain;
 public enum Role {
 	/** Regular library member */
 	MEMBER,
-	
 
 	/** System administrator */
 	ADMIN,
