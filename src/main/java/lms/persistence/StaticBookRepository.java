@@ -8,10 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lms.domain.Book;
-import lms.domain.BookRepo;
+import lms.domain.BookRepository;
 
 /**
- * In-memory implementation of {@link BookRepo} for simple usage, testing, or
+ * In-memory implementation of {@link BookRepository} for simple usage, testing, or
  * prototyping.
  *
  * <p>
@@ -44,11 +44,13 @@ import lms.domain.BookRepo;
  * @author Majd Awwad
  * @version 1.1
  */
-public class StaticBookRepo implements BookRepo {
+public class StaticBookRepository implements BookRepository {
 
+	private static StaticBookRepository instance = null;
+	
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
-
+	
 	static {
 		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
 				"Software Engineering", 5, "English", "Shelf A1"));
@@ -66,9 +68,18 @@ public class StaticBookRepo implements BookRepo {
 	 * @return {@code true} if the book was added successfully, {@code false} if a
 	 *         book with the same ISBN already exists
 	 */
+	
+	StaticBookRepository getInstance() {
+	
+		if (instance == null) {
+			instance = new StaticBookRepository();
+		}
+		return instance;
+	}
 
 	@Override
 	public boolean addBook(Book book) {
+		
 		if (getBookByIsbn(book.getIsbn()) != null) {
 			return false;
 		}
@@ -83,9 +94,9 @@ public class StaticBookRepo implements BookRepo {
 	 */
 
 	@Override
-	public Book getBookById(UUID bookId) {
-		Optional<Book> book = books.stream().filter(b -> b.getBookId().equals(bookId)).findFirst();
-		return book.orElse(null);
+	public Optional<Book> getBookById(UUID bookId) {
+		
+		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
 	}
 
 	/**
@@ -96,9 +107,8 @@ public class StaticBookRepo implements BookRepo {
 	 */
 
 	@Override
-	public Book getBookByIsbn(String isbn) {
-		Optional<Book> book = books.stream().filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
-		return book.orElse(null);
+	public Optional<Book> getBookByIsbn(String isbn) {
+		return books.stream().filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
 	}
 
 	/**
@@ -112,7 +122,7 @@ public class StaticBookRepo implements BookRepo {
 	@Override
 	public boolean updateBook(Book updatedBook) {
 		for (int i = 0; i < books.size(); i++) {
-			if (books.get(i).getBookId().equals(updatedBook.getBookId())) {
+			if (books.get(i).getId().equals(updatedBook.getId())) {
 				books.set(i, updatedBook);
 				return true;
 			}
@@ -130,7 +140,7 @@ public class StaticBookRepo implements BookRepo {
 
 	@Override
 	public boolean deleteBook(UUID bookId) {
-		return books.removeIf(b -> b.getBookId().equals(bookId));
+		return books.removeIf(b -> b.getId().equals(bookId));
 	}
 
 	/**

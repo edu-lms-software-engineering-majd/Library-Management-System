@@ -97,7 +97,7 @@ public class AdminCLI implements CLI {
 
 			switch (choice) {
 			case "1":
-				handleAddBook();
+				handleAddItem();
 				break;
 			case "2":
 				handleViewAllBooks();
@@ -136,6 +136,36 @@ public class AdminCLI implements CLI {
 				System.out.println("Invalid choice, try again.");
 			}
 		}
+	}
+
+	private void handleAddItem() {
+		
+		System.out.println("Choose the Type of Item you Wanna Add");
+		showItemsMenu();
+	    String choice = scanner.nextLine().trim();
+	    
+	    switch (choice) {
+        case "1":
+            handleAddBook();
+            break;
+        case "2":
+            handleAddCD();
+            break;
+        case "3":
+        	handleAddJuernal();
+            return;
+        default:
+            System.out.println("Invalid choice!");
+    }
+	}
+
+	private void showItemsMenu() {
+	    System.out.println("\n===== Items Menu =====");
+	    System.out.println("1. Book");
+	    System.out.println("2. CD");
+	    System.out.println("3. Jeurnal");
+	    System.out.print("Choose an option: ");
+		
 	}
 
 	private void handleDeleteUser() {
@@ -258,9 +288,9 @@ private void handleViewLoanStats() {
 	        System.out.printf("%-10s %-15s %-15s %-12s %-8d %-10.2f\n",
 	            loan.getLoanId().toString().substring(0, 8),
 	            loan.getUserId().toString().substring(0, 8),
-	            loan.getBookId().toString().substring(0, 8),
+	            loan.getItemId().toString().substring(0, 8),
 	            loan.getDueDate(),
-	            loan.getOverdueDays(),
+	            loan.getDaysOverdue(),
 	            loan.calculateFine());
 	    }
 	}
@@ -304,11 +334,6 @@ private void handleViewLoanStats() {
 			System.out.print("Enter shelf location: ");
 			String shelfLocation = scanner.nextLine().trim();
 
-			// Create the book object
-			// Book book = new Book(title, author, isbn, publisher, year, category,
-			// totalCopies, language, description, shelfLocation);
-
-			// Add to repository (replace with your actual BookService or BookRepo)
 			Book book = bookService.addBook(AuthService.getCurrentUser(), title, author, isbn, publisher, year,
 					category, totalCopies, language, shelfLocation);
 

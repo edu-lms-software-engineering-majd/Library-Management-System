@@ -22,24 +22,11 @@ import java.util.UUID;
 public class FineTransaction {
 
     private final UUID transactionId;
-    private final UUID accountId;
-    private final UUID loanId;
     private final double amount;
     private final String description;
     private final LocalDate transactionDate;
     private final TransactionType type;
 
-    /**
-     * Enum representing the type of fine transaction.
-     */
-    public enum TransactionType {
-        /** Fine issued to a user (debit). */
-        FINE,
-        /** Payment made by a user (credit). */
-        PAYMENT,
-        /** Refund issued to a user. */
-        REFUND
-    }
 
     /**
      * Creates a new fine transaction record.
@@ -50,20 +37,15 @@ public class FineTransaction {
      * @param description short description or reason for the transaction
      * @param type        the type of transaction (FINE, PAYMENT, REFUND)
      */
-    public FineTransaction(UUID accountId, UUID loanId, double amount, String description, TransactionType type) {
+    public FineTransaction(double amount, String description, TransactionType type) {
         this.transactionId = UUID.randomUUID();
-        this.accountId = accountId;
-        this.loanId = loanId;
         this.amount = amount;
         this.description = description;
         this.transactionDate = LocalDate.now();
         this.type = type;
     }
 
-    // Getters
     public UUID getTransactionId() { return transactionId; }
-    public UUID getAccountId() { return accountId; }
-    public UUID getLoanId() { return loanId; }
     public double getAmount() { return amount; }
     public String getDescription() { return description; }
     public LocalDate getTransactionDate() { return transactionDate; }
@@ -74,6 +56,7 @@ public class FineTransaction {
      *
      * @return a human-readable summary of the transaction
      */
+    
     public String getSummary() {
         String sign = amount >= 0 ? "+" : "";
         return String.format("%s%.2f NIS - %s", sign, amount, description);

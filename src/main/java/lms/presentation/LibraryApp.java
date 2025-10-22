@@ -5,14 +5,12 @@ import lms.application.AuthService;
 import lms.application.BookService;
 import lms.application.LoanService;
 import lms.application.UserService;
-import lms.domain.BookRepo;
-import lms.domain.LoanRepo;
-import lms.domain.UserRepo;
-import lms.persistence.AccountRepo;
-import lms.persistence.StaticAccountRepo;
-import lms.persistence.StaticBookRepo;
-import lms.persistence.StaticLoanRepo;
-import lms.persistence.StaticUserRepo;
+import lms.domain.BookRepository;
+import lms.domain.LoanRepository;
+import lms.domain.UserRepository;
+import lms.persistence.StaticBookRepository;
+import lms.persistence.StaticLoanRepository;
+import lms.persistence.StaticUserRepository;
 
 /**
  * Entry point for the Library Management System (LMS).
@@ -25,8 +23,8 @@ import lms.persistence.StaticUserRepo;
  *
  * <h2>Responsibilities:</h2>
  * <ul>
- * <li>Instantiate repositories ({@link StaticUserRepo},
- * {@link StaticBookRepo})</li>
+ * <li>Instantiate repositories ({@link StaticUserRepository},
+ * {@link StaticBookRepository})</li>
  * <li>Initialize core services ({@link AuthService}, {@link UserService},
  * {@link BookService})</li>
  * <li>Inject dependencies into the CLI layer</li>
@@ -67,18 +65,15 @@ public class LibraryApp {
 	 */
 	public static void main(String[] args) {
 
-		UserRepo userRepo = new StaticUserRepo();
+		UserRepository userRepo = new StaticUserRepository();
+		BookRepository bookRepo = new StaticBookRepository();
+		LoanRepository loanRepo = new StaticLoanRepository();
+		
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
-
-		BookRepo bookRepo = new StaticBookRepo();
-		BookService bookService = new BookService(bookRepo);
-
-		AccountRepo accountRepo = new StaticAccountRepo();
-		AccountService accountService = new AccountService(accountRepo);
-
-		LoanRepo loanRepo = new StaticLoanRepo();
-		LoanService loanService = new LoanService(loanRepo, bookRepo, accountRepo, accountService);
+		BookService bookService = new BookService(bookRepo, userRepo);
+		AccountService accountService = new AccountService(userRepo);
+		LoanService loanService = new LoanService(bookRepo, accountService);
 
 		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService);
 		cli.start();

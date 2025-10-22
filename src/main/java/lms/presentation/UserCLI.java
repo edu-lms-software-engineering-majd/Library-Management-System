@@ -142,13 +142,15 @@ public class UserCLI implements CLI {
 	
 	private void displayActiveLoans(List<Loan> loans) {
 	 
+		// TODO : Active Loans Implementation now is Limited To Books, Need re-implementation
+		
 	    System.out.println("  No \t\t Book Title \t \t Borrowed \t\t Due Date\t\tStatus");
 	    
 
 	    for (int i = 0; i < loans.size(); i++) {
 	        Loan loan = loans.get(i);
 	        Book book = bookService.getAllBooks().stream()
-	                .filter(b -> b.getBookId().equals(loan.getBookId()))
+	                .filter(b -> b.getBookId().equals(loan.getItemId()))
 	                .findFirst()
 	                .orElse(null);
 

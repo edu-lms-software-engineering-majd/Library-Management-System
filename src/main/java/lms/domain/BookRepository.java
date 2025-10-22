@@ -22,7 +22,7 @@ import java.util.UUID;
  * @author Majd Awwad
  * @version 1.0
  */
-public interface BookRepo {
+public interface BookRepository {
 
 	/**
 	 * Adds a new book to the repository.
@@ -47,7 +47,7 @@ public interface BookRepo {
 	 * @param isbn the ISBN string of the book
 	 * @return the {@link Book} if found, otherwise {@code null}
 	 */
-	Book getBookByIsbn(String isbn);
+	Optional<Book> getBookByIsbn(String isbn);
 
 	/**
 	 * Updates an existing book in the repository.

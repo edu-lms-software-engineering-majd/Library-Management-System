@@ -1,17 +1,22 @@
 package lms.application;
 
 import java.util.UUID;
+
 import lms.domain.Account;
-import lms.persistence.AccountRepo;
+import lms.domain.AccountStatus;
+import lms.domain.User;
+import lms.domain.UserRepository;
 
 /**
  * Service class responsible for managing user accounts.
  */
 public class AccountService {
-    private final AccountRepo accountRepo;
 
-    public AccountService(AccountRepo accountRepo) {
-        this.accountRepo = accountRepo;
+	private final UserRepository userRepo;
+	
+    public AccountService(UserRepository userRepo) {
+		this.userRepo = userRepo;
+    	
     }
 
     /**
@@ -21,22 +26,12 @@ public class AccountService {
      * @return the existing or newly created account
      */
     public Account getOrCreateAccount(UUID userId) {
-        return accountRepo.findByUserId(userId).orElseGet(() -> {
-            Account newAccount = new Account(userId);
-            accountRepo.save(newAccount);
-            return newAccount;
-        });
-    }
+    	
+    	User user = userRepo.getByID(userId).orElseThrow(() -> 
+			new IllegalArgumentException("User with ID " + userId + " does not exist."));
 
-    /**
-     * Checks whether a user is allowed to borrow items.
-     *
-     * @param userId the user ID
-     * @return true if the user can borrow, false otherwise
-     */
-    public boolean canUserBorrow(UUID userId) {
-        Account account = getOrCreateAccount(userId);
-        return account.canBorrow();
+    	return user.getAccount();
+		
     }
 
     /**
@@ -48,12 +43,15 @@ public class AccountService {
      * @throws IllegalArgumentException if amount is not positive
      */
     public void addFineToUser(UUID userId, double amount, String reason) {
-        if (amount <= 0) {
+        
+    	if (amount <= 0) {
             throw new IllegalArgumentException("Fine amount must be positive");
         }
+    	
         Account account = getOrCreateAccount(userId);
         account.addFine(amount, reason);
-        accountRepo.update(account);
+        
+        userRepo.update(userRepo.getByID(userId).get());
     }
 
     /**
@@ -64,12 +62,15 @@ public class AccountService {
      * @throws IllegalArgumentException if amount is not positive
      */
     public void payUserFine(UUID userId, double amount) {
-        if (amount <= 0) {
+        
+    	if (amount <= 0) {
             throw new IllegalArgumentException("Payment amount must be positive");
         }
+    	
         Account account = getOrCreateAccount(userId);
         account.payFine(amount);
-        accountRepo.update(account);
+        
+        userRepo.update(userRepo.getByID(userId).get());
     }
 
     /**
@@ -78,9 +79,10 @@ public class AccountService {
      * @param userId the user ID
      * @return the user's balance
      */
-    public double getUserBalance(UUID userId) {
-        Account account = getOrCreateAccount(userId);
-        return account.getBalance();
+    public double getUserTotalFined(UUID userId) {
+        
+    	Account account = getOrCreateAccount(userId);
+        return account.getTotalFines();
     }
 
     /**
@@ -89,32 +91,10 @@ public class AccountService {
      * @param userId the user ID
      * @return the account status
      */
-    public Account.AccountStatus getUserAccountStatus(UUID userId) {
-        Account account = getOrCreateAccount(userId);
+    public AccountStatus getUserAccountStatus(UUID userId) {
+        
+    	Account account = getOrCreateAccount(userId);
         return account.getStatus();
-    }
-
-    /**
-     * Sets the maximum number of items a user can borrow.
-     *
-     * @param userId   the user ID
-     * @param maxLimit the maximum borrow limit
-     */
-    public void setUserBorrowLimit(UUID userId, int maxLimit) {
-        Account account = getOrCreateAccount(userId);
-        account.setMaxBorrowLimit(maxLimit);
-        accountRepo.update(account);
-    }
-
-    /**
-     * Gets the current number of items borrowed by the user.
-     *
-     * @param userId the user ID
-     * @return the count of currently borrowed items
-     */
-    public int getUserCurrentBorrowedCount(UUID userId) {
-        Account account = getOrCreateAccount(userId);
-        return account.getCurrentBorrowedCount();
     }
 
     /**

@@ -4,14 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.domain.Book;
-import lms.domain.BookRepo;
-import lms.domain.User;
-import lms.domain.UserRepo;
-import lms.domain.exception.BookNotAvailableException;
-import lms.domain.exception.BookNotFoundException;
-import lms.domain.exception.BorrowNotAllowedException;
+import lms.domain.BookRepository;
+import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
-import lms.domain.exception.UserNotFoundException;
 
 /**
  * Application service for coordinating book management use cases.
@@ -24,7 +19,7 @@ import lms.domain.exception.UserNotFoundException;
  * <li>Enforcing authorization rules (e.g., only admins can add books).</li>
  * <li>Delegating book creation to the {@link Book} domain entity, which
  * encapsulates its own validation rules.</li>
- * <li>Interacting with a {@link BookRepo} to persist or retrieve books.</li>
+ * <li>Interacting with a {@link BookRepository} to persist or retrieve books.</li>
  * </ul>
  *
  * <p>
@@ -44,8 +39,8 @@ import lms.domain.exception.UserNotFoundException;
 
 public class BookService {
 
-	private final BookRepo bookRepo;
-	private final UserRepo userRepo;
+	private final BookRepository bookRepo;
+	private final UserRepository userRepo;
 
 	private BookService() {
 		// Prevent instantiation without dependencies
@@ -59,7 +54,7 @@ public class BookService {
 	 * @param bookRepo the repository used for persisting and retrieving books
 	 */
 
-	public BookService(BookRepo bookRepo, UserRepo userService) {
+	public BookService(BookRepository bookRepo, UserRepository userService) {
 		this.bookRepo = bookRepo;
 		this.userRepo = userService;
 	}
@@ -73,7 +68,7 @@ public class BookService {
 	 * <ol>
 	 * <li>Verifies that the given user is an administrator.</li>
 	 * <li>Constructs a {@link Book}, which performs its own validation.</li>
-	 * <li>Attempts to persist the book using {@link BookRepo}.</li>
+	 * <li>Attempts to persist the book using {@link BookRepository}.</li>
 	 * </ol>
 	 *
 	 * @param userDTO         the user attempting the action (must be admin)
@@ -117,23 +112,6 @@ public class BookService {
 
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
-	}
-
-	public boolean borrowBook(UserDTO userDTO, UUID bookID) throws IllegalStateException, BorrowNotAllowedException, UserNotFoundException, BookNotAvailableException, BookNotFoundException {
-				
-		User user = userRepo.getUserByID(userDTO.userID())
-	            .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userDTO.userID()));
-		
-        Book book = bookRepo.getBookById(bookID)
-                .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + bookID));
-
-        user.borrowBook(book);
-        
-        userRepo.updateUser(user);
-        bookRepo.updateBook(book);
-
-        return true;
-        
 	}
 
 	private boolean isAvailableBook(UUID bookID) {

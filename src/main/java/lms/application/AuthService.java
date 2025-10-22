@@ -1,7 +1,7 @@
 package lms.application;
 
 import lms.domain.User;
-import lms.domain.UserRepo;
+import lms.domain.UserRepository;
 import lms.domain.exception.InvalidPasswordException;
 import lms.domain.exception.UserNotFoundException;
 
@@ -12,7 +12,7 @@ import lms.domain.exception.UserNotFoundException;
  * <p>
  * The {@code AuthService} is responsible for managing login, logout, and
  * retrieving the currently authenticated user. It coordinates with the
- * {@link UserRepo} from the domain layer to validate credentials and maintain
+ * {@link UserRepository} from the domain layer to validate credentials and maintain
  * the session state.
  * </p>
  *
@@ -59,7 +59,7 @@ import lms.domain.exception.UserNotFoundException;
 public class AuthService {
 
 	/** Repository used to access and manage users */
-	private final UserRepo userRepo;
+	private final UserRepository userRepo;
 
 	/** Currently logged-in user, or null if no user is logged in */
 	private static UserDTO currentUser;
@@ -70,7 +70,7 @@ public class AuthService {
 	 * @param userRepo the repository used to retrieve user data
 	 */
 
-	public AuthService(UserRepo userRepo) {
+	public AuthService(UserRepository userRepo) {
 		this.userRepo = userRepo;
 		
 	}
@@ -88,7 +88,7 @@ public class AuthService {
 
 	public boolean login(String userName, String rawPassword) throws UserNotFoundException, InvalidPasswordException {
 
-		User user = userRepo.getUserByUserName(userName)
+		User user = userRepo.getByUserName(userName)
 				.orElseThrow(() -> new UserNotFoundException("User '" + userName + "' does not exist."));
 
 		if (!user.verifyPassword(rawPassword)) {

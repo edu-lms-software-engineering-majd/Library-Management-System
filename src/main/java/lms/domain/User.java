@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.application.UserDTO;
-import lms.domain.exception.BookNotAvailableException;
-import lms.domain.exception.BorrowNotAllowedException;
 import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
 
@@ -86,16 +84,16 @@ public class User {
 	private Role role;
 
 	/** List of items the user has borrowed */
-	private List<UUID> loans;
+	private List<Loan> loans;
 
 	/** User's financial account for fines and payments */
 	private Account account;
 
 	private static final int MAX_BORROW_LIMIT = 10;
 	
-	private List<Notification> newNotifications;
+	private List<Notification> unreadNotifications;
 	
-	private List<Notification> oldNotifications;
+	private List<Notification> readNotifications;
 
 	/**
 	 * Constructs a new user with the given personal details, hashed password, and
@@ -127,7 +125,7 @@ public class User {
 
 
 		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
-		this.account = new Account();
+		this.account = new Account(this.userID);
 
 	}
 
@@ -146,7 +144,7 @@ public class User {
 	 */
 
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role,
-			List<UUID> loans, Account account) {
+			List<Loan> loans, Account account) {
 		this(firstName, lastName, email, username, hashedPassword, role);
 		this.loans = loans;
 		this.account = account;
@@ -213,29 +211,57 @@ public class User {
 	 */
 
 	public void changeEmail(String newEmail) {
+		
 		if (newEmail == null || !newEmail.contains("@")) {
 			throw new IllegalArgumentException("Invalid email");
 		}
+		
 		this.email = newEmail;
 	}
+	
+	public boolean hasFine() {
 
-	public void borrowBook(Book book) throws BorrowNotAllowedException, BookNotAvailableException, IllegalStateException {
-
-		if (loans.size() >= MAX_BORROW_LIMIT) {
-			throw new BorrowNotAllowedException("Borrow limit reached for user: " + username);
-		}
-		
-		if(!canBorrow()) {
-			throw new BorrowNotAllowedException("User " + this.userID + " cannot borrow more books.");
-		}
-
-		if (!book.isAvailable()) {
-			throw new BookNotAvailableException("Book " + book.getTitle() + " is not available.");
-		}
-
-		loans.add(book.getBookId());
-		book.decreaseAvailableCopies();
+		return 
+				account.getTotalFines() > 0;
 	}
+
+	public boolean canBorrow() {
+
+		return 
+				loans.size() < MAX_BORROW_LIMIT && !hasFine();
+	}
+
+	public void addLoan(Loan loan) {
+		
+		this.loans.add(loan);
+		
+	}
+
+	public void removeLoan(Loan loan) {
+		
+		this.loans.remove(loan);
+	}
+	
+    /**
+     * Adds a new unread notification to the user.
+     * 
+     * @param notification the notification to add
+     */
+    public void addNotification(Notification notification) {
+        this.unreadNotifications.add(notification);
+    }
+    
+    /**
+     * Marks a notification as read by moving it from unread to read list.
+     * 
+     * @param notification the notification to mark as read
+     */
+    public void markAsRead(Notification notification) {
+        if (unreadNotifications.remove(notification)) {
+            readNotifications.add(notification);
+        }
+    }
+
 
 	/** @return the user's first name */
 	public String getFirstName() {
@@ -283,7 +309,7 @@ public class User {
 	}
 
 	/** @return an unmodifiable list of user's loans */
-	public List<UUID> getLoans() {
+	public List<Loan> getLoans() {
 		return Collections.unmodifiableList(loans);
 	}
 
@@ -296,14 +322,16 @@ public class User {
 	public Role getRole() {
 		return role;
 	}
-
-	public boolean hasFine() {
-
-		return (account.getTotalFine() != 0);
+	
+	public Account getAccount() {
+		return account;
 	}
-
-	public boolean canBorrow() {
-
-		return (account.getTotalFine() != 0);
-	}
+	
+	public List<Notification> getUnreadNotifications() {
+        return Collections.unmodifiableList(unreadNotifications);
+    }
+    
+    public List<Notification> getReadNotifications() {
+        return Collections.unmodifiableList(readNotifications);
+    }
 }
