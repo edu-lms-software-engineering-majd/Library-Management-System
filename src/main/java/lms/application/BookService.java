@@ -1,9 +1,11 @@
 package lms.application;
 
 import java.util.List;
+import java.util.UUID;
 
 import lms.domain.Book;
-import lms.domain.BookRepo;
+import lms.domain.BookRepository;
+import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
 
 /**
@@ -17,7 +19,8 @@ import lms.domain.exception.PermissionDeniedException;
  * <li>Enforcing authorization rules (e.g., only admins can add books).</li>
  * <li>Delegating book creation to the {@link Book} domain entity, which
  * encapsulates its own validation rules.</li>
- * <li>Interacting with a {@link BookRepo} to persist or retrieve books.</li>
+ * <li>Interacting with a {@link BookRepository} to persist or retrieve
+ * books.</li>
  * </ul>
  *
  * <p>
@@ -37,7 +40,14 @@ import lms.domain.exception.PermissionDeniedException;
 
 public class BookService {
 
-	private final BookRepo bookRepo;
+	private final BookRepository bookRepo;
+	private final UserRepository userRepo;
+
+	private BookService() {
+		// Prevent instantiation without dependencies
+		bookRepo = null;
+		userRepo = null;
+	}
 
 	/**
 	 * Creates a new {@code BookService} with the given repository.
@@ -45,8 +55,9 @@ public class BookService {
 	 * @param bookRepo the repository used for persisting and retrieving books
 	 */
 
-	public BookService(BookRepo bookRepo) {
+	public BookService(BookRepository bookRepo, UserRepository userService) {
 		this.bookRepo = bookRepo;
+		this.userRepo = userService;
 	}
 
 	/**
@@ -58,7 +69,7 @@ public class BookService {
 	 * <ol>
 	 * <li>Verifies that the given user is an administrator.</li>
 	 * <li>Constructs a {@link Book}, which performs its own validation.</li>
-	 * <li>Attempts to persist the book using {@link BookRepo}.</li>
+	 * <li>Attempts to persist the book using {@link BookRepository}.</li>
 	 * </ol>
 	 *
 	 * @param userDTO         the user attempting the action (must be admin)
@@ -102,5 +113,15 @@ public class BookService {
 
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
+	}
+
+	private boolean isAvailableBook(UUID bookID) {
+
+		return bookRepo.getBookById(bookID).get().getAvailableCopies() > 0;
+	}
+
+	public boolean isValidBook(UUID bookID) {
+
+		return this.bookRepo.getBookById(bookID).isPresent();
 	}
 }

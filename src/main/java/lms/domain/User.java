@@ -89,6 +89,12 @@ public class User {
 	/** User's financial account for fines and payments */
 	private Account account;
 
+	private static final int MAX_BORROW_LIMIT = 10;
+	
+	private List<Notification> unreadNotifications;
+	
+	private List<Notification> readNotifications;
+
 	/**
 	 * Constructs a new user with the given personal details, hashed password, and
 	 * role.
@@ -117,7 +123,10 @@ public class User {
 		this.registrationDate = LocalDate.now();
 		this.userID = UUID.randomUUID();
 
-		this.loans = new ArrayList<>();
+ 
+
+		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
+ 
 		this.account = new Account(this.userID);
 
 	}
@@ -204,11 +213,57 @@ public class User {
 	 */
 
 	public void changeEmail(String newEmail) {
+		
 		if (newEmail == null || !newEmail.contains("@")) {
 			throw new IllegalArgumentException("Invalid email");
 		}
+		
 		this.email = newEmail;
 	}
+	
+	public boolean hasFine() {
+
+		return 
+				account.getTotalFines() > 0;
+	}
+
+	public boolean canBorrow() {
+
+		return 
+				loans.size() < MAX_BORROW_LIMIT && !hasFine();
+	}
+
+	public void addLoan(Loan loan) {
+		
+		this.loans.add(loan);
+		
+	}
+
+	public void removeLoan(Loan loan) {
+		
+		this.loans.remove(loan);
+	}
+	
+    /**
+     * Adds a new unread notification to the user.
+     * 
+     * @param notification the notification to add
+     */
+    public void addNotification(Notification notification) {
+        this.unreadNotifications.add(notification);
+    }
+    
+    /**
+     * Marks a notification as read by moving it from unread to read list.
+     * 
+     * @param notification the notification to mark as read
+     */
+    public void markAsRead(Notification notification) {
+        if (unreadNotifications.remove(notification)) {
+            readNotifications.add(notification);
+        }
+    }
+
 
 	/** @return the user's first name */
 	public String getFirstName() {
@@ -269,4 +324,16 @@ public class User {
 	public Role getRole() {
 		return role;
 	}
+	
+	public Account getAccount() {
+		return account;
+	}
+	
+	public List<Notification> getUnreadNotifications() {
+        return Collections.unmodifiableList(unreadNotifications);
+    }
+    
+    public List<Notification> getReadNotifications() {
+        return Collections.unmodifiableList(readNotifications);
+    }
 }

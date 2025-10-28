@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import lms.domain.Role;
 import lms.domain.User;
-import lms.domain.UserRepo;
+import lms.domain.UserRepository;
 import lms.domain.exception.UserNotFoundException;
 
 /**
@@ -49,15 +49,15 @@ import lms.domain.exception.UserNotFoundException;
 public class UserService {
 
 	/** Repository used for accessing and managing users */
-	private final UserRepo userRepo;
+	private final UserRepository userRepo;
 
 	/**
-	 * Constructs a {@code UserService} with the given {@link UserRepo}.
+	 * Constructs a {@code UserService} with the given {@link UserRepository}.
 	 *
 	 * @param userRepo the repository used for persisting and retrieving users
 	 */
 
-	public UserService(UserRepo userRepo) {
+	public UserService(UserRepository userRepo) {
 		this.userRepo = userRepo;
 	}
 
@@ -124,7 +124,7 @@ public class UserService {
 		if (currentUser.role() != Role.ADMIN || currentUser.userID() != userID)
 			throw new IllegalAccessException("You are not allowed to update this user");
 
-		Optional<User> userOptional = userRepo.getUserByID(userID);
+		Optional<User> userOptional = userRepo.getByID(userID);
 		if (userOptional.isEmpty()) {
 			throw new UserNotFoundException("No such user with this username");
 		}
@@ -140,22 +140,23 @@ public class UserService {
 		if (newRole != null)
 			user.changeRole(newRole);
 
-		return userRepo.updateUser(user);
+		return userRepo.update(user);
 	}
 
 	public boolean deleteUserByUsername(String username) throws UserNotFoundException {
-		userRepo.deleteUser(username);
-		return false;
+ 
+		return 
+				userRepo.delete(username);
 
-		/*
-		 * التصحيح بس بدي اتاكد من مجد public boolean deleteUserByUsername(String
-		 * username) throws UserNotFoundException { return
-		 * userRepo.deleteUser(username);
-		 * المفروض يا مجد  لازم يرجع اسم امستخدم مش فولس
-		 * 
-		 * 
-		 * 
-		 */
+	}
+
+	public boolean canBorrow(UUID userID) throws UserNotFoundException {
+
+		User user = userRepo.getByID(userID)
+				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
+
+		return user.canBorrow();
+ 
 	}
 
 }

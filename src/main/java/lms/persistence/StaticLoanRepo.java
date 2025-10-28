@@ -1,9 +1,15 @@
 package lms.persistence;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lms.domain.Loan;
 import lms.domain.LoanRepo;
-import java.util.*;
-import java.util.stream.Collectors;
 
  
 public class StaticLoanRepo implements LoanRepo {
@@ -24,7 +30,7 @@ public class StaticLoanRepo implements LoanRepo {
     @Override
     public List<Loan> findActiveLoansByUser(UUID userId) {
         return loans.values().stream()
-            .filter(loan -> loan.getUserId().equals(userId) && !loan.isReturned())
+				.filter(loan -> loan.getUserId().equals(userId) && !loan.isReturned())
             .collect(Collectors.toList());
     }
     

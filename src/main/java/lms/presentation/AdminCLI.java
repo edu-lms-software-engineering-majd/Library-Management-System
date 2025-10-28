@@ -97,7 +97,7 @@ public class AdminCLI implements CLI {
 
 			switch (choice) {
 			case "1":
-				handleAddBook();
+				handleAddItem();
 				break;
 			case "2":
 				handleViewAllBooks();
@@ -136,6 +136,36 @@ public class AdminCLI implements CLI {
 				System.out.println("Invalid choice, try again.");
 			}
 		}
+	}
+
+	private void handleAddItem() {
+
+		System.out.println("Choose the Type of Item you Wanna Add");
+		showItemsMenu();
+		String choice = scanner.nextLine().trim();
+
+		switch (choice) {
+		case "1":
+			handleAddBook();
+			break;
+		case "2":
+			handleAddCD();
+			break;
+		case "3":
+			handleAddJuernal();
+			return;
+		default:
+			System.out.println("Invalid choice!");
+		}
+	}
+
+	private void showItemsMenu() {
+		System.out.println("\n===== Items Menu =====");
+		System.out.println("1. Book");
+		System.out.println("2. CD");
+		System.out.println("3. Jeurnal");
+		System.out.print("Choose an option: ");
+
 	}
 
 	private void handleDeleteUser() {
@@ -201,72 +231,64 @@ public class AdminCLI implements CLI {
 	 * Handles loan management operations for administrators.
 	 */
 	private void handleLoanManagement() {
-	    System.out.println("\n===== Loan Management =====");
-	    System.out.println("1. View Overdue Loans");
-	    System.out.println("2. View Loan Statistics");
-	    System.out.println("3. Back to Main Menu");
-	    System.out.print("Choose an option: ");
+		System.out.println("\n===== Loan Management =====");
+		System.out.println("1. View Overdue Loans");
+		System.out.println("2. View Loan Statistics");
+		System.out.println("3. Back to Main Menu");
+		System.out.print("Choose an option: ");
 
-	    String choice = scanner.nextLine().trim();
-	    switch (choice) {
-	        case "1":
-	            handleViewOverdueLoans();
-	            break;
-	        case "2":
-	            handleViewLoanStats();
-	            break;
-	        case "3":
-	            return;
-	        default:
-	            System.out.println("Invalid choice!");
-	    }
+		String choice = scanner.nextLine().trim();
+		switch (choice) {
+		case "1":
+			handleViewOverdueLoans();
+			break;
+		case "2":
+			handleViewLoanStats();
+			break;
+		case "3":
+			return;
+		default:
+			System.out.println("Invalid choice!");
+		}
 	}
 
-	
+	/**
+	 * Displays comprehensive loan statistics.
+	 */
+	private void handleViewLoanStats() {
+		System.out.println("\n===== Loan Statistics =====");
+		int[] stats = loanService.getLoanStatistics();
+		System.out.println("Total Loans: " + stats[0]);
+		System.out.println("Active Loans: " + stats[1]);
+		System.out.println("Overdue Loans: " + stats[2]);
+		System.out.println("Overdue Rate: " + String.format("%.1f%%", (stats[2] * 100.0 / stats[0])));
+	}
 
-/**
- * Displays comprehensive loan statistics.
- */
-private void handleViewLoanStats() {
-    System.out.println("\n===== Loan Statistics =====");
-    int[] stats = loanService.getLoanStatistics();
-    System.out.println("Total Loans: " + stats[0]);
-    System.out.println("Active Loans: " + stats[1]);
-    System.out.println("Overdue Loans: " + stats[2]);
-    System.out.println("Overdue Rate: " + String.format("%.1f%%", (stats[2] * 100.0 / stats[0])));
-}
-
-	
-	
-	
 	/**
 	 * Displays all overdue loans in the system.
 	 */
 	private void handleViewOverdueLoans() {
-	    System.out.println("\n===== Overdue Loans =====");
-	    var overdueLoans = loanService.getOverdueLoans();
-	    
-	    if (overdueLoans.isEmpty()) {
-	        System.out.println("No overdue loans found.");
-	        return;
-	    }
+		System.out.println("\n===== Overdue Loans =====");
+		var overdueLoans = loanService.getOverdueLoans();
 
-	    System.out.printf("%-10s %-15s %-15s %-12s %-8s %-10s\n", 
-	        "Loan ID", "User ID", "Book ID", "Due Date", "Days Late", "Fine");
-	    
-	    for (var loan : overdueLoans) {
-	        System.out.printf("%-10s %-15s %-15s %-12s %-8d %-10.2f\n",
-	            loan.getLoanId().toString().substring(0, 8),
-	            loan.getUserId().toString().substring(0, 8),
-	            loan.getBookId().toString().substring(0, 8),
-	            loan.getDueDate(),
-	            loan.getOverdueDays(),
-	            loan.calculateFine());
-	    }
+		if (overdueLoans.isEmpty()) {
+			System.out.println("No overdue loans found.");
+			return;
+		}
+
+		System.out.printf("%-10s %-15s %-15s %-12s %-8s %-10s\n", "Loan ID", "User ID", "Book ID", "Due Date",
+				"Days Late", "Fine");
+
+		for (var loan : overdueLoans) {
+			System.out.printf("%-10s %-15s %-15s %-12s %-8d %-10.2f\n", loan.getLoanId().toString().substring(0, 8),
+					loan.getUserId().toString().substring(0, 8),
+
+					loan.getItemId().toString().substring(0, 8), loan.getDueDate(), loan.getDaysOverdue(),
+
+					loan.calculateFine());
+		}
 	}
 
-	
-	
 	/** Handles the process of adding a book via {@link BookService}. */
 	private void handleAddBook() {
 		try {
@@ -304,11 +326,6 @@ private void handleViewLoanStats() {
 			System.out.print("Enter shelf location: ");
 			String shelfLocation = scanner.nextLine().trim();
 
-			// Create the book object
-			// Book book = new Book(title, author, isbn, publisher, year, category,
-			// totalCopies, language, description, shelfLocation);
-
-			// Add to repository (replace with your actual BookService or BookRepo)
 			Book book = bookService.addBook(AuthService.getCurrentUser(), title, author, isbn, publisher, year,
 					category, totalCopies, language, shelfLocation);
 
@@ -368,27 +385,29 @@ private void handleViewLoanStats() {
 	 * to the console.
 	 */
 	private void handleViewReports() {
-		/*// TODO: write the implementation of this method
-	 	System.out.println("Reports: (simulation)");
-		 System.out.println("Total Books: 100");
-		 System.out.println("Total Users: 25");*/
-		
+		/*
+		 * // TODO: write the implementation of this method
+		 * System.out.println("Reports: (simulation)");
+		 * System.out.println("Total Books: 100");
+		 * System.out.println("Total Users: 25");
+		 */
+
 		System.out.println("\n===== System Reports =====");
-	    int[] loanStats = loanService.getLoanStatistics();
-	    List<Book> books = bookService.getAllBooks();
-	    List<UserDTO> users = userService.getAllUsers();
-	    
-	    System.out.println("Library Statistics:");
-	    System.out.println("Total Books: " + books.size());
-	    System.out.println("Total Users: " + users.size());
-	    System.out.println("Total Loans: " + loanStats[0]);
-	    System.out.println("Active Loans: " + loanStats[1]);
-	    System.out.println("Overdue Loans: " + loanStats[2]);
-	    System.out.println("Overdue Rate: " + String.format("%.1f%%", (loanStats[2] * 100.0 / loanStats[0])));
-	    
-	    // Calculate available books
-	    long availableBooks = books.stream().filter(book -> book.getAvailableCopies() > 0).count();
-	    System.out.println("Available Books: " + availableBooks + "/" + books.size());
+		int[] loanStats = loanService.getLoanStatistics();
+		List<Book> books = bookService.getAllBooks();
+		List<UserDTO> users = userService.getAllUsers();
+
+		System.out.println("Library Statistics:");
+		System.out.println("Total Books: " + books.size());
+		System.out.println("Total Users: " + users.size());
+		System.out.println("Total Loans: " + loanStats[0]);
+		System.out.println("Active Loans: " + loanStats[1]);
+		System.out.println("Overdue Loans: " + loanStats[2]);
+		System.out.println("Overdue Rate: " + String.format("%.1f%%", (loanStats[2] * 100.0 / loanStats[0])));
+
+		// Calculate available books
+		long availableBooks = books.stream().filter(book -> book.getAvailableCopies() > 0).count();
+		System.out.println("Available Books: " + availableBooks + "/" + books.size());
 	}
 
 	/** Displays all users retrieved from {@link UserService}. */
@@ -473,10 +492,5 @@ private void handleViewLoanStats() {
 		}
 
 	}
-	
-	
-	
-	
-	
 
 }

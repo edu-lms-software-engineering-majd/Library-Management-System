@@ -8,11 +8,12 @@ import java.util.UUID;
 
 import lms.domain.Role;
 import lms.domain.User;
-import lms.domain.UserRepo;
+import lms.domain.UserRepository;
 import lms.domain.utils.PasswordUtils;
 
 /**
- * In-memory implementation of {@link UserRepo} for testing and simple usage.
+ * In-memory implementation of {@link UserRepository} for testing and simple
+ * usage.
  * 
  * <p>
  * This repository stores users in a static list and provides basic CRUD
@@ -35,21 +36,29 @@ import lms.domain.utils.PasswordUtils;
  * @author Majd
  * @version 1.1
  */
-public class StaticUserRepo implements UserRepo {
+
+public class StaticUserRepository implements UserRepository {
+
+	private static StaticUserRepository instance = null;
 
 	/** Internal list storing all users */
 	private static final List<User> users = new ArrayList<>();
 
 	// 🔹 Initialize with demo users
 	static {
-		users.add(new User("Admin", "System", "admin@test.com", "admin", PasswordUtils.hashPassword("admi123"),
-				Role.ADMIN));
-
-		users.add(new User("John", "Doe", "user@test.com", "user", PasswordUtils.hashPassword("user123"),
-				Role.LIBRARIAN));
-
 		users.add(new User("Majd", "Awwad", "majdawwad@gmail.com", "majd04", PasswordUtils.hashPassword("majd123"),
 				Role.ADMIN));
+
+		users.add(new User("Ahmad", "Salameh", "ahmadsalameh@gmail.com", "ahmad04",
+				PasswordUtils.hashPassword("ahmad123"), Role.LIBRARIAN));
+
+	}
+
+	public static StaticUserRepository getInstance() {
+		if (instance == null) {
+			instance = new StaticUserRepository();
+		}
+		return instance;
 	}
 
 	/**
@@ -71,7 +80,9 @@ public class StaticUserRepo implements UserRepo {
 	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
 	@Override
-	public Optional<User> getUserByUserName(String userName) {
+
+	public Optional<User> getByUserName(String userName) {
+
 		Optional<User> user = users.stream().filter(u -> u.getUsername().equalsIgnoreCase(userName)).findFirst();
 		return user;
 	}
@@ -84,7 +95,9 @@ public class StaticUserRepo implements UserRepo {
 	 *         exists
 	 */
 	@Override
-	public boolean addUser(User user) {
+
+	public boolean add(User user) {
+
 		if (isExist(user.getUsername())) {
 			return false;
 		}
@@ -99,7 +112,8 @@ public class StaticUserRepo implements UserRepo {
 	 *         exist
 	 */
 	@Override
-	public boolean updateUser(User updatedUser) {
+
+	public boolean update(User updatedUser) {
 
 		for (int i = 0; i < users.size(); i++) {
 
@@ -120,7 +134,8 @@ public class StaticUserRepo implements UserRepo {
 	 *         found
 	 */
 	@Override
-	public boolean deleteUser(String userName) {
+
+	public boolean delete(String userName) {
 
 		return users.removeIf(u -> u.getUsername().equalsIgnoreCase(userName));
 	}
@@ -144,7 +159,8 @@ public class StaticUserRepo implements UserRepo {
 	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
 	@Override
-	public Optional<User> getUserByID(UUID userID) {
+
+	public Optional<User> getByID(UUID userID) {
 
 		return Optional.of(users.stream().filter(u -> u.getUserID().equals(userID)).findFirst().orElse(null));
 	}

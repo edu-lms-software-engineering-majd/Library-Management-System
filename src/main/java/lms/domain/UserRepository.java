@@ -23,7 +23,7 @@ import lms.domain.exception.UserNotFoundException;
  * @author Majd Awwad
  * @version 1.1
  */
-public interface UserRepo {
+public interface UserRepository {
 
 	/**
 	 * Checks whether a user with the given username exists.
@@ -32,6 +32,7 @@ public interface UserRepo {
 	 * @return {@code true} if a user with the username exists, {@code false}
 	 *         otherwise
 	 */
+	
 	boolean isExist(String userName);
 
 	/**
@@ -41,7 +42,7 @@ public interface UserRepo {
 	 * @return An {@code Optional} containing the {@link User} object if found, or
 	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
-	Optional<User> getUserByUserName(String userName);
+	Optional<User> getByUserName(String userName);
 
 	/**
 	 * Adds a new user to the repository.
@@ -50,7 +51,7 @@ public interface UserRepo {
 	 * @return {@code true} if the user was added successfully, {@code false}
 	 *         otherwise
 	 */
-	boolean addUser(User user);
+	boolean add(User user);
 
 	/**
 	 * Updates an existing user in the repository.
@@ -59,7 +60,7 @@ public interface UserRepo {
 	 * @return {@code true} if the update was successful, {@code false} if the user
 	 *         does not exist
 	 */
-	boolean updateUser(User user);
+	boolean update(User user);
 
 	/**
 	 * Deletes a user from the repository by their username.
@@ -69,7 +70,7 @@ public interface UserRepo {
 	 *         was not found
 	 * @throws {@link UserNotFoundException} if the username is not exist.
 	 */
-	boolean deleteUser(String userName) throws UserNotFoundException;
+	boolean delete(String userName) throws UserNotFoundException;
 
 	/**
 	 * Retrieves a user by their unique identifier.
@@ -78,7 +79,7 @@ public interface UserRepo {
 	 * @return An {@code Optional} containing the {@link User} object if found, or
 	 *         an empty {@code Optional} if no user with the given ID exists.
 	 */
-	Optional<User> getUserByID(UUID userID);
+	Optional<User> getByID(UUID userID);
 
 	/**
 	 * Returns a list of all users in the repository. Implementations may return an

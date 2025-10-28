@@ -20,7 +20,7 @@ import java.util.UUID;
  * @author Majd Awwad
  * @version 1.0
  */
-public class Book {
+public class Book implements LoanableItem {
 	private final UUID bookId;
 	private String title;
 	private String author;
@@ -75,7 +75,9 @@ public class Book {
 		}
 
 		if (category == null || category.isBlank()) {
-			throw new IllegalArgumentException("Book category cannot be empty");// the new updet category
+ 
+			throw new IllegalArgumentException("Book category cannot be empty");
+ 
 		}
 
 		if (totalCopies < 0) {
@@ -86,7 +88,9 @@ public class Book {
 		}
 
 		if (shelfLocation == null || shelfLocation.isBlank()) {
-			throw new IllegalArgumentException("Book shelf location cannot be empty");// the new updet shelf
+ 
+			throw new IllegalArgumentException("Book shelf location cannot be empty");
+ 
 		}
 
 		this.title = title;
@@ -121,10 +125,34 @@ public class Book {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);
 		this.description = description;
 	}
-
-	/** @return the unique identifier of the book */
-	public UUID getBookId() {
+	
+	public boolean isAvailable() {
+        
+		return availableCopies > 0;
+    }
+	
+	@Override
+	public UUID getId() {
 		return bookId;
+	}
+	
+	@Override
+	public void decrementAvailableCopies() throws IllegalStateException {
+		
+		if (availableCopies <= 0)
+            throw new IllegalStateException("No copies available to borrow.");
+		
+        availableCopies--;
+	}
+
+	@Override
+	public void incrementAvailableCopies() {
+		
+		if (availableCopies >= getTotalCopies())
+            throw new IllegalStateException("You Already Have All Copies of this Book");
+		
+        availableCopies++;
+		
 	}
 
 	/** @return the title of the book */
