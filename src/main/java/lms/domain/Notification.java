@@ -54,6 +54,10 @@ public class Notification {
 	public UUID getSenderID() {
 		return senderID;
 	}
+
+	public NotificationType getType() {
+		return type;
+	}
 	
 	
 	

@@ -101,7 +101,7 @@ class BookTest {
 	void testValidBookCreation() {
 		Book book = new Book("Java", "Author", "123", "Pub", 2020, "Programming", 5, "English", "A1");
 
-		assertNotNull(book.getBookId());
+		assertNotNull(book.getId());
 		assertEquals("Java", book.getTitle());
 		assertEquals("Author", book.getAuthor());
 		assertEquals("123", book.getIsbn());
