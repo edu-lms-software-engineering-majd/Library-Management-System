@@ -41,6 +41,7 @@ public class CDService {
 	private final CDRepository cdRepo;
 	private final UserRepository userRepo;
 
+	@SuppressWarnings("unused")
 	private CDService() {
 		cdRepo = null;
 		userRepo = null;
@@ -135,7 +136,6 @@ public class CDService {
 		CD cd = cdRepo.getCDById(cdId)
 				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		// Update fields if provided (CD class validates the values)
 		if (newTitle != null && !newTitle.isBlank()) {
 			cd.setTitle(newTitle);
 		}
