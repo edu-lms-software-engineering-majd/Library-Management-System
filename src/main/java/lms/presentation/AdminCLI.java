@@ -61,6 +61,7 @@ public class AdminCLI implements CLI {
 	private final AuthService authService;
 	private final LoanService loanService;
 
+<<<<<<< HEAD
 	/**
 	 * Creates a new admin CLI.
 	 *
@@ -158,7 +159,37 @@ public class AdminCLI implements CLI {
             System.out.println("Invalid choice!");
     }
 	}
+||||||| 7160386
+    /**
+     * Creates a new admin CLI.
+     *
+     * @param userService service for managing users
+     * @param bookService service for managing books
+     * @param authService service for authentication and authorization
+     */
+    public AdminCLI(UserService userService, BookService bookService, AuthService authService) {
+        this.userService = userService;
+        this.bookService = bookService;
+        this.authService = authService;
+    }
+=======
+	/**
+	 * Creates a new admin CLI.
+	 *
+	 * @param userService service for managing users
+	 * @param bookService service for managing books
+	 * @param authService service for authentication and authorization
+	 */
+	public AdminCLI(UserService userService, BookService bookService, AuthService authService,
+			LoanService loanService) {
+		this.userService = userService;
+		this.bookService = bookService;
+		this.authService = authService;
+		this.loanService = loanService;
+	}
+>>>>>>> ahmad-salameh
 
+<<<<<<< HEAD
 	private void showItemsMenu() {
 	    System.out.println("\n===== Items Menu =====");
 	    System.out.println("1. Book");
@@ -166,6 +197,200 @@ public class AdminCLI implements CLI {
 	    System.out.println("3. Jeurnal");
 	    System.out.print("Choose an option: ");
 		
+	}
+||||||| 7160386
+    /**
+     * Starts the admin menu loop.
+     * <p>
+     * Displays the menu, handles user input, and executes actions until the admin
+     * chooses to log out. Access is restricted to users with {@link Role#ADMIN}.
+     * </p>
+     *
+     * @throws IllegalAccessException if a non-admin tries to start the CLI
+     */
+    public void start() throws IllegalAccessException {
+        if (AuthService.getCurrentUser().role() != Role.ADMIN) {
+            throw new IllegalAccessException("Only administrators can access this menu.");
+        }
+=======
+	/**
+	 * Starts the admin menu loop.
+	 * <p>
+	 * Displays the menu, handles user input, and executes actions until the admin
+	 * chooses to log out. Access is restricted to users with {@link Role#ADMIN}.
+	 * </p>
+	 *
+	 * @throws IllegalAccessException if a non-admin tries to start the CLI
+	 */
+	public void start() throws IllegalAccessException {
+		if (AuthService.getCurrentUser().role() != Role.ADMIN) {
+			throw new IllegalAccessException("Only administrators can access this menu.");
+		}
+>>>>>>> ahmad-salameh
+
+<<<<<<< HEAD
+	private void handleDeleteUser() {
+		System.out.print("Enter the username of the user to delete: ");
+		String username = scanner.nextLine().trim();
+||||||| 7160386
+        boolean running = true;
+        while (running) {
+            showAdminMenu();
+            String choice = scanner.nextLine().trim();
+=======
+		boolean running = true;
+		while (running) {
+			showAdminMenu();
+			String choice = scanner.nextLine().trim();
+>>>>>>> ahmad-salameh
+
+<<<<<<< HEAD
+		try {
+			UserDTO user = userService.getUserByUsername(username);
+			System.out.println("User found: " + user.username());
+||||||| 7160386
+            switch (choice) {
+                case "1": handleAddBook(); break;
+                case "2": handleViewAllBooks(); break;
+                case "3": handleUpdateBook(); break;
+                case "4": handleDeleteBook(); break;
+                case "5": handleAddUser(); break;
+                case "6": handleViewAllUsers(); break;
+                case "7": handleUpdateUser(); break;
+                case "8": handleDeleteUser(); break;
+                case "9": handleViewReports(); break;
+                case "10":
+                    authService.logout();
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice, try again.");
+            }
+        }
+    }
+=======
+			switch (choice) {
+			case "1":
+				handleAddItem();
+				break;
+			case "2":
+				handleViewAllBooks();
+				break;
+			case "3":
+				handleUpdateBook();
+				break;
+			case "4":
+				handleDeleteBook();
+				break;
+			case "5":
+				handleAddUser();
+				break;
+			case "6":
+				handleViewAllUsers();
+				break;
+			case "7":
+				handleUpdateUser();
+				break;
+			case "8":
+				handleDeleteUser();
+				break;
+			case "9":
+				handleViewReports();
+				break;
+>>>>>>> ahmad-salameh
+
+<<<<<<< HEAD
+			System.out.print("Are you sure you want to delete this user? (y/n): ");
+			String confirmation = scanner.nextLine().trim().toLowerCase();
+||||||| 7160386
+    private void handleDeleteUser() {
+        System.out.print("Enter the username of the user to delete: ");
+        String username = scanner.nextLine().trim();
+=======
+			case "10":
+				handleLoanManagement();
+				break;
+			case "11":
+				authService.logout();
+				running = false;
+				break;
+>>>>>>> ahmad-salameh
+
+<<<<<<< HEAD
+			if ("y".equals(confirmation)) {
+				userService.deleteUserByUsername(user.username()); // new updet
+				System.out.println("✅ User deleted successfully.");
+			} else {
+				System.out.println("❎ Deletion cancelled.");
+			}
+		} catch (UserNotFoundException e) {
+			System.out.println("❌ No user found with username: " + username);
+		} catch (Exception e) {
+			System.out.println("⚠️ An error occurred: " + e.getMessage());
+		}
+	}
+||||||| 7160386
+        try {
+            UserDTO user = userService.getUserByUsername(username);
+
+            System.out.println("User found: ");
+            System.out.println(user);
+
+            System.out.print("Are you sure you want to delete this user? (y/n): ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+
+            if ("y".equals(confirmation)) {
+                boolean deleted = userService.deleteUserByUsername(user.username());
+                if (deleted) {
+                    System.out.println("✅ User deleted successfully.");
+                } else {
+                    System.out.println("⚠️ Failed to delete user (user may not exist anymore).");
+                }
+            } else {
+                System.out.println("❎ Deletion cancelled.");
+            }
+
+        } catch (UserNotFoundException e) {
+            System.out.println("❌ No user found with username: " + username);
+        } catch (Exception e) {
+            System.out.println("⚠️ An error occurred: " + e.getMessage());
+        }
+    }
+=======
+			default:
+				System.out.println("Invalid choice, try again.");
+			}
+		}
+	}
+
+	private void handleAddItem() {
+
+		System.out.println("Choose the Type of Item you Wanna Add");
+		showItemsMenu();
+		String choice = scanner.nextLine().trim();
+
+		switch (choice) {
+		case "1":
+			handleAddBook();
+			break;
+		case "2":
+			handleAddCD();
+			break;
+		case "3":
+			handleAddJuernal();
+			return;
+		default:
+			System.out.println("Invalid choice!");
+		}
+	}
+
+	private void showItemsMenu() {
+		System.out.println("\n===== Items Menu =====");
+		System.out.println("1. Book");
+		System.out.println("2. CD");
+		System.out.println("3. Jeurnal");
+		System.out.print("Choose an option: ");
+
 	}
 
 	private void handleDeleteUser() {
@@ -191,6 +416,7 @@ public class AdminCLI implements CLI {
 			System.out.println("⚠️ An error occurred: " + e.getMessage());
 		}
 	}
+>>>>>>> ahmad-salameh
 
 	private void handleDeleteBook() {
 		// TODO Implement this method
@@ -227,6 +453,7 @@ public class AdminCLI implements CLI {
 		System.out.print("Choose an option: ");
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Handles loan management operations for administrators.
 	 */
@@ -298,6 +525,73 @@ private void handleViewLoanStats() {
 	
 	
 	/** Handles the process of adding a book via {@link BookService}. */
+||||||| 7160386
+	/** Handles the process of adding a book via {@link BookService}.*/
+=======
+	/**
+	 * Handles loan management operations for administrators.
+	 */
+	private void handleLoanManagement() {
+		System.out.println("\n===== Loan Management =====");
+		System.out.println("1. View Overdue Loans");
+		System.out.println("2. View Loan Statistics");
+		System.out.println("3. Back to Main Menu");
+		System.out.print("Choose an option: ");
+
+		String choice = scanner.nextLine().trim();
+		switch (choice) {
+		case "1":
+			handleViewOverdueLoans();
+			break;
+		case "2":
+			handleViewLoanStats();
+			break;
+		case "3":
+			return;
+		default:
+			System.out.println("Invalid choice!");
+		}
+	}
+
+	/**
+	 * Displays comprehensive loan statistics.
+	 */
+	private void handleViewLoanStats() {
+		System.out.println("\n===== Loan Statistics =====");
+		int[] stats = loanService.getLoanStatistics();
+		System.out.println("Total Loans: " + stats[0]);
+		System.out.println("Active Loans: " + stats[1]);
+		System.out.println("Overdue Loans: " + stats[2]);
+		System.out.println("Overdue Rate: " + String.format("%.1f%%", (stats[2] * 100.0 / stats[0])));
+	}
+
+	/**
+	 * Displays all overdue loans in the system.
+	 */
+	private void handleViewOverdueLoans() {
+		System.out.println("\n===== Overdue Loans =====");
+		var overdueLoans = loanService.getOverdueLoans();
+
+		if (overdueLoans.isEmpty()) {
+			System.out.println("No overdue loans found.");
+			return;
+		}
+
+		System.out.printf("%-10s %-15s %-15s %-12s %-8s %-10s\n", "Loan ID", "User ID", "Book ID", "Due Date",
+				"Days Late", "Fine");
+
+		for (var loan : overdueLoans) {
+			System.out.printf("%-10s %-15s %-15s %-12s %-8d %-10.2f\n", loan.getLoanId().toString().substring(0, 8),
+					loan.getUserId().toString().substring(0, 8),
+
+					loan.getItemId().toString().substring(0, 8), loan.getDueDate(), loan.getDaysOverdue(),
+
+					loan.calculateFine());
+		}
+	}
+
+	/** Handles the process of adding a book via {@link BookService}. */
+>>>>>>> ahmad-salameh
 	private void handleAddBook() {
 		try {
 			System.out.println("=== Add a New Book ===");
@@ -393,6 +687,7 @@ private void handleViewLoanStats() {
 	 * to the console.
 	 */
 	private void handleViewReports() {
+<<<<<<< HEAD
 		/*// TODO: write the implementation of this method
 	 	System.out.println("Reports: (simulation)");
 		 System.out.println("Total Books: 100");
@@ -414,6 +709,36 @@ private void handleViewLoanStats() {
 	    // Calculate available books
 	    long availableBooks = books.stream().filter(book -> book.getAvailableCopies() > 0).count();
 	    System.out.println("Available Books: " + availableBooks + "/" + books.size());
+||||||| 7160386
+		// TODO: write the implementation of this method
+		System.out.println("Reports: (simulation)");
+		System.out.println("Total Books: 100");
+		System.out.println("Total Users: 25");
+=======
+		/*
+		 * // TODO: write the implementation of this method
+		 * System.out.println("Reports: (simulation)");
+		 * System.out.println("Total Books: 100");
+		 * System.out.println("Total Users: 25");
+		 */
+
+		System.out.println("\n===== System Reports =====");
+		int[] loanStats = loanService.getLoanStatistics();
+		List<Book> books = bookService.getAllBooks();
+		List<UserDTO> users = userService.getAllUsers();
+
+		System.out.println("Library Statistics:");
+		System.out.println("Total Books: " + books.size());
+		System.out.println("Total Users: " + users.size());
+		System.out.println("Total Loans: " + loanStats[0]);
+		System.out.println("Active Loans: " + loanStats[1]);
+		System.out.println("Overdue Loans: " + loanStats[2]);
+		System.out.println("Overdue Rate: " + String.format("%.1f%%", (loanStats[2] * 100.0 / loanStats[0])));
+
+		// Calculate available books
+		long availableBooks = books.stream().filter(book -> book.getAvailableCopies() > 0).count();
+		System.out.println("Available Books: " + availableBooks + "/" + books.size());
+>>>>>>> ahmad-salameh
 	}
 
 	/** Displays all users retrieved from {@link UserService}. */

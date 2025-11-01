@@ -75,8 +75,9 @@ public class Book implements LoanableItem {
 		}
 
 		if (category == null || category.isBlank()) {
+ 
 			throw new IllegalArgumentException("Book category cannot be empty");
-		}
+ 		}
 
 		if (totalCopies < 0) {
 			throw new IllegalArgumentException("Total copies cannot be negative");

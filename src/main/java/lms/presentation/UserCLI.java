@@ -136,6 +136,7 @@ public class UserCLI implements CLI {
 	        return;
 	    }
 
+<<<<<<< HEAD
 	    displayActiveLoans(activeLoans);
 	}
 	
@@ -146,13 +147,47 @@ public class UserCLI implements CLI {
 		
 	    System.out.println("  No \t\t Book Title \t \t Borrowed \t\t Due Date\t\tStatus");
 	    
+||||||| 7160386
+        // Defensive check
+        if (keyword.isEmpty()) {
+            System.out.println("⚠️ Keyword cannot be empty. Please try again.");
+            return;
+        }
+=======
+	    displayActiveLoans(activeLoans);
+	}
+	
+	
+	private void displayActiveLoans(List<Loan> loans) {
+	 
+ 
+		// TODO : Active Loans Implementation now is Limited To Books, Need re-implementation
+		
+ 
+	    System.out.println("  No \t\t Book Title \t \t Borrowed \t\t Due Date\t\tStatus");
+	    
+>>>>>>> ahmad-salameh
 
+<<<<<<< HEAD
 	    for (int i = 0; i < loans.size(); i++) {
 	        Loan loan = loans.get(i);
 	        Book book = bookService.getAllBooks().stream()
 	                .filter(b -> b.getBookId().equals(loan.getItemId()))
 	                .findFirst()
 	                .orElse(null);
+||||||| 7160386
+        List<Book> allBooks = bookService.getAllBooks();
+        List<Book> results = new ArrayList<>();
+=======
+	    for (int i = 0; i < loans.size(); i++) {
+	        Loan loan = loans.get(i);
+	        Book book = bookService.getAllBooks().stream()
+ 
+	                .filter(b -> b.getBookId().equals(loan.getItemId()))
+ 
+	                .findFirst()
+	                .orElse(null);
+>>>>>>> ahmad-salameh
 
 	        String title = (book != null) ? 
 	                (book.getTitle().length() > 28 ? book.getTitle().substring(0, 25) + "..." : book.getTitle()) 

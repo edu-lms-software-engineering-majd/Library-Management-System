@@ -124,7 +124,7 @@ public class UserService {
 		if (currentUser.role() != Role.ADMIN || currentUser.userID() != userID)
 			throw new IllegalAccessException("You are not allowed to update this user");
 
-		Optional<User> userOptional = userRepo.getUserByID(userID);
+		Optional<User> userOptional = userRepo.getByID(userID);
 		if (userOptional.isEmpty()) {
 			throw new UserNotFoundException("No such user with this username");
 		}
@@ -140,22 +140,21 @@ public class UserService {
 		if (newRole != null)
 			user.changeRole(newRole);
 
-		return userRepo.updateUser(user);
+		return userRepo.update(user);
 	}
 
-	public boolean deleteUserByUsername(String username) throws UserNotFoundException {
-
+	public boolean deleteUserByUsername(String username) throws UserNotFoundException { 
 		return 
-				userRepo.deleteUser(username);
+				userRepo.delete(username);
 
 	}
 
 	public boolean canBorrow(UUID userID) throws UserNotFoundException {
 
-		User user = userRepo.getUserByID(userID)
+		User user = userRepo.getByID(userID)
 				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
 
 		return user.canBorrow();
-	}
+ 	}
 
 }

@@ -19,7 +19,14 @@ import lms.domain.exception.PermissionDeniedException;
  * <li>Enforcing authorization rules (e.g., only admins can add books).</li>
  * <li>Delegating book creation to the {@link Book} domain entity, which
  * encapsulates its own validation rules.</li>
+<<<<<<< HEAD
  * <li>Interacting with a {@link BookRepository} to persist or retrieve books.</li>
+||||||| 7160386
+ * <li>Interacting with a {@link BookRepo} to persist or retrieve books.</li>
+=======
+ * <li>Interacting with a {@link BookRepository} to persist or retrieve
+ * books.</li>
+>>>>>>> ahmad-salameh
  * </ul>
  *
  * <p>

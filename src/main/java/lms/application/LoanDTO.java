@@ -3,13 +3,15 @@ package lms.application;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import lms.domain.Loan;
+
 /**
  * Data Transfer Object (DTO) for representing a loan record.
  */
 public record LoanDTO(
     UUID loanId,
     UUID userId,
-    UUID bookId,
+    UUID itemId,
     LocalDate borrowDate,
     LocalDate dueDate,
     LocalDate returnDate,
@@ -26,18 +28,18 @@ public record LoanDTO(
      * @param loan the Loan domain object
      * @return a new LoanDTO containing the same data
      */
-    public static LoanDTO fromLoan(lms.domain.Loan loan) {
+    public static LoanDTO fromLoan(Loan loan) {
         return new LoanDTO(
             loan.getLoanId(),
             loan.getUserId(),
-            loan.getBookId(),
+            loan.getItemId(),
             loan.getBorrowDate(),
             loan.getDueDate(),
             loan.getReturnDate(),
             loan.isReturned(),
             loan.isFineApplied(),
             loan.isOverdue(),
-            loan.getOverdueDays(),
+            loan.getDaysOverdue(),
             loan.calculateFine()
         );
     }

@@ -30,11 +30,6 @@ import lms.domain.exception.PermissionDeniedException;
  */
 public final class AuthorizationService {
 
-//    private final UserRepo userRepo;
-//    public AuthorizationService (UserRepo userRepo) {
-//        this.userRepo = userRepo;
-//    }
-
 	private AuthorizationService() {
 	}
 
@@ -64,5 +59,4 @@ public final class AuthorizationService {
 		}
 		return true;
 	}
-
 }

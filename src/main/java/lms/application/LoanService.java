@@ -7,7 +7,10 @@ import java.util.UUID;
 
 import lms.domain.Book;
 import lms.domain.BookRepository;
+import lms.domain.CD;
 import lms.domain.CDRepository;
+import lms.domain.Journal;
+import lms.domain.JournalRepository;
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
 import lms.domain.LoanableItem;
@@ -44,40 +47,39 @@ public class LoanService {
 
 	/** Repository for managing user data. */
 	private final UserRepository userRepo;
-	
+
 	/** Repository for managing book data. */
 	private final BookRepository bookRepo;
-	
+
 	/** Repository for managing CD data. */
 	private final CDRepository cdRepo;
-	
+
 	/** Repository for managing journal data. */
 	private final JournalRepository journalRepo;
-	
+
 	/** Repository for managing loan data. */
 	private final LoanRepository loanRepo;
-	
-	private NotificationService notificationService;
 
+	private AccountService notificationService;
 
 	/**
 	 * Constructs a new LoanService with the required repositories.
 	 *
-	 * @param userRepo the repository for user operations
-	 * @param bookRepo the repository for book operations
-	 * @param cdRepo the repository for CD operations
+	 * @param userRepo    the repository for user operations
+	 * @param bookRepo    the repository for book operations
+	 * @param cdRepo      the repository for CD operations
 	 * @param journalRepo the repository for journal operations
-	 * @param loanRepo the repository for loan operations
+	 * @param loanRepo    the repository for loan operations
 	 */
 	public LoanService(UserRepository userRepo, BookRepository bookRepo, CDRepository cdRepo,
-			JournalRepository journalRepo, LoanRepository loanRepo, NotificationService notificationService) {
-		
+			JournalRepository journalRepo, LoanRepository loanRepo, AccountService accountService) {
+
 		this.userRepo = userRepo;
 		this.bookRepo = bookRepo;
 		this.cdRepo = cdRepo;
 		this.journalRepo = journalRepo;
 		this.loanRepo = loanRepo;
-		this.notificationService = notificationService;
+		this.notificationService = accountService;
 	}
 
 	/**
@@ -94,14 +96,15 @@ public class LoanService {
 	 * </ol>
 	 * </p>
 	 *
-	 * @param userDTO the user data transfer object containing user information
-	 * @param itemId the unique identifier of the item to loan
+	 * @param userDTO  the user data transfer object containing user information
+	 * @param itemId   the unique identifier of the item to loan
 	 * @param itemType the type of item (e.g., "book", "cd", "journal")
 	 * @return the created Loan object
-	 * @throws UserNotFoundException if the user does not exist
-	 * @throws ItemNotFoundException if the item does not exist
+	 * @throws UserNotFoundException     if the user does not exist
+	 * @throws ItemNotFoundException     if the item does not exist
 	 * @throws ItemNotAvailableException if the item is not available for borrowing
-	 * @throws BorrowNotAllowedException if the user has reached their borrowing limit
+	 * @throws BorrowNotAllowedException if the user has reached their borrowing
+	 *                                   limit
 	 */
 	public Loan loanItem(UserDTO userDTO, UUID itemId, String itemType)
 			throws UserNotFoundException, ItemNotFoundException, ItemNotAvailableException, BorrowNotAllowedException {
@@ -139,30 +142,29 @@ public class LoanService {
 	 * and retrieves the corresponding item.
 	 * </p>
 	 *
-	 * @param itemId the unique identifier of the item
+	 * @param itemId   the unique identifier of the item
 	 * @param itemType the type of item ("book", "cd", or "journal")
 	 * @return the LoanableItem object
-	 * @throws ItemNotFoundException if the item is not found in the repository
+	 * @throws ItemNotFoundException    if the item is not found in the repository
 	 * @throws IllegalArgumentException if the item type is not supported
 	 */
 	private LoanableItem getItemByIdAndType(UUID itemId, String itemType) throws ItemNotFoundException {
-		
-		return 
-				switch (itemType.toLowerCase()) {
-					
-					case "book"    -> bookRepo.getBookById(itemId)
-										.orElseThrow(() -> new ItemNotFoundException("Book not found with ID: " + itemId));
-					
-					case "cd"      -> cdRepo.getCDById(itemId)
-										.orElseThrow(() -> new ItemNotFoundException("CD not found with ID: " + itemId));
-					
-					case "journal" -> journalRepo.getJournalById(itemId)
-										.orElseThrow(() -> new ItemNotFoundException("Journal not found with ID: " + itemId));
-					
-					default -> throw new IllegalArgumentException("Unsupported item type: " + itemType);
+
+		return switch (itemType.toLowerCase()) {
+
+		case "book" -> bookRepo.getBookById(itemId)
+				.orElseThrow(() -> new ItemNotFoundException("Book not found with ID: " + itemId));
+
+		case "cd" ->
+			cdRepo.getCDById(itemId).orElseThrow(() -> new ItemNotFoundException("CD not found with ID: " + itemId));
+
+		case "journal" -> journalRepo.getJournalById(itemId)
+				.orElseThrow(() -> new ItemNotFoundException("Journal not found with ID: " + itemId));
+
+		default -> throw new IllegalArgumentException("Unsupported item type: " + itemType);
 		};
 	}
-	
+
 	/**
 	 * Updates the appropriate repository with the modified item.
 	 *
@@ -171,18 +173,18 @@ public class LoanService {
 	 * based on the item type.
 	 * </p>
 	 *
-	 * @param item the loanable item to update
+	 * @param item     the loanable item to update
 	 * @param itemType the type of item ("book", "cd", or "journal")
 	 */
 	private void updateItemRepository(LoanableItem item, String itemType) {
-        
+
 		switch (itemType.toLowerCase()) {
-            case "book" 	-> 	bookRepo.updateBook((Book) item);
-            case "cd" 		-> 	cdRepo.updateCD((CD) item);
-            case "journal" 	-> 	journalRepo.updateJournal((Journal) item);
-        }
-    }
-	
+		case "book" -> bookRepo.updateBook((Book) item);
+		case "cd" -> cdRepo.updateCD((CD) item);
+		case "journal" -> journalRepo.updateJournal((Journal) item);
+		}
+	}
+
 	/**
 	 * Processes the return of a loaned item.
 	 *
@@ -200,77 +202,77 @@ public class LoanService {
 	 * @param loanId the unique identifier of the loan to return
 	 * @return true if the return operation is successful
 	 * @throws IllegalArgumentException if the loan does not exist
-	 * @throws IllegalStateException if the item has already been returned
-	 * @throws UserNotFoundException if the user associated with the loan is not found
-	 * @throws ItemNotFoundException if the item associated with the loan is not found
+	 * @throws IllegalStateException    if the item has already been returned
+	 * @throws UserNotFoundException    if the user associated with the loan is not
+	 *                                  found
+	 * @throws ItemNotFoundException    if the item associated with the loan is not
+	 *                                  found
 	 */
 	public boolean returnItem(UUID userID, UUID loanID)
 			throws IllegalArgumentException, IllegalStateException, UserNotFoundException, ItemNotFoundException {
 
-		if(! AuthorizationService.ensureLibrarian(AuthService.getCurrentUser())) {
+		if (!AuthorizationService.ensureLibrarian(AuthService.getCurrentUser())) {
 			throw new PermissionDeniedException("Only librarians can process returns.");
 		}
-		
-	    UUID loanId = loanID;
+
+		UUID loanId = loanID;
 
 		Loan loan = loanRepo.findById(loanID)
-	            .orElseThrow(() -> new LoanNotFoundException("Loan not found - ID: " + loanId));
+				.orElseThrow(() -> new LoanNotFoundException("Loan not found - ID: " + loanId));
 
-	    if (loan.isReturned()) {
-	        throw new IllegalStateException("Item already returned on: " + loan.getReturnDate());
-	    }
+		if (loan.isReturned()) {
+			throw new IllegalStateException("Item already returned on: " + loan.getReturnDate());
+		}
 
-	    loan.returnItem();
+		loan.returnItem();
 
-	    LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
-	    item.incrementAvailableCopies();
-	    
-	    User user = userRepo.getByID(loan.getUserId())
-	            	.orElseThrow(() -> new UserNotFoundException("User not found"));
+		LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
+		item.incrementAvailableCopies();
 
-	    double fineAmount = 0.0;
-	    if (loan.isOverdue()) {
-	        
-	    	fineAmount = loan.calculateFine();
-	    	
-	        user.getAccount().addFine(fineAmount, 
-	            "Late return of " + loan.getItemType() + " - " + loan.getDaysOverdue() + " day(s) overdue");
-	        
-	        loan.markFineApplied();
-	        
-	        System.out.println("⚠️  Late fine applied: " + fineAmount + " NIS");
-	        System.out.println("   Overdue days: " + loan.getDaysOverdue());
-	    }
+		User user = userRepo.getByID(loan.getUserId()).orElseThrow(() -> new UserNotFoundException("User not found"));
 
-	    loanRepo.update(loan);
-	    updateItemRepository(item, loan.getItemType());
-	    userRepo.update(user);
+		double fineAmount = 0.0;
+		if (loan.isOverdue()) {
 
-	    System.out.println("✅ " + loan.getItemType() + " returned successfully");
-	    if (fineAmount > 0) {
-	        System.out.println("   Fine applied: " + fineAmount + " NIS");
-	    }
+			fineAmount = loan.calculateFine();
 
-	    return true;
+			user.getAccount().addFine(fineAmount,
+					"Late return of " + loan.getItemType() + " - " + loan.getDaysOverdue() + " day(s) overdue");
+
+			loan.markFineApplied();
+
+			System.out.println("⚠️  Late fine applied: " + fineAmount + " NIS");
+			System.out.println("   Overdue days: " + loan.getDaysOverdue());
+		}
+
+		loanRepo.update(loan);
+		updateItemRepository(item, loan.getItemType());
+		userRepo.update(user);
+
+		System.out.println("✅ " + loan.getItemType() + " returned successfully");
+		if (fineAmount > 0) {
+			System.out.println("   Fine applied: " + fineAmount + " NIS");
+		}
+
+		return true;
 	}
-	
-	/**
-     * Checks for overdue loans and notifies users.
-     * This can be called by a scheduled task.
-     */
-    public void checkAndNotifyOverdueLoans() {
-        List<Loan> overdueLoans = loanRepo.findOverdueLoans();
-        
-        for (Loan loan : overdueLoans) {
-            User user = userRepo.getByID(loan.getUserId()).orElse(null);
-            if (user != null) {
-                LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
-                notificationService.notifyOverdueItem(user, item.getTitle());
-            }
-        }
-    }
 
-	
+	/**
+	 * Checks for overdue loans and notifies users. This can be called by a
+	 * scheduled task.
+	 */
+	public void checkAndNotifyOverdueLoans() {
+		List<Loan> overdueLoans = loanRepo.findOverdueLoans();
+
+		for (Loan loan : overdueLoans) {
+			User user = userRepo.getByID(loan.getUserId()).orElse(null);
+			if (user != null) {
+				LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
+				notificationService.notifyOverdueItem(user, item.getTitle());
+			}
+		}
+	}
+
 	/**
 	 * Retrieves the list of active loans for a given user.
 	 *
@@ -318,7 +320,8 @@ public class LoanService {
 	 * @param loanId the loan ID
 	 * @return an array containing [Loan, LoanableItem]
 	 * @throws IllegalArgumentException if the loan does not exist
-	 * @throws ItemNotFoundException if the item associated with the loan is not found
+	 * @throws ItemNotFoundException    if the item associated with the loan is not
+	 *                                  found
 	 */
 	public Object[] getLoanWithItemInfo(UUID loanId) {
 		Loan loan = getLoan(loanId);
@@ -345,8 +348,9 @@ public class LoanService {
 	 * @param additionalDays number of extra days to add
 	 * @return true if the extension is successful
 	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException if the loan does not exist or additional days is not positive
-	 * @throws IllegalStateException if the loan has already been completed
+	 * @throws IllegalArgumentException  if the loan does not exist or additional
+	 *                                   days is not positive
+	 * @throws IllegalStateException     if the loan has already been completed
 	 */
 	public boolean extendLoan(UserDTO userDTO, UUID loanId, int additionalDays) throws PermissionDeniedException {
 		AuthorizationService.ensureAdmin(userDTO);
