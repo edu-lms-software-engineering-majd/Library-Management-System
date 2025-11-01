@@ -19,7 +19,7 @@ class BookTest {
 
     @Test
     void givenValidInputs_whenBookCreated_thenFieldsAreInitialized() {
-        assertNotNull(book.getBookId());
+        assertNotNull(book.getId());
         assertEquals("Java", book.getTitle());
         assertEquals(5, book.getTotalCopies());
         assertEquals(5, book.getAvailableCopies());

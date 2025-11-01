@@ -1,13 +1,5 @@
 package lms.persistence;
 
-<<<<<<< HEAD
-
-||||||| 7160386
-import lms.domain.Book;
-import lms.domain.BookRepo;
-
-=======
->>>>>>> ahmad-salameh
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lms.domain.Book;
+import lms.domain.BookRepo;
 import lms.domain.BookRepository;
 
 /**
@@ -59,15 +52,7 @@ import lms.domain.BookRepository;
  * @author Majd Awwad
  * @version 1.1
  */
-<<<<<<< HEAD
 public class StaticBookRepository implements BookRepository {
-||||||| 7160386
-public class StaticBookRepo implements BookRepo {
-=======
-public class StaticBookRepository implements BookRepository {
-
-	private static StaticBookRepository instance = null;
->>>>>>> ahmad-salameh
 
 	private static StaticBookRepository instance = null;
 	
@@ -85,7 +70,6 @@ public class StaticBookRepository implements BookRepository {
 	}
 
 	/**
-<<<<<<< HEAD
 	 * Adds a new book to the repository if the ISBN is unique.
 	 *
 	 * @param book the {@link Book} to add
@@ -100,30 +84,9 @@ public class StaticBookRepository implements BookRepository {
 		}
 		return instance;
 	}
-||||||| 7160386
-     * Adds a new book to the repository if the ISBN is unique.
-     *
-     * @param book the {@link Book} to add
-     * @return {@code true} if the book was added successfully, {@code false} if a book with
-     *         the same ISBN already exists
-     */
-=======
-	 * Adds a new book to the repository if the ISBN is unique.
-	 *
-	 * @param book the {@link Book} to add
-	 * @return {@code true} if the book was added successfully, {@code false} if a
-	 *         book with the same ISBN already exists
-	 */
->>>>>>> ahmad-salameh
 
 	@Override
 	public boolean addBook(Book book) {
-<<<<<<< HEAD
-		
-||||||| 7160386
-=======
-
->>>>>>> ahmad-salameh
 		if (getBookByIsbn(book.getIsbn()) != null) {
 			return false;
 		}
@@ -138,19 +101,9 @@ public class StaticBookRepository implements BookRepository {
 	 */
 
 	@Override
-<<<<<<< HEAD
 	public Optional<Book> getBookById(UUID bookId) {
 		
 		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
-||||||| 7160386
-	public Book getBookById(UUID bookId) {
-		Optional<Book> book = books.stream().filter(b -> b.getBookId().equals(bookId)).findFirst();
-		return book.orElse(null);
-=======
-	public Optional<Book> getBookById(UUID bookId) {
-
-		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
->>>>>>> ahmad-salameh
 	}
 
 	/**

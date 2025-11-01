@@ -5,30 +5,12 @@ import lms.application.AuthService;
 import lms.application.BookService;
 import lms.application.LoanService;
 import lms.application.UserService;
-<<<<<<< HEAD
 import lms.domain.BookRepository;
 import lms.domain.LoanRepository;
 import lms.domain.UserRepository;
 import lms.persistence.StaticBookRepository;
 import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
-||||||| 7160386
-import lms.domain.BookRepo;
-import lms.domain.UserRepo;
-import lms.persistence.StaticBookRepo;
-import lms.persistence.StaticUserRepo;
-=======
-import lms.domain.BookRepository;
-import lms.domain.CDRepository;
-import lms.domain.JournalRepository;
-import lms.domain.LoanRepository;
-import lms.domain.UserRepository;
-import lms.persistence.StaticBookRepository;
-import lms.persistence.StaticCDRepository;
-import lms.persistence.StaticJournalRepository;
-import lms.persistence.StaticLoanRepository;
-import lms.persistence.StaticUserRepository;
->>>>>>> ahmad-salameh
 
 /**
  * Entry point for the Library Management System (LMS).
@@ -100,43 +82,17 @@ public class LibraryApp {
 	 */
 	public static void main(String[] args) {
 
-<<<<<<< HEAD
 		UserRepository userRepo = new StaticUserRepository();
 		BookRepository bookRepo = new StaticBookRepository();
 		LoanRepository loanRepo = new StaticLoanRepository();
 		
-||||||| 7160386
-		UserRepo userRepo = new StaticUserRepo();
-=======
-		UserRepository userRepo = new StaticUserRepository();
-		BookRepository bookRepo = new StaticBookRepository();
-		LoanRepository loanRepo = new StaticLoanRepository();
-		CDRepository cdRepo = new StaticCDRepository();
-		JournalRepository journalRepo = new StaticJournalRepository();
-		
-
->>>>>>> ahmad-salameh
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
-<<<<<<< HEAD
 		BookService bookService = new BookService(bookRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
 		LoanService loanService = new LoanService(bookRepo, accountService);
 
 		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService);
-||||||| 7160386
-
-		BookRepo bookRepo = new StaticBookRepo();
-		BookService bookService = new BookService(bookRepo);
-
-		LibraryCLI cli = new LibraryCLI(authService, userService, bookService);
-=======
-		BookService bookService = new BookService(bookRepo, userRepo);
-		AccountService accountService = new AccountService(userRepo);
-		
-	    LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalRepo	, loanRepo, accountService);
-		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService);
->>>>>>> ahmad-salameh
 		cli.start();
 	}
 }

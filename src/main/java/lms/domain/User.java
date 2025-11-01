@@ -123,20 +123,10 @@ public class User {
 		this.registrationDate = LocalDate.now();
 		this.userID = UUID.randomUUID();
 
-<<<<<<< HEAD
-
+		this.unreadNotifications = new ArrayList<>();
+		this.readNotifications = new ArrayList<>();
 		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
 		this.account = new Account(this.userID);
-||||||| 7160386
-		this.loans = new ArrayList<>();
-		this.account = new Account();
-=======
- 
-
-		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
- 
-		this.account = new Account(this.userID);
->>>>>>> ahmad-salameh
 
 	}
 
