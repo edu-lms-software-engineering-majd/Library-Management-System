@@ -52,7 +52,6 @@ public class Book implements LoanableItem {
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
 		this.bookId = UUID.randomUUID();
-		
 
 		if (title == null || title.isBlank()) {
 			throw new IllegalArgumentException("Book title cannot be empty");
@@ -75,9 +74,9 @@ public class Book implements LoanableItem {
 		}
 
 		if (category == null || category.isBlank()) {
- 
+
 			throw new IllegalArgumentException("Book category cannot be empty");
- 		}
+		}
 
 		if (totalCopies < 0) {
 			throw new IllegalArgumentException("Total copies cannot be negative");
@@ -122,34 +121,34 @@ public class Book implements LoanableItem {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);
 		this.description = description;
 	}
-	
+
 	public boolean isAvailable() {
-        
+
 		return availableCopies > 0;
-    }
-	
+	}
+
 	@Override
 	public UUID getId() {
 		return bookId;
 	}
-	
+
 	@Override
 	public void decrementAvailableCopies() throws IllegalStateException {
-		
+
 		if (availableCopies <= 0)
-            throw new IllegalStateException("No copies available to borrow.");
-		
-        availableCopies--;
+			throw new IllegalStateException("No copies available to borrow.");
+
+		availableCopies--;
 	}
 
 	@Override
 	public void incrementAvailableCopies() {
-		
+
 		if (availableCopies >= getTotalCopies())
-            throw new IllegalStateException("You Already Have All Copies of this Book");
-		
-        availableCopies++;
-		
+			throw new IllegalStateException("You Already Have All Copies of this Book");
+
+		availableCopies++;
+
 	}
 
 	/** @return the title of the book */

@@ -33,13 +33,13 @@ public interface BookRepository {
 	 */
 	boolean addBook(Book book);
 
-    /**
-     * Retrieves a book by its unique ID.
-     *
-     * @param bookId the {@link UUID} of the book
-     * @return the {@link Book} if found, otherwise {@code null}
-     */
-    Optional<Book> getBookById(UUID bookId);
+	/**
+	 * Retrieves a book by its unique ID.
+	 *
+	 * @param bookId the {@link UUID} of the book
+	 * @return the {@link Book} if found, otherwise {@code null}
+	 */
+	Optional<Book> getBookById(UUID bookId);
 
 	/**
 	 * Retrieves a book by its ISBN.
