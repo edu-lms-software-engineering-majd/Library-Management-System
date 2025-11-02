@@ -7,262 +7,204 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class AccountTest {
+class AccountTest {
+
+	private static final double SUSPENSION_THRESHOLD = 100.0;
+	private static final double SMALL_FINE = 10.0;
+	private static final double MEDIUM_FINE = 50.0;
+	private static final double LARGE_FINE = 150.0;
+	private static final double ABOVE_THRESHOLD = 101.0;
+	private static final double JUST_ABOVE_THRESHOLD = 100.01;
+	private static final String LATE_RETURN_REASON = "Late return";
+	private static final String MULTIPLE_VIOLATIONS_REASON = "Multiple violations";
+
+	private User mockUser;
+	private UUID testUserId;
+	private Account account;
+
+	@BeforeEach
+	void setUp() {
+		mockUser = Mockito.mock(User.class);
+		testUserId = UUID.randomUUID();
+		Mockito.when(mockUser.getUserID()).thenReturn(testUserId);
+		account = new Account(testUserId);
+	}
+
+	@AfterEach
+	void tearDown() {
+		account = null;
+		mockUser = null;
+	}
 
 	@Test
-	void givenNegativeAmount_whenAddFine_ThrowsIllegalArgumentException() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		assertThrows(IllegalArgumentException.class, () -> {
-			Account account = new Account(user.getUserID());
-			account.addFine(-10, "due date of 10 days");
-		});
+	void givenNegativeAmount_whenAddFine_thenThrowsIllegalArgumentException() {
+		assertThrows(IllegalArgumentException.class, () -> 
+			account.addFine(-10, "due date of 10 days"));
 	}
-	
+
 	@Test
-	void givenZeroFineAmount_whenAddFine_ThrowsIllegalArgumentException() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		assertThrows(IllegalArgumentException.class, () -> {
-			Account account = new Account(user.getUserID());
-			account.addFine(0, "due date of 10 days");
-		});
+	void givenZeroFineAmount_whenAddFine_thenThrowsIllegalArgumentException() {
+		assertThrows(IllegalArgumentException.class, () -> 
+			account.addFine(0, "due date of 10 days"));
 	}
-	
+
 	@Test
 	void givenValidAmount_whenAddFine_thenFineIsAssigned() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(10, "due date of 10 days");
-		
-		assertEquals(10.0, account.getTotalFines());
+		account.addFine(SMALL_FINE, "due date of 10 days");
+
+		assertEquals(SMALL_FINE, account.getTotalFines());
 		assertEquals(1, account.getFineTransactions().size());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
-	
+
 	@Test
-	void givenNegativeAmount_whenPayFine_ThrowsIllegalArgumentException() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		assertThrows(IllegalArgumentException.class, () -> {
-			Account account = new Account(user.getUserID());
-			account.payFine(-10);
-		});
+	void givenNegativeAmount_whenPayFine_thenThrowsIllegalArgumentException() {
+		assertThrows(IllegalArgumentException.class, () -> 
+			account.payFine(-10));
 	}
-	
+
 	@Test
-	void givenZeroAmount_whenPayFine_ThrowsIllegalArgumentException() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		assertThrows(IllegalArgumentException.class, () -> {
-			Account account = new Account(user.getUserID());
-			account.payFine(0);
-		});
+	void givenZeroAmount_whenPayFine_thenThrowsIllegalArgumentException() {
+		assertThrows(IllegalArgumentException.class, () -> 
+			account.payFine(0));
 	}
-	
+
 	@Test
-	void givenAmountExceedsTotalFines_whenPayFine_ThrowsIllegalArgumentException() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		assertThrows(IllegalArgumentException.class, () -> {
-			Account account = new Account(user.getUserID());
-			account.addFine(10, "Late return");
-			account.payFine(20);
-		});
+	void givenAmountExceedsTotalFines_whenPayFine_thenThrowsIllegalArgumentException() {
+		account.addFine(SMALL_FINE, LATE_RETURN_REASON);
+
+		assertThrows(IllegalArgumentException.class, () -> 
+			account.payFine(20));
 	}
-	
+
 	@Test
 	void givenValidPayment_whenPayFine_thenFineIsReduced() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(50, "Late return");
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
 		account.payFine(30);
-		
+
 		assertEquals(20.0, account.getTotalFines());
 		assertEquals(2, account.getFineTransactions().size());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
-	
+
 	@Test
 	void givenFullPayment_whenPayFine_thenTotalFinesIsZero() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(50, "Late return");
-		account.payFine(50);
-		
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
+		account.payFine(MEDIUM_FINE);
+
 		assertEquals(0.0, account.getTotalFines());
 		assertEquals(2, account.getFineTransactions().size());
 	}
-	
+
 	@Test
 	void givenFineExceedsThreshold_whenAddFine_thenAccountIsSuspended() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(101, "Multiple late returns");
-		
-		assertEquals(101.0, account.getTotalFines());
+		account.addFine(ABOVE_THRESHOLD, "Multiple late returns");
+
+		assertEquals(ABOVE_THRESHOLD, account.getTotalFines());
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 	}
-	
+
 	@Test
 	void givenSuspendedAccount_whenPayAllFines_thenAccountIsActivated() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(150, "Multiple violations");
+		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-		
-		account.payFine(150);
-		
+
+		account.payFine(LARGE_FINE);
+
 		assertEquals(0.0, account.getTotalFines());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
-	
+
 	@Test
 	void givenSuspendedAccount_whenPartialPayment_thenAccountRemainsSuspended() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(150, "Multiple violations");
+		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-		
-		account.payFine(50);
-		
+
+		account.payFine(MEDIUM_FINE);
+
 		assertEquals(100.0, account.getTotalFines());
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 	}
-	
+
 	@Test
 	void givenNewAccount_whenCreated_thenFieldsAreInitializedCorrectly() {
-		UUID userId = UUID.randomUUID();
-		Account account = new Account(userId);
-		
 		assertNotNull(account.getAccountId());
-		assertEquals(userId, account.getUserId());
+		assertEquals(testUserId, account.getUserId());
 		assertEquals(0.0, account.getTotalFines());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 		assertNotNull(account.getCreatedAt());
 		assertNotNull(account.getUpdatedAt());
 		assertTrue(account.getFineTransactions().isEmpty());
 	}
-	
+
 	@Test
 	void givenAccount_whenGetFineTransactions_thenReturnsUnmodifiableList() {
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(50, "Late return");
-		
-		assertThrows(UnsupportedOperationException.class, () -> {
-			account.getFineTransactions().clear();
-		});
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
+
+		assertThrows(UnsupportedOperationException.class, () -> 
+			account.getFineTransactions().clear());
 	}
-	
+
 	@Test
 	void givenMultipleFines_whenAdded_thenTotalFinesAccumulates() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
 		account.addFine(10, "Fine 1");
 		account.addFine(20, "Fine 2");
 		account.addFine(30, "Fine 3");
-		
+
 		assertEquals(60.0, account.getTotalFines());
 		assertEquals(3, account.getFineTransactions().size());
 	}
-	
+
 	@Test
 	void givenMultiplePayments_whenMade_thenTotalFinesDecreasesCorrectly() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
 		account.addFine(100, "Large fine");
 		account.payFine(20);
 		account.payFine(30);
 		account.payFine(25);
-		
+
 		assertEquals(25.0, account.getTotalFines());
 		assertEquals(4, account.getFineTransactions().size());
 	}
-	
+
 	@Test
 	void givenAccount_whenSetStatus_thenStatusIsUpdated() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
-		
+
 		account.setStatus(AccountStatus.BLACKLISTED);
-		
+
 		assertEquals(AccountStatus.BLACKLISTED, account.getStatus());
 	}
-	
+
 	@Test
 	void givenAccount_whenToString_thenReturnsFormattedString() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(50.50, "Late return");
-		
+		account.addFine(50.50, LATE_RETURN_REASON);
+
 		String result = account.toString();
-		
+
 		assertNotNull(result);
 		assertTrue(result.contains("Account"));
 		assertTrue(result.contains("50.50"));
 		assertTrue(result.contains("ACTIVE"));
 	}
-	
+
 	@Test
 	void givenExactThresholdAmount_whenAddFine_thenAccountRemainActive() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(100, "Threshold fine");
-		
-		assertEquals(100.0, account.getTotalFines());
+		account.addFine(SUSPENSION_THRESHOLD, "Threshold fine");
+
+		assertEquals(SUSPENSION_THRESHOLD, account.getTotalFines());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
-	
+
 	@Test
 	void givenJustAboveThreshold_whenAddFine_thenAccountIsSuspended() {
-		
-		User user = Mockito.mock(User.class);
-		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
-		
-		Account account = new Account(user.getUserID());
-		account.addFine(100.01, "Just over threshold");
-		
-		assertEquals(100.01, account.getTotalFines());
+		account.addFine(JUST_ABOVE_THRESHOLD, "Just over threshold");
+
+		assertEquals(JUST_ABOVE_THRESHOLD, account.getTotalFines());
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 	}
-	
 }
