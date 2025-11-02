@@ -12,7 +12,8 @@ import lms.domain.Loan;
 import lms.domain.LoanRepository;
 
 /**
- * In-memory implementation of {@link LoanRepository} for testing and simple usage.
+ * In-memory implementation of {@link LoanRepository} for testing and simple
+ * usage.
  * 
  * <p>
  * This repository stores loans in a static list and provides basic CRUD

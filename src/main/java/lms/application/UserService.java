@@ -143,9 +143,8 @@ public class UserService {
 		return userRepo.update(user);
 	}
 
-	public boolean deleteUserByUsername(String username) throws UserNotFoundException { 
-		return 
-				userRepo.delete(username);
+	public boolean deleteUserByUsername(String username) throws UserNotFoundException {
+		return userRepo.delete(username);
 
 	}
 
@@ -155,6 +154,6 @@ public class UserService {
 				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
 
 		return user.canBorrow();
- 	}
+	}
 
 }

@@ -11,16 +11,8 @@ import lms.domain.BookRepo;
 import lms.domain.BookRepository;
 
 /**
-<<<<<<< HEAD
- * In-memory implementation of {@link BookRepository} for simple usage, testing, or
- * prototyping.
-||||||| 7160386
- * In-memory implementation of {@link BookRepo} for simple usage, testing, or
- * prototyping.
-=======
  * In-memory implementation of {@link BookRepository} for simple usage, testing,
  * or prototyping.
->>>>>>> ahmad-salameh
  *
  * <p>
  * This repository stores {@link Book} objects in a static list and provides
@@ -35,30 +27,14 @@ import lms.domain.BookRepository;
  * <li>Not thread-safe: concurrent access may cause inconsistent behavior.</li>
  * <li>Primarily intended for demos, prototypes, or unit tests.</li>
  * <li>For production use, replace with a database-backed repository (e.g.,
- * {@code JdbcBookRepo}).</li>
+ * {@code JdbcBookRepository}).</li>
  * </ul>
- * 
- * <p>
- * Sample usage:
- * </p>
- * 
- * <pre>
- * BookRepo repo = new StaticBookRepo();
- * Book book = new Book("Title", "Author", "ISBN123", "Publisher", 2023, "Category", 5, "English", "Shelf X1");
- * repo.addBook(book);
- * Book retrieved = repo.getBookByIsbn("ISBN123");
- * </pre>
- * 
- * @author Majd Awwad
- * @version 1.1
  */
 public class StaticBookRepository implements BookRepository {
 
-	private static StaticBookRepository instance = null;
-	
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
-	
+
 	static {
 		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
 				"Software Engineering", 5, "English", "Shelf A1"));
@@ -93,38 +69,16 @@ public class StaticBookRepository implements BookRepository {
 		return books.add(book);
 	}
 
-	/**
-	 * Retrieves a book by its unique identifier.
-	 *
-	 * @param bookId the {@link UUID} of the book
-	 * @return the {@link Book} if found, or {@code null} otherwise
-	 */
-
 	@Override
 	public Optional<Book> getBookById(UUID bookId) {
 		
 		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
 	}
 
-	/**
-	 * Retrieves a book by its ISBN.
-	 *
-	 * @param isbn the ISBN of the book
-	 * @return the {@link Book} if found, or {@code null} otherwise
-	 */
-
 	@Override
 	public Optional<Book> getBookByIsbn(String isbn) {
 		return books.stream().filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
 	}
-
-	/**
-	 * Updates an existing book in the repository.
-	 *
-	 * @param updatedBook the {@link Book} with updated information
-	 * @return {@code true} if the update was successful, {@code false} if the book
-	 *         does not exist
-	 */
 
 	@Override
 	public boolean updateBook(Book updatedBook) {
@@ -137,24 +91,10 @@ public class StaticBookRepository implements BookRepository {
 		return false;
 	}
 
-	/**
-	 * Deletes a book from the repository by its unique identifier.
-	 *
-	 * @param bookId the {@link UUID} of the book to delete
-	 * @return {@code true} if deletion was successful, {@code false} if the book
-	 *         was not found
-	 */
-
 	@Override
 	public boolean deleteBook(UUID bookId) {
 		return books.removeIf(b -> b.getId().equals(bookId));
 	}
-
-	/**
-	 * Returns an unmodifiable list of all books in the repository.
-	 *
-	 * @return a list of all {@link Book} objects
-	 */
 
 	@Override
 	public List<Book> getAllBooks() {

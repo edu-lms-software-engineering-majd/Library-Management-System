@@ -19,43 +19,13 @@ import lms.domain.exception.UserNotFoundException;
  *
  * <p>
  * Provides a text-based interface that allows administrators to perform CRUD
- * (Create, Read, Update, Delete) operations on both books and users. The admin
- * can also view reports and manage system resources.
+ * operations on both books and users. The admin can also view reports and
+ * manage system resources.
  * </p>
- *
- * <h2>Main Responsibilities:</h2>
- * <ul>
- * <li>Display a menu of administrative options</li>
- * <li>Interact with {@link BookService} and {@link UserService} to perform
- * operations</li>
- * <li>Enforce role-based restrictions using {@link AuthService}</li>
- * <li>Handle input/output through the console</li>
- * </ul>
- *
- * <h2>Example Usage:</h2>
- * 
- * <pre>{@code
- * UserService userService = new UserService(...);
- * BookService bookService = new BookService(...);
- * AuthService authService = new AuthService(...);
- *
- * AdminCLI cli = new AdminCLI(userService, bookService, authService);
- * cli.start();
- * }</pre>
- *
- * <p>
- * This class belongs to the <b>presentation layer</b> and should not contain
- * business logic. Instead, it delegates to services in the application layer.
- * </p>
- *
- * @author Majd Awwad
- * @version 2.0
  */
 public class AdminCLI implements CLI {
 
-	/** Scanner for reading input from the console */
 	private final Scanner scanner = new Scanner(System.in);
-
 	private final UserService userService;
 	private final BookService bookService;
 	private final AuthService authService;
@@ -194,17 +164,12 @@ public class AdminCLI implements CLI {
 
 	private void handleDeleteBook() {
 		// TODO Implement this method
-
 	}
 
 	private void handleUpdateBook() {
 		// TODO Implement this method
-
 	}
 
-	/**
-	 * Displays the administrator menu options.
-	 */
 	private void showAdminMenu() {
 		System.out.println("\n===== Admin Panel =====");
 		System.out.println("Books Management:");
@@ -352,7 +317,6 @@ private void handleViewLoanStats() {
 		}
 	}
 
-	/** Displays all books retrieved from {@link BookService}. */
 	private void handleViewAllBooks() {
 		System.out.println("\n===== All Books =====");
 
@@ -368,16 +332,14 @@ private void handleViewLoanStats() {
 
 		for (Book book : books) {
 			System.out.printf("%-5s %-30s %-20s %-15s %-10d %-5s %-10s %-10s\n",
-					book.getBookId().toString().substring(0, 5), // short ID for CLI display
-					book.getTitle(), book.getAuthor(), book.getIsbn(), book.getPublicationYear(),
-					book.getAvailableCopies() + "/" + book.getTotalCopies(), book.getCategory(),
-					book.getShelfLocation());
+					book.getBookId().toString().substring(0, 5), book.getTitle(), book.getAuthor(), book.getIsbn(),
+					book.getPublicationYear(), book.getAvailableCopies() + "/" + book.getTotalCopies(),
+					book.getCategory(), book.getShelfLocation());
 		}
 
 		System.out.println("==============================\n");
 	}
 
-	/** Handles the process of adding a new user via {@link UserService}. */
 	private void handleAddUser() {
 		System.out.print("Enter username: ");
 		String username = scanner.nextLine();
@@ -388,10 +350,6 @@ private void handleViewLoanStats() {
 		System.out.println("User '" + username + "' with email " + email + " added successfully (simulation).");
 	}
 
-	/**
-	 * Displays a report of books and users. Currently only prints simulated values
-	 * to the console.
-	 */
 	private void handleViewReports() {
 		/*// TODO: write the implementation of this method
 	 	System.out.println("Reports: (simulation)");
@@ -416,58 +374,30 @@ private void handleViewLoanStats() {
 	    System.out.println("Available Books: " + availableBooks + "/" + books.size());
 	}
 
-	/** Displays all users retrieved from {@link UserService}. */
-	private void handleViewAllUsers() {
-		System.out.println("\n===== All Users =====");
-
-		List<UserDTO> users = userService.getAllUsers(); // Or userRepo.getAllUsers() mapped to DTOs
-
-		if (users.isEmpty()) {
-			System.out.println("No users available in the system.");
-			return;
-		}
-
-		System.out.printf("%-5s %-20s %-20s %-15s %-10s\n", "ID", "First Name", "Last Name", "Username", "Role");
-
-		for (UserDTO user : users) {
-			System.out.printf("%-5s %-20s %-20s %-15s %-10s\n", user.userID().toString().substring(0, 5), // short ID
-																											// for CLI
-																											// display
-					user.firstName(), user.lastName(), user.username(), user.role());
-		}
-
-		System.out.println("==============================\n");
-	}
-
-	/** Handles user updates by delegating to {@link UserService#updateUser}. */
 	private void handleUpdateUser() {
 		System.out.print("Enter username of the user to update: ");
 		String username = scanner.nextLine();
 
 		try {
-
 			UserDTO existing = userService.getUserByUsername(username);
 
 			System.out.println("Updating user: " + existing.username());
 			System.out.println("Leave a field blank to keep the current value.");
 
-			System.out.println("New username(Optional): ");
+			System.out.print("New username(Optional): ");
 			String newUsername = scanner.nextLine();
-			if (newUsername.isBlank()) {
-				newUsername = null; // means unchanged
-			}
+			if (newUsername.isBlank())
+				newUsername = null;
 
 			System.out.print("New password(Optional): ");
 			String password = scanner.nextLine();
-			if (password.isBlank()) {
-				password = null; // means unchanged
-			}
+			if (password.isBlank())
+				password = null;
 
 			System.out.print("New email(Optional): ");
 			String email = scanner.nextLine();
-			if (email.isBlank()) {
+			if (email.isBlank())
 				email = null;
-			}
 
 			System.out.print("New role (ADMIN / MEMBER / LIBRARIAN)(Optional): ");
 			String roleInput = scanner.nextLine();
@@ -483,11 +413,10 @@ private void handleViewLoanStats() {
 			boolean updated = userService.updateUser(AuthService.getCurrentUser(), existing.userID(), newUsername,
 					password, email, role);
 
-			if (updated) {
+			if (updated)
 				System.out.println("User updated successfully.");
-			} else {
+			else
 				System.out.println("Failed to update user.");
-			}
 
 		} catch (UserNotFoundException e) {
 			System.out.println("❌ No user found with username: " + username);
@@ -496,12 +425,5 @@ private void handleViewLoanStats() {
 		} catch (Exception e) {
 			System.out.println("⚠️ An unexpected error occurred: " + e.getMessage());
 		}
-
 	}
-	
-	
-	
-	
-	
-
 }
