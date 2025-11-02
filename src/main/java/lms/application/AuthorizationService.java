@@ -45,7 +45,7 @@ public final class AuthorizationService {
 	 * @throws PermissionDeniedException if the user is not an admin
 	 */
 	public static boolean ensureAdmin(UserDTO user) throws PermissionDeniedException {
-
+		
 		if (user == null || user.role() != Role.ADMIN) {
 			throw new PermissionDeniedException("Action requires admin privileges.");
 		}
@@ -53,11 +53,10 @@ public final class AuthorizationService {
 	}
 
 	public static boolean ensureLibrarian(UserDTO userID) throws PermissionDeniedException {
-
-		if (userID == null || userID.role() != Role.LIBRARIAN) {
+		
+		if(userID == null || userID.role() != Role.LIBRARIAN) {
 			throw new PermissionDeniedException("Action requires librarian privileges.");
 		}
 		return true;
 	}
-
 }

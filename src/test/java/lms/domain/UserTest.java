@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
- 
 import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
 
@@ -30,38 +29,33 @@ class UserTest {
 	}
 
 	@Test
- 
 
 	void givenValidPassword_whenVerifyPassword_thenReturnTrue() {
 
- 
 		String validPassword = "StrongPass1!";
 		assertTrue(user.verifyPassword(validPassword));
 	}
 
 	@Test
- 
+
 	void givenInvalidPassword_whenVerifyPassword_thenReturnFalse() {
 
- 
 		String invalidPassword = "invalidPassword!";
 		assertFalse(user.verifyPassword(invalidPassword));
 	}
 
 	@Test
- 
 
 	void givenValidNewPassword_whenChangePassword_thenPasswordIsUpdated() {
 
 		String validNewPassword = "this is a new Password";
- 
 		user.changePassword(validNewPassword);
 		assertTrue(user.verifyPassword(validNewPassword));
 	}
 
 	@Test
 	void givenOldPassword_whenChangePassword_thenThrowPasswordReuseException() {
- 
+
 		assertThrows(PasswordReuseException.class, () -> {
 			String oldPassword = "StrongPass1!";
 			user.changePassword(oldPassword);
@@ -70,35 +64,30 @@ class UserTest {
 
 	@Test
 	void givenWeakPassword_whenChangePassword_thenThrowIllegalArgumentException() {
- 
 
 		assertThrows(IllegalArgumentException.class, () -> {
 			String newPassword = "week";
-
 			user.changePassword(newPassword);
 		});
 	}
 
 	@Test
 	void givenNullPassword_whenChangePassword_thenThrowIllegalArgumentException() {
- 
+
 		assertThrows(IllegalArgumentException.class, () -> {
 			user.changePassword(null);
 		});
 	}
 
 	@Test
- 
 	void givenNullRole_whenChangeRoll_thenThrowIllegalArgumentException() {
 
- 
 		assertThrows(IllegalArgumentException.class, () -> {
 			user.changeRole(null);
 		});
 	}
 
 	@Test
- 
 
 	void givenValidRole_whenChangeRoll_thenRoleIsUpdated() {
 
@@ -109,17 +98,14 @@ class UserTest {
 	@Test
 	void givinNullEmail_whenChangeEmail_thenTrowIllegalArgumentException() {
 
- 
 		assertThrows(IllegalArgumentException.class, () -> {
 			user.changeEmail(null);
 		});
 	}
 
 	@Test
- 
 	void givinInvalidEmail_whenChangeEmail_thenTrowIllegalArgumentException() {
 
- 
 		assertThrows(IllegalArgumentException.class, () -> {
 			String invalidEmail = "email.com";
 			user.changeEmail(invalidEmail);
@@ -127,10 +113,8 @@ class UserTest {
 	}
 
 	@Test
- 
 	void givinValidEmail_whenChangeEmail_thenEmailIsUpdated() {
 
- 
 		String validEmail = "mawwad223@gmail.com";
 		user.changeEmail(validEmail);
 		assertEquals(validEmail, user.getEmail());

@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+package lms.domain;
+
+public interface CDRepository {
+
+	// TODO : write the appropriate method definitions
+}
+||||||| 7160386
+=======
 package lms.domain;
 
 import java.util.List;
@@ -66,3 +75,4 @@ public interface CDRepository {
 	 */
 	List<CD> searchCDs(String keyword);
 }
+>>>>>>> ahmad-salameh

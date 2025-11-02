@@ -1,5 +1,13 @@
 package lms.persistence;
 
+<<<<<<< HEAD
+
+||||||| 7160386
+import lms.domain.Book;
+import lms.domain.BookRepo;
+
+=======
+>>>>>>> ahmad-salameh
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,8 +18,16 @@ import lms.domain.Book;
 import lms.domain.BookRepository;
 
 /**
+<<<<<<< HEAD
+ * In-memory implementation of {@link BookRepository} for simple usage, testing, or
+ * prototyping.
+||||||| 7160386
+ * In-memory implementation of {@link BookRepo} for simple usage, testing, or
+ * prototyping.
+=======
  * In-memory implementation of {@link BookRepository} for simple usage, testing,
  * or prototyping.
+>>>>>>> ahmad-salameh
  *
  * <p>
  * This repository stores {@link Book} objects in a static list and provides
@@ -43,13 +59,21 @@ import lms.domain.BookRepository;
  * @author Majd Awwad
  * @version 1.1
  */
+<<<<<<< HEAD
+public class StaticBookRepository implements BookRepository {
+||||||| 7160386
+public class StaticBookRepo implements BookRepo {
+=======
 public class StaticBookRepository implements BookRepository {
 
 	private static StaticBookRepository instance = null;
+>>>>>>> ahmad-salameh
 
+	private static StaticBookRepository instance = null;
+	
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
-
+	
 	static {
 		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
 				"Software Engineering", 5, "English", "Shelf A1"));
@@ -61,16 +85,45 @@ public class StaticBookRepository implements BookRepository {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Adds a new book to the repository if the ISBN is unique.
 	 *
 	 * @param book the {@link Book} to add
 	 * @return {@code true} if the book was added successfully, {@code false} if a
 	 *         book with the same ISBN already exists
 	 */
+	
+	StaticBookRepository getInstance() {
+	
+		if (instance == null) {
+			instance = new StaticBookRepository();
+		}
+		return instance;
+	}
+||||||| 7160386
+     * Adds a new book to the repository if the ISBN is unique.
+     *
+     * @param book the {@link Book} to add
+     * @return {@code true} if the book was added successfully, {@code false} if a book with
+     *         the same ISBN already exists
+     */
+=======
+	 * Adds a new book to the repository if the ISBN is unique.
+	 *
+	 * @param book the {@link Book} to add
+	 * @return {@code true} if the book was added successfully, {@code false} if a
+	 *         book with the same ISBN already exists
+	 */
+>>>>>>> ahmad-salameh
 
 	@Override
 	public boolean addBook(Book book) {
+<<<<<<< HEAD
+		
+||||||| 7160386
+=======
 
+>>>>>>> ahmad-salameh
 		if (getBookByIsbn(book.getIsbn()) != null) {
 			return false;
 		}
@@ -85,9 +138,19 @@ public class StaticBookRepository implements BookRepository {
 	 */
 
 	@Override
+<<<<<<< HEAD
+	public Optional<Book> getBookById(UUID bookId) {
+		
+		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
+||||||| 7160386
+	public Book getBookById(UUID bookId) {
+		Optional<Book> book = books.stream().filter(b -> b.getBookId().equals(bookId)).findFirst();
+		return book.orElse(null);
+=======
 	public Optional<Book> getBookById(UUID bookId) {
 
 		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
+>>>>>>> ahmad-salameh
 	}
 
 	/**

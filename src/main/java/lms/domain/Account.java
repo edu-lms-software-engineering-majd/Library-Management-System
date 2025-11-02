@@ -1,7 +1,6 @@
 package lms.domain;
 
 import java.time.LocalDate;
- 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -228,13 +227,11 @@ public class Account {
      * 
      * @param status the new account status
      */
- 
     public void setStatus(AccountStatus status) {
         this.status = status;
         this.updatedAt = LocalDate.now();
     }
     
- 
     /**
      * Suspends the account.
      * 
@@ -276,6 +273,5 @@ public class Account {
         return String.format("Account[ID: %s, Balance: %.2f, Status: %s", 
             accountId.toString().substring(0, 8), 
             totalFines, status);
- 
     }
 }
