@@ -7,73 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class AccountTest {
 
-	@BeforeAll
-	static void setUpBeforeClass() {
-		// Reserved for future global test setup
-	}
-
-	/**
-	 * Cleans up test environment after all test methods. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if cleanup fails
-	 */
-	@AfterAll
-	static void tearDownAfterClass() {
-		// Reserved for future global test cleanup
-	}
-
-	/**
-	 * Sets up test environment before each test method. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if setup fails
-	 */
-	@BeforeEach
-	void setUp() {
-		// Reserved for future per-test setup
-	}
-
-	/**
-	 * Cleans up test environment after each test method. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if cleanup fails
-	 */
-	@AfterEach
-	void tearDown() {
-		// Reserved for future per-test cleanup
-	}
-
-	@Test
-	void givenNullAccount_whenGetAccountId_throwsNullPointerException(){
-		
-		assertThrows(NullPointerException.class, () -> {
-			Account account = null;
-			account.getAccountId();
-		});
-	}
-	
-	@Test
-	void givenNullAccount_whenAddFine_ThrowsIllegalStateException() {
-		assertThrows(IllegalStateException.class, () -> {
-			Account account = null;
-			account.addFine(10, "due date of 10 days");
-		});
-	}
-	
 	@Test
 	void givenNegativeAmount_whenAddFine_ThrowsIllegalArgumentException() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -85,7 +25,6 @@ public class AccountTest {
 	
 	@Test
 	void givenZeroFineAmount_whenAddFine_ThrowsIllegalArgumentException() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -97,7 +36,6 @@ public class AccountTest {
 	
 	@Test
 	void givenValidAmount_whenAddFine_thenFineIsAssigned() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -108,18 +46,9 @@ public class AccountTest {
 		assertEquals(1, account.getFineTransactions().size());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
-		
-	@Test
-	void givenNullAccount_whenPayFine_ThrowsIllegalStateException() {
-		assertThrows(IllegalStateException.class, () -> {
-			Account account = null;
-			account.payFine(10);
-		});
-	}
 	
 	@Test
 	void givenNegativeAmount_whenPayFine_ThrowsIllegalArgumentException() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -131,7 +60,6 @@ public class AccountTest {
 	
 	@Test
 	void givenZeroAmount_whenPayFine_ThrowsIllegalArgumentException() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -143,7 +71,6 @@ public class AccountTest {
 	
 	@Test
 	void givenAmountExceedsTotalFines_whenPayFine_ThrowsIllegalArgumentException() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -156,7 +83,6 @@ public class AccountTest {
 	
 	@Test
 	void givenValidPayment_whenPayFine_thenFineIsReduced() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -171,7 +97,6 @@ public class AccountTest {
 	
 	@Test
 	void givenFullPayment_whenPayFine_thenTotalFinesIsZero() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -185,7 +110,6 @@ public class AccountTest {
 	
 	@Test
 	void givenFineExceedsThreshold_whenAddFine_thenAccountIsSuspended() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -198,7 +122,6 @@ public class AccountTest {
 	
 	@Test
 	void givenSuspendedAccount_whenPayAllFines_thenAccountIsActivated() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -214,7 +137,6 @@ public class AccountTest {
 	
 	@Test
 	void givenSuspendedAccount_whenPartialPayment_thenAccountRemainsSuspended() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
@@ -230,7 +152,6 @@ public class AccountTest {
 	
 	@Test
 	void givenNewAccount_whenCreated_thenFieldsAreInitializedCorrectly() {
-		
 		UUID userId = UUID.randomUUID();
 		Account account = new Account(userId);
 		
@@ -245,7 +166,6 @@ public class AccountTest {
 	
 	@Test
 	void givenAccount_whenGetFineTransactions_thenReturnsUnmodifiableList() {
-		
 		User user = Mockito.mock(User.class);
 		Mockito.when(user.getUserID()).thenReturn(UUID.randomUUID());
 		
