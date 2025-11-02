@@ -41,8 +41,11 @@ public class User {
 		this.registrationDate = LocalDate.now();
 		this.userID = UUID.randomUUID();
 
-		this.loans = new ArrayList<>(MAX_BORROW_LIMIT);
+		this.unreadNotifications = new ArrayList<>();
+		this.readNotifications = new ArrayList<>();
+		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
 		this.account = new Account(this.userID);
+
 	}
 
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role,

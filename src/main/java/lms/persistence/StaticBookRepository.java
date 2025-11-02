@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lms.domain.Book;
+import lms.domain.BookRepo;
 import lms.domain.BookRepository;
 
 /**
@@ -31,8 +32,6 @@ import lms.domain.BookRepository;
  */
 public class StaticBookRepository implements BookRepository {
 
-	private static StaticBookRepository instance = null;
-
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
 
@@ -46,7 +45,16 @@ public class StaticBookRepository implements BookRepository {
 				"Software Design", 2, "English", "Shelf C3"));
 	}
 
-	public static StaticBookRepository getInstance() {
+	/**
+	 * Adds a new book to the repository if the ISBN is unique.
+	 *
+	 * @param book the {@link Book} to add
+	 * @return {@code true} if the book was added successfully, {@code false} if a
+	 *         book with the same ISBN already exists
+	 */
+	
+	StaticBookRepository getInstance() {
+	
 		if (instance == null) {
 			instance = new StaticBookRepository();
 		}
@@ -55,7 +63,7 @@ public class StaticBookRepository implements BookRepository {
 
 	@Override
 	public boolean addBook(Book book) {
-		if (getBookByIsbn(book.getIsbn()).isPresent()) {
+		if (getBookByIsbn(book.getIsbn()) != null) {
 			return false;
 		}
 		return books.add(book);
@@ -63,6 +71,7 @@ public class StaticBookRepository implements BookRepository {
 
 	@Override
 	public Optional<Book> getBookById(UUID bookId) {
+		
 		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
 	}
 

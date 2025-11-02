@@ -89,7 +89,7 @@ public class UserService {
 
 	public UserDTO getUserByUsername(String username) throws UserNotFoundException {
 
-		Optional<User> userOptional = userRepo.getUserByUserName(username);
+		Optional<User> userOptional = userRepo.getByUserName(username);
 
 		if (userOptional.isEmpty()) {
 			throw new UserNotFoundException("No such user with this username");

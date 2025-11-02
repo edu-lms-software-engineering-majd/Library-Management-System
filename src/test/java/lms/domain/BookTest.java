@@ -22,13 +22,13 @@ class BookTest {
 		book = null;
 	}
 
-	@Test
-	void givenValidInputs_whenBookCreated_thenFieldsAreInitialized() {
-		assertNotNull(book.getBookId());
-		assertEquals("Java", book.getTitle());
-		assertEquals(5, book.getTotalCopies());
-		assertEquals(5, book.getAvailableCopies());
-	}
+    @Test
+    void givenValidInputs_whenBookCreated_thenFieldsAreInitialized() {
+        assertNotNull(book.getId());
+        assertEquals("Java", book.getTitle());
+        assertEquals(5, book.getTotalCopies());
+        assertEquals(5, book.getAvailableCopies());
+    }
 
 	@Test
 	void givenInvalidEmptyTitle_whenCreateBook_thenThrowException() {

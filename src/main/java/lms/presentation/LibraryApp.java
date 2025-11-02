@@ -6,13 +6,9 @@ import lms.application.BookService;
 import lms.application.LoanService;
 import lms.application.UserService;
 import lms.domain.BookRepository;
-import lms.domain.CDRepository;
-import lms.domain.JournalRepository;
 import lms.domain.LoanRepository;
 import lms.domain.UserRepository;
 import lms.persistence.StaticBookRepository;
-import lms.persistence.StaticCDRepository;
-import lms.persistence.StaticJournalRepository;
 import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
 
@@ -62,15 +58,11 @@ public class LibraryApp {
 		UserRepository userRepo = new StaticUserRepository();
 		BookRepository bookRepo = new StaticBookRepository();
 		LoanRepository loanRepo = new StaticLoanRepository();
-		CDRepository cdRepo = new StaticCDRepository();
-		JournalRepository journalRepo = new StaticJournalRepository();
-
+		
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
 		BookService bookService = new BookService(bookRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
-
-		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalRepo, loanRepo, accountService);
 
 		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService);
 		cli.start();

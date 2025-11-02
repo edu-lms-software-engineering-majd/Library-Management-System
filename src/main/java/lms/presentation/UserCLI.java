@@ -82,7 +82,55 @@ public class UserCLI implements CLI {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Displays the user's current active loans.
+	 */
+	private void handleViewMyLoans() {
+	    System.out.println("\n=== My Active Loans ===");
+	    
+	    UUID userId = AuthService.getCurrentUser().userID();
+	    List<Loan> activeLoans = loanService.getUserActiveLoans(userId);
 
+	    if (activeLoans.isEmpty()) {
+	        System.out.println("You have no active loans.");
+	        return;
+	    }
+
+	    displayActiveLoans(activeLoans);
+	}
+	
+	
+	private void displayActiveLoans(List<Loan> loans) {
+	 
+		// TODO : Active Loans Implementation now is Limited To Books, Need re-implementation
+		
+	    System.out.println("  No \t\t Book Title \t \t Borrowed \t\t Due Date\t\tStatus");
+	    
+
+	    for (int i = 0; i < loans.size(); i++) {
+	        Loan loan = loans.get(i);
+	        Book book = bookService.getAllBooks().stream()
+	                .filter(b -> b.getBookId().equals(loan.getItemId()))
+	                .findFirst()
+	                .orElse(null);
+
+	        String title = (book != null) ? 
+	                (book.getTitle().length() > 28 ? book.getTitle().substring(0, 25) + "..." : book.getTitle()) 
+	                : "Unknown Book";
+	        
+	        String status = loan.isOverdue() ? "OVERDUE " : "Active ";
+
+	        System.out.printf("│ %-3d │ %-28s │ %-12s │ %-10s │ %-8s │\n",
+	                i + 1, title, loan.getBorrowDate(), loan.getDueDate(), status);
+	    }
+	    System.out.println("****************************************************");
+	}
+	
+	
+
+	/** Displays the menu options for the user. */
 	private void showUserMenu() {
 		System.out.println("\n===== User Menu =====");
 		System.out.println("1. Search for a Book");

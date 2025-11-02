@@ -39,7 +39,7 @@ import lms.domain.utils.PasswordUtils;
 public class StaticUserRepository implements UserRepository {
 
 	private static StaticUserRepository instance = null;
-
+	
 	/** Internal list storing all users */
 	private static final List<User> users = new ArrayList<>();
 
@@ -47,14 +47,13 @@ public class StaticUserRepository implements UserRepository {
 	static {
 		users.add(new User("Admin", "System", "admin@test.com", "admin", PasswordUtils.hashPassword("admi123"),
 				Role.ADMIN));
+
 		users.add(new User("John", "Doe", "user@test.com", "user", PasswordUtils.hashPassword("user123"),
 				Role.LIBRARIAN));
 		users.add(new User("Majd", "Awwad", "majdawwad@gmail.com", "majd04", PasswordUtils.hashPassword("majd123"),
 				Role.ADMIN));
-		users.add(new User("Ahmad", "Salameh", "ahmadsalameh@gmail.com", "ahmad04",
-				PasswordUtils.hashPassword("ahmad123"), Role.LIBRARIAN));
 	}
-
+	
 	public static StaticUserRepository getInstance() {
 		if (instance == null) {
 			instance = new StaticUserRepository();
@@ -69,7 +68,8 @@ public class StaticUserRepository implements UserRepository {
 
 	@Override
 	public Optional<User> getByUserName(String userName) {
-		return users.stream().filter(u -> u.getUsername().equalsIgnoreCase(userName)).findFirst();
+		Optional<User> user = users.stream().filter(u -> u.getUsername().equalsIgnoreCase(userName)).findFirst();
+		return user;
 	}
 
 	@Override
@@ -82,8 +82,10 @@ public class StaticUserRepository implements UserRepository {
 
 	@Override
 	public boolean update(User updatedUser) {
+
 		for (int i = 0; i < users.size(); i++) {
 			if (users.get(i).getUserID().equals(updatedUser.getUserID())) {
+
 				users.set(i, updatedUser);
 				return true;
 			}
@@ -93,6 +95,7 @@ public class StaticUserRepository implements UserRepository {
 
 	@Override
 	public boolean delete(String userName) {
+
 		return users.removeIf(u -> u.getUsername().equalsIgnoreCase(userName));
 	}
 
@@ -103,6 +106,7 @@ public class StaticUserRepository implements UserRepository {
 
 	@Override
 	public Optional<User> getByID(UUID userID) {
+
 		return Optional.of(users.stream().filter(u -> u.getUserID().equals(userID)).findFirst().orElse(null));
 	}
 }
