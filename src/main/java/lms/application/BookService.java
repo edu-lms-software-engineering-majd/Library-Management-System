@@ -115,9 +115,38 @@ public class BookService {
 	 *
 	 * @return a list of all {@link Book} entities
 	 */
-
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
+	}
+
+	/**
+	 * Searches/filters books using the specified search strategy.
+	 * 
+	 * <p>
+	 * This method implements the Strategy pattern, allowing different search
+	 * algorithms to be applied at runtime without modifying the service code.
+	 * This follows the Open/Closed Principle - open for extension, closed for modification.
+	 * </p>
+	 *
+	 * @param strategy the search strategy to apply
+	 * @param searchTerm the search term or criteria
+	 * @return list of books matching the search criteria
+	 */
+	public List<Book> searchBooks(lms.application.search.SearchStrategy<Book> strategy, String searchTerm) {
+		if (strategy == null) {
+			throw new IllegalArgumentException("Search strategy cannot be null");
+		}
+		return strategy.execute(bookRepo.getAllBooks(), searchTerm);
+	}
+
+	/**
+	 * Retrieves a book by its ID.
+	 *
+	 * @param bookId the UUID of the book
+	 * @return the Book if found, null otherwise
+	 */
+	public Book getBookById(UUID bookId) {
+		return bookRepo.getBookById(bookId).orElse(null);
 	}
 
 	private boolean isAvailableBook(UUID bookID) {
