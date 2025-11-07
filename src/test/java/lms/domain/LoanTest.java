@@ -3,6 +3,7 @@ package lms.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,11 +16,6 @@ import org.junit.jupiter.api.Test;
 
 class LoanTest {
 
-	private static final int BOOK_LOAN_DAYS = 28;
-	private static final int CD_LOAN_DAYS = 21;
-	private static final int JOURNAL_LOAN_DAYS = 7;
-	private static final int DEFAULT_LOAN_DAYS = 14;
-
 	private Loan bookLoan;
 	private Loan cdLoan;
 	private Loan journalLoan;
@@ -28,8 +24,8 @@ class LoanTest {
 
 	@BeforeEach
 	void setUp() {
-		testUserId = UUID.randomUUID();
-		testItemId = UUID.randomUUID();
+		testUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+		testItemId = UUID.fromString("123e4567-e89b-12d3-a456-426614174001");
 		bookLoan = new Loan(testUserId, testItemId, "book", LocalDate.now());
 		cdLoan = new Loan(testUserId, testItemId, "cd", LocalDate.now());
 		journalLoan = new Loan(testUserId, testItemId, "journal", LocalDate.now());
@@ -43,111 +39,245 @@ class LoanTest {
 	}
 
 	@Test
-	void givenValidInputs_whenCreateBookLoan_thenLoanIsInitializedCorrectly() {
+	void givenValidParameters_whenCreateBookLoan_thenLoanIsInitializedCorrectly() {
+
+		assertNotNull(bookLoan);
 		assertNotNull(bookLoan.getLoanId());
 		assertEquals(testUserId, bookLoan.getUserId());
 		assertEquals(testItemId, bookLoan.getItemId());
 		assertEquals("book", bookLoan.getItemType());
-		assertNotNull(bookLoan.getBorrowDate());
-		assertEquals(LocalDate.now().plusDays(BOOK_LOAN_DAYS), bookLoan.getDueDate());
-		assertFalse(bookLoan.isReturned());
+		assertEquals(LocalDate.now(), bookLoan.getBorrowDate());
+		assertEquals(LocalDate.now().plusDays(28), bookLoan.getDueDate());
+		assertNull(bookLoan.getReturnDate());
 		assertTrue(bookLoan.isActive());
 	}
 
 	@Test
-	void givenValidInputs_whenCreateCDLoan_thenDueDateIsCalculatedCorrectly() {
-		assertEquals(LocalDate.now().plusDays(CD_LOAN_DAYS), cdLoan.getDueDate());
+	void givenBookType_whenCreateLoan_thenDueDateIs28DaysFromBorrowDate() {
+
+		LocalDate borrowDate = LocalDate.now();
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertEquals(borrowDate.plusDays(28), loan.getDueDate());
 	}
 
 	@Test
-	void givenValidInputs_whenCreateJournalLoan_thenDueDateIsCalculatedCorrectly() {
-		assertEquals(LocalDate.now().plusDays(JOURNAL_LOAN_DAYS), journalLoan.getDueDate());
+	void givenCDType_whenCreateLoan_thenDueDateIs21DaysFromBorrowDate() {
+
+		LocalDate borrowDate = LocalDate.now();
+		Loan loan = new Loan(testUserId, testItemId, "cd", borrowDate);
+
+		assertEquals(borrowDate.plusDays(21), loan.getDueDate());
 	}
 
 	@Test
-	void givenUnknownItemType_whenCreateLoan_thenDefaultDueDateIsUsed() {
-		Loan genericLoan = new Loan(testUserId, testItemId, "unknown", LocalDate.now());
-		assertEquals(LocalDate.now().plusDays(DEFAULT_LOAN_DAYS), genericLoan.getDueDate());
+	void givenJournalType_whenCreateLoan_thenDueDateIs7DaysFromBorrowDate() {
+
+		LocalDate borrowDate = LocalDate.now();
+		Loan loan = new Loan(testUserId, testItemId, "journal", borrowDate);
+
+		assertEquals(borrowDate.plusDays(7), loan.getDueDate());
 	}
 
 	@Test
-	void givenActiveLoan_whenReturnItem_thenLoanIsMarkedAsReturned() {
+	void givenUnknownItemType_whenCreateLoan_thenDueDateIs14DaysFromBorrowDate() {
+
+		LocalDate borrowDate = LocalDate.now();
+		Loan loan = new Loan(testUserId, testItemId, "magazine", borrowDate);
+
+		assertEquals(borrowDate.plusDays(14), loan.getDueDate());
+	}
+
+	@Test
+	void givenCaseInsensitiveBookType_whenCreateLoan_thenDueDateIsCalculatedCorrectly() {
+
+		LocalDate borrowDate = LocalDate.now();
+		Loan loan = new Loan(testUserId, testItemId, "BOOK", borrowDate);
+
+		assertEquals(borrowDate.plusDays(28), loan.getDueDate());
+	}
+
+	@Test
+	void givenNewLoan_whenCheckIsActive_thenReturnTrue() {
+
+		assertTrue(bookLoan.isActive());
+	}
+
+	@Test
+	void givenActiveLoan_whenReturnItem_thenLoanIsNoLongerActive() {
+
 		bookLoan.returnItem();
 
-		assertTrue(bookLoan.isReturned());
 		assertFalse(bookLoan.isActive());
+		assertNotNull(bookLoan.getReturnDate());
 		assertEquals(LocalDate.now(), bookLoan.getReturnDate());
 	}
 
 	@Test
 	void givenReturnedLoan_whenReturnItemAgain_thenThrowIllegalStateException() {
+
 		bookLoan.returnItem();
 
-		assertThrows(IllegalStateException.class, () -> bookLoan.returnItem());
+		assertThrows(IllegalStateException.class, () -> {
+			bookLoan.returnItem();
+		});
 	}
 
 	@Test
-	void givenLoanWithinDueDate_whenCheckOverdue_thenReturnsFalse() {
-		assertFalse(bookLoan.isOverdue());
-	}
-
-	@Test
-	void givenLoanPastDueDate_whenCheckOverdue_thenReturnsTrue() {
-		bookLoan.setDueDate(LocalDate.now().minusDays(1));
-
-		assertTrue(bookLoan.isOverdue());
-	}
-
-	@Test
-	void givenReturnedLoan_whenCheckOverdue_thenReturnsFalse() {
-		bookLoan.setDueDate(LocalDate.now().minusDays(5));
-		bookLoan.returnItem();
+	void givenLoanWithinDueDate_whenCheckIsOverdue_thenReturnFalse() {
 
 		assertFalse(bookLoan.isOverdue());
 	}
 
 	@Test
-	void givenLoanOnTime_whenGetDaysOverdue_thenReturnsZero() {
+	void givenLoanOnDueDate_whenCheckIsOverdue_thenReturnFalse() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(28);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertFalse(loan.isOverdue());
+	}
+
+	@Test
+	void givenLoanPastDueDate_whenCheckIsOverdue_thenReturnTrue() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertTrue(loan.isOverdue());
+	}
+
+	@Test
+	void givenReturnedLoanPastDueDate_whenCheckIsOverdue_thenReturnFalse() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+		loan.returnItem();
+
+		assertFalse(loan.isOverdue());
+	}
+
+	@Test
+	void givenLoanNotOverdue_whenGetDaysOverdue_thenReturnZero() {
+
 		assertEquals(0, bookLoan.getDaysOverdue());
 	}
 
 	@Test
-	void givenOverdueLoan_whenGetDaysOverdue_thenReturnsCorrectDays() {
-		int daysOverdue = 5;
-		bookLoan.setDueDate(LocalDate.now().minusDays(daysOverdue));
+	void givenOverdueLoan_whenGetDaysOverdue_thenReturnCorrectNumberOfDays() {
 
-		assertEquals(daysOverdue, bookLoan.getDaysOverdue());
+		LocalDate borrowDate = LocalDate.now().minusDays(33);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertEquals(5, loan.getDaysOverdue());
 	}
 
 	@Test
-	void givenReturnedLoan_whenGetDaysOverdue_thenReturnsZero() {
-		bookLoan.setDueDate(LocalDate.now().minusDays(5));
-		bookLoan.returnItem();
+	void givenReturnedOverdueLoan_whenGetDaysOverdue_thenReturnZero() {
 
-		assertEquals(0, bookLoan.getDaysOverdue());
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+		loan.returnItem();
+
+		assertEquals(0, loan.getDaysOverdue());
 	}
 
 	@Test
-	void givenActiveLoanNotOverdue_whenCanExtend_thenReturnsTrue() {
+	void givenLoanNotOverdue_whenCalculateFine_thenReturnZero() {
+
+		assertEquals(0.0, bookLoan.calculateFine());
+	}
+
+	@Test
+	void givenOverdueBookLoan_whenCalculateFine_thenReturnCorrectFineAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(33);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		double expectedFine = 5 * 0.50;
+		assertEquals(expectedFine, loan.calculateFine());
+	}
+
+	@Test
+	void givenOverdueCDLoan_whenCalculateFine_thenReturnCorrectFineAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(26);
+		Loan loan = new Loan(testUserId, testItemId, "cd", borrowDate);
+
+		double expectedFine = 5 * 0.75;
+		assertEquals(expectedFine, loan.calculateFine());
+	}
+
+	@Test
+	void givenOverdueJournalLoan_whenCalculateFine_thenReturnCorrectFineAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(10);
+		Loan loan = new Loan(testUserId, testItemId, "journal", borrowDate);
+
+		double expectedFine = 3 * 1.00;
+		assertEquals(expectedFine, loan.calculateFine());
+	}
+
+	@Test
+	void givenOverdueGenericLoan_whenCalculateFine_thenReturnCorrectFineAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(24);
+		Loan loan = new Loan(testUserId, testItemId, "magazine", borrowDate);
+
+		double expectedFine = 10 * 0.25;
+		assertEquals(expectedFine, loan.calculateFine());
+	}
+
+	@Test
+	void givenReturnedOverdueLoan_whenCalculateFine_thenReturnZero() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+		loan.returnItem();
+
+		assertEquals(0.0, loan.calculateFine());
+	}
+
+	@Test
+	void givenNewLoan_whenCheckIsFineApplied_thenReturnFalse() {
+
+		assertFalse(bookLoan.isFineApplied());
+	}
+
+	@Test
+	void givenLoan_whenMarkFineApplied_thenIsFineAppliedReturnsTrue() {
+
+		bookLoan.markFineApplied();
+
+		assertTrue(bookLoan.isFineApplied());
+	}
+
+	@Test
+	void givenActiveLoanNotOverdue_whenCanExtend_thenReturnTrue() {
+
 		assertTrue(bookLoan.canExtend());
 	}
 
 	@Test
-	void givenOverdueLoan_whenCanExtend_thenReturnsFalse() {
-		bookLoan.setDueDate(LocalDate.now().minusDays(1));
+	void givenOverdueLoan_whenCanExtend_thenReturnFalse() {
 
-		assertFalse(bookLoan.canExtend());
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertFalse(loan.canExtend());
 	}
 
 	@Test
-	void givenReturnedLoan_whenCanExtend_thenReturnsFalse() {
+	void givenReturnedLoan_whenCanExtend_thenReturnFalse() {
+
 		bookLoan.returnItem();
 
 		assertFalse(bookLoan.canExtend());
 	}
 
 	@Test
-	void givenActiveLoan_whenExtendLoan_thenDueDateIsExtended() {
+	void givenActiveLoanNotOverdue_whenExtendLoan_thenDueDateIsExtended() {
+
 		LocalDate originalDueDate = bookLoan.getDueDate();
 		int extensionDays = 7;
 
@@ -157,146 +287,198 @@ class LoanTest {
 	}
 
 	@Test
-	void givenOverdueLoan_whenExtendLoan_thenThrowIllegalStateException() {
-		bookLoan.setDueDate(LocalDate.now().minusDays(1));
+	void givenActiveLoan_whenExtendLoanBy14Days_thenDueDateIsExtendedCorrectly() {
 
-		assertThrows(IllegalStateException.class, () -> bookLoan.extendLoan(7));
+		LocalDate originalDueDate = bookLoan.getDueDate();
+
+		bookLoan.extendLoan(14);
+
+		assertEquals(originalDueDate.plusDays(14), bookLoan.getDueDate());
+	}
+
+	@Test
+	void givenOverdueLoan_whenExtendLoan_thenThrowIllegalStateException() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(30);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertThrows(IllegalStateException.class, () -> {
+			loan.extendLoan(7);
+		});
 	}
 
 	@Test
 	void givenReturnedLoan_whenExtendLoan_thenThrowIllegalStateException() {
+
 		bookLoan.returnItem();
 
-		assertThrows(IllegalStateException.class, () -> bookLoan.extendLoan(7));
+		assertThrows(IllegalStateException.class, () -> {
+			bookLoan.extendLoan(7);
+		});
 	}
 
 	@Test
-	void givenLoanOnTime_whenCalculateFine_thenReturnsZero() {
-		assertEquals(0.0, bookLoan.calculateFine());
+	void givenLoan_whenGetLoanId_thenReturnNonNullUUID() {
+
+		assertNotNull(bookLoan.getLoanId());
 	}
 
 	@Test
-	void givenOverdueBookLoan_whenCalculateFine_thenReturnsCorrectAmount() {
-		int daysOverdue = 5;
-		bookLoan.setDueDate(LocalDate.now().minusDays(daysOverdue));
+	void givenLoan_whenGetUserId_thenReturnCorrectUserId() {
 
-		double expectedFine = daysOverdue * 0.50;
-		assertEquals(expectedFine, bookLoan.calculateFine());
+		assertEquals(testUserId, bookLoan.getUserId());
 	}
 
 	@Test
-	void givenOverdueCDLoan_whenCalculateFine_thenReturnsCorrectAmount() {
-		int daysOverdue = 3;
-		cdLoan.setDueDate(LocalDate.now().minusDays(daysOverdue));
+	void givenLoan_whenGetItemId_thenReturnCorrectItemId() {
 
-		double expectedFine = daysOverdue * 0.75;
-		assertEquals(expectedFine, cdLoan.calculateFine());
+		assertEquals(testItemId, bookLoan.getItemId());
 	}
 
 	@Test
-	void givenOverdueJournalLoan_whenCalculateFine_thenReturnsCorrectAmount() {
-		int daysOverdue = 4;
-		journalLoan.setDueDate(LocalDate.now().minusDays(daysOverdue));
+	void givenLoan_whenGetItemType_thenReturnCorrectItemType() {
 
-		double expectedFine = daysOverdue * 1.00;
-		assertEquals(expectedFine, journalLoan.calculateFine());
+		assertEquals("book", bookLoan.getItemType());
+		assertEquals("cd", cdLoan.getItemType());
+		assertEquals("journal", journalLoan.getItemType());
 	}
 
 	@Test
-	void givenOverdueGenericLoan_whenCalculateFine_thenReturnsCorrectAmount() {
-		Loan genericLoan = new Loan(testUserId, testItemId, "unknown", LocalDate.now());
-		int daysOverdue = 10;
-		genericLoan.setDueDate(LocalDate.now().minusDays(daysOverdue));
+	void givenLoan_whenGetBorrowDate_thenReturnCorrectBorrowDate() {
 
-		double expectedFine = daysOverdue * 0.25;
-		assertEquals(expectedFine, genericLoan.calculateFine());
+		assertEquals(LocalDate.now(), bookLoan.getBorrowDate());
 	}
 
 	@Test
-	void givenNewLoan_whenCheckFineApplied_thenReturnsFalse() {
-		assertFalse(bookLoan.isFineApplied());
+	void givenNewLoan_whenGetReturnDate_thenReturnNull() {
+
+		assertNull(bookLoan.getReturnDate());
 	}
 
 	@Test
-	void givenLoan_whenMarkFineApplied_thenFineAppliedIsTrue() {
+	void givenReturnedLoan_whenGetReturnDate_thenReturnCurrentDate() {
+
+		bookLoan.returnItem();
+
+		assertNotNull(bookLoan.getReturnDate());
+		assertEquals(LocalDate.now(), bookLoan.getReturnDate());
+	}
+
+	@Test
+	void givenMultipleDifferentLoans_whenCreateLoans_thenEachHasUniqueLoanId() {
+
+		Loan loan1 = new Loan(testUserId, testItemId, "book", LocalDate.now());
+		Loan loan2 = new Loan(testUserId, testItemId, "book", LocalDate.now());
+		Loan loan3 = new Loan(testUserId, testItemId, "book", LocalDate.now());
+
+		assertFalse(loan1.getLoanId().equals(loan2.getLoanId()));
+		assertFalse(loan2.getLoanId().equals(loan3.getLoanId()));
+		assertFalse(loan1.getLoanId().equals(loan3.getLoanId()));
+	}
+
+	@Test
+	void givenLoanExtendedMultipleTimes_whenExtendLoan_thenDueDateAccumulatesCorrectly() {
+
+		LocalDate originalDueDate = bookLoan.getDueDate();
+
+		bookLoan.extendLoan(7);
+		bookLoan.extendLoan(7);
+
+		assertEquals(originalDueDate.plusDays(14), bookLoan.getDueDate());
+	}
+
+	@Test
+	void givenLoanNearDueDate_whenExtendLoan_thenLoanIsNoLongerNearDue() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(26);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertTrue(loan.canExtend());
+		loan.extendLoan(7);
+
+		assertEquals(borrowDate.plusDays(28 + 7), loan.getDueDate());
+		assertFalse(loan.isOverdue());
+	}
+
+	@Test
+	void givenPastBorrowDate_whenCreateLoan_thenDueDateCalculatesFromBorrowDate() {
+
+		LocalDate pastDate = LocalDate.of(2024, 1, 15);
+		Loan loan = new Loan(testUserId, testItemId, "book", pastDate);
+
+		assertEquals(pastDate, loan.getBorrowDate());
+		assertEquals(pastDate.plusDays(28), loan.getDueDate());
+	}
+
+	@Test
+	void givenLoanOverdueBy1Day_whenCalculateFine_thenReturnCorrectAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(29);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertEquals(1, loan.getDaysOverdue());
+		assertEquals(0.50, loan.calculateFine());
+	}
+
+	@Test
+	void givenLoanOverdueBy10Days_whenCalculateFine_thenReturnCorrectAmount() {
+
+		LocalDate borrowDate = LocalDate.now().minusDays(38);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
+
+		assertEquals(10, loan.getDaysOverdue());
+		assertEquals(5.00, loan.calculateFine());
+	}
+
+	@Test
+	void givenFineAlreadyApplied_whenMarkFineAppliedAgain_thenRemainsTrue() {
+
 		bookLoan.markFineApplied();
+		assertTrue(bookLoan.isFineApplied());
 
+		bookLoan.markFineApplied();
 		assertTrue(bookLoan.isFineApplied());
 	}
 
 	@Test
-	void givenLoan_whenSetUserId_thenUserIdIsUpdated() {
-		UUID newUserId = UUID.randomUUID();
+	void givenMixedCaseItemType_whenCreateLoan_thenDueDateCalculatesCorrectly() {
 
-		bookLoan.setUserId(newUserId);
+		Loan loan1 = new Loan(testUserId, testItemId, "BooK", LocalDate.now());
+		Loan loan2 = new Loan(testUserId, testItemId, "CD", LocalDate.now());
+		Loan loan3 = new Loan(testUserId, testItemId, "JoUrNaL", LocalDate.now());
 
-		assertEquals(newUserId, bookLoan.getUserId());
+		assertEquals(LocalDate.now().plusDays(28), loan1.getDueDate());
+		assertEquals(LocalDate.now().plusDays(21), loan2.getDueDate());
+		assertEquals(LocalDate.now().plusDays(7), loan3.getDueDate());
 	}
 
 	@Test
-	void givenLoan_whenSetItemId_thenItemIdIsUpdated() {
-		UUID newItemId = UUID.randomUUID();
+	void givenExtendedLoan_whenCheckIsActive_thenStillReturnTrue() {
 
-		bookLoan.setItemId(newItemId);
+		bookLoan.extendLoan(7);
 
-		assertEquals(newItemId, bookLoan.getItemId());
-	}
-
-	@Test
-	void givenLoan_whenSetItemType_thenItemTypeIsUpdated() {
-		bookLoan.setItemType("magazine");
-
-		assertEquals("magazine", bookLoan.getItemType());
-	}
-
-	@Test
-	void givenLoan_whenSetDueDate_thenDueDateIsUpdated() {
-		LocalDate newDueDate = LocalDate.now().plusDays(30);
-
-		bookLoan.setDueDate(newDueDate);
-
-		assertEquals(newDueDate, bookLoan.getDueDate());
-	}
-
-	@Test
-	void givenLoan_whenSetReturnDate_thenReturnDateIsUpdated() {
-		LocalDate returnDate = LocalDate.now().minusDays(1);
-
-		bookLoan.setReturnDate(returnDate);
-
-		assertEquals(returnDate, bookLoan.getReturnDate());
-	}
-
-	@Test
-	void givenActiveLoan_whenIsActive_thenReturnsTrue() {
 		assertTrue(bookLoan.isActive());
 	}
 
 	@Test
-	void givenReturnedLoan_whenIsActive_thenReturnsFalse() {
+	void givenExtendedLoan_whenReturnItem_thenLoanIsMarkedReturned() {
+
+		bookLoan.extendLoan(7);
 		bookLoan.returnItem();
 
 		assertFalse(bookLoan.isActive());
+		assertNotNull(bookLoan.getReturnDate());
 	}
 
 	@Test
-	void givenNewLoan_whenIsReturned_thenReturnsFalse() {
-		assertFalse(bookLoan.isReturned());
-	}
+	void givenLoanReturnedOnDueDate_whenCheckIsOverdue_thenReturnFalse() {
 
-	@Test
-	void givenReturnedLoan_whenIsReturned_thenReturnsTrue() {
-		bookLoan.returnItem();
+		LocalDate borrowDate = LocalDate.now().minusDays(28);
+		Loan loan = new Loan(testUserId, testItemId, "book", borrowDate);
 
-		assertTrue(bookLoan.isReturned());
-	}
+		assertFalse(loan.isOverdue());
+		loan.returnItem();
 
-	@Test
-	void givenCaseInsensitiveItemType_whenCreateLoan_thenDueDateIsCalculatedCorrectly() {
-		Loan upperCaseLoan = new Loan(testUserId, testItemId, "BOOK", LocalDate.now());
-		Loan mixedCaseLoan = new Loan(testUserId, testItemId, "BooK", LocalDate.now());
-
-		assertEquals(LocalDate.now().plusDays(BOOK_LOAN_DAYS), upperCaseLoan.getDueDate());
-		assertEquals(LocalDate.now().plusDays(BOOK_LOAN_DAYS), mixedCaseLoan.getDueDate());
+		assertFalse(loan.isOverdue());
 	}
 }

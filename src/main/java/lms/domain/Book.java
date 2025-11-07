@@ -2,6 +2,8 @@ package lms.domain;
 
 import java.util.UUID;
 
+import lms.domain.utils.BookValidator;
+
 /**
  * Represents a book in the Library Management System.
  *
@@ -51,44 +53,11 @@ public class Book implements LoanableItem {
 	 */
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
+		BookValidator validator = new BookValidator();
+		validator.validate(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
+				shelfLocation);
+
 		this.bookId = UUID.randomUUID();
-
-		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("Book title cannot be empty");
-		}
-
-		if (author == null || author.isBlank()) {
-			throw new IllegalArgumentException("Book Auther cannot be empty");
-		}
-
-		if (isbn == null || isbn.isBlank()) {
-			throw new IllegalArgumentException("Book ISBN cannot be empty");
-		}
-
-		if (publisher == null || publisher.isBlank()) {
-			throw new IllegalArgumentException("Book publisher cannot be empty");
-		}
-
-		if (publicationYear > java.time.Year.now().getValue()) {
-			throw new IllegalArgumentException("Publication year cannot be in the future");
-		}
-
-		if (category == null || category.isBlank()) {
-
-			throw new IllegalArgumentException("Book category cannot be empty");
-		}
-
-		if (totalCopies < 0) {
-			throw new IllegalArgumentException("Total copies cannot be negative");
-		}
-		if (language == null || language.isBlank()) {
-			throw new IllegalArgumentException("Book language cannot be empty");
-		}
-
-		if (shelfLocation == null || shelfLocation.isBlank()) {
-			throw new IllegalArgumentException("Book shelf location cannot be empty");
-		}
-
 		this.title = title;
 		this.author = author;
 		this.isbn = isbn;

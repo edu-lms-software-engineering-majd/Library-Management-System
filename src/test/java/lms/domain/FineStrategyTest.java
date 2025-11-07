@@ -9,7 +9,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import lms.domain.strategy.BookFineStrategy;
+import lms.domain.strategy.CDFineStrategy;
 import lms.domain.strategy.FineStrategy;
+import lms.domain.strategy.JournalFineStrategy;
 
 class FineStrategyTest {
 
@@ -27,15 +30,16 @@ class FineStrategyTest {
 	}
 
 	@BeforeEach
-	void setUp() throws Exception {
-		bookStrategy = null;
-		cdStrategy = null;
-		journalStrategy = null;
+	void setUp() {
+		
+		bookStrategy = new BookFineStrategy();
+		cdStrategy = new CDFineStrategy();
+		journalStrategy = new JournalFineStrategy();
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
-
+	void tearDown() {
+		
 		bookStrategy = null;
 		cdStrategy = null;
 		journalStrategy = null;

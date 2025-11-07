@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import lms.domain.Journal;
 import lms.domain.JournalRepository;
 
-public class StaticJournalRepository implements JournalRepository {
+public class StaticJournalsRepository implements JournalRepository {
 
 	private final Map<UUID, Journal> journals = new HashMap<>();
 
