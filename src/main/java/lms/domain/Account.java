@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import lms.domain.utils.AccountValidator;
+
 /**
  * Represents a user account in the Library Management System.
  * 
@@ -173,9 +175,8 @@ public class Account {
 	 */
 	public void addFine(double amount, String reason) throws IllegalArgumentException {
 
-		if (amount <= 0) {
-			throw new IllegalArgumentException("Fine amount must be positive");
-		}
+		AccountValidator validator = new AccountValidator();
+		validator.validateFineAmount(amount);
 
 		this.totalFines += amount;
 		this.updatedAt = LocalDate.now();
@@ -211,12 +212,8 @@ public class Account {
 	 */
 	public void payFine(double amount) {
 
-		if (amount <= 0) {
-			throw new IllegalArgumentException("Amount must be positive");
-		}
-		if (amount > this.totalFines) {
-			throw new IllegalArgumentException("Amount exceeds total fines");
-		}
+		AccountValidator validator = new AccountValidator();
+		validator.validatePaymentAmount(amount, this.totalFines);
 
 		this.totalFines -= amount;
 		this.updatedAt = LocalDate.now();
