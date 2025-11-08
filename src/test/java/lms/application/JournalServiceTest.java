@@ -277,7 +277,7 @@ class JournalServiceTest {
 	void givenBorrowedJournal_whenIsAvailableJournal_thenReturnFalse() {
 		UUID journalId = UUID.randomUUID();
 		Journal journal = new Journal("Journal", "Author");
-		journal.setBorrowed(true);
+		journal.decrementAvailableCopies();
 		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 
 		boolean result = journalService.isAvailableJournal(journalId);
@@ -333,7 +333,7 @@ class JournalServiceTest {
 	void givenBorrowedJournal_whenBorrowJournal_thenThrowIllegalStateException() {
 		UUID journalId = UUID.randomUUID();
 		Journal journal = new Journal("Journal", "Author");
-		journal.setBorrowed(true);
+		journal.decrementAvailableCopies();
 		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 
 		assertThrows(IllegalStateException.class, () ->
@@ -355,12 +355,13 @@ class JournalServiceTest {
 	void givenBorrowedJournal_whenReturnJournal_thenJournalIsReturned() {
 		UUID journalId = UUID.randomUUID();
 		Journal journal = new Journal("Journal", "Author");
-		journal.setBorrowed(true);
+		journal.decrementAvailableCopies();
 		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 		when(journalRepo.updateJournal(journal)).thenReturn(true);
 
 		journalService.returnJournal(memberUser, journalId);
 
+		assertEquals(1, journal.getAvailableCopies());
 		assertFalse(journal.isBorrowed());
 		verify(journalRepo).updateJournal(journal);
 	}

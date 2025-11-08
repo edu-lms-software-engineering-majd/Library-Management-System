@@ -2,6 +2,8 @@ package lms.domain;
 
 import java.util.UUID;
 
+import lms.domain.utils.JournalValidator;
+
 /**
  * Represents a Journal in the library collection.
  *
@@ -15,7 +17,7 @@ import java.util.UUID;
  * required fields must be non-null and non-blank.
  * </p>
  *
- * @author Ahmad
+ * @author Ahmad & Majd Awwad
  * @version 2.0
  */
 public class Journal implements LoanableItem {
@@ -49,20 +51,10 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if title or author is null or blank, or if totalCopies is less than 1
 	 */
 	public Journal(String title, String author, int totalCopies) {
+		JournalValidator validator = new JournalValidator();
+		validator.validate(title, author, totalCopies);
+
 		this.id = UUID.randomUUID();
-
-		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("Journal title cannot be empty");
-		}
-
-		if (author == null || author.isBlank()) {
-			throw new IllegalArgumentException("Journal author cannot be empty");
-		}
-
-		if (totalCopies < 1) {
-			throw new IllegalArgumentException("Total copies must be at least 1");
-		}
-
 		this.title = title;
 		this.author = author;
 		this.totalCopies = totalCopies;
@@ -84,9 +76,8 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if title is null or blank
 	 */
 	public void setTitle(String title) {
-		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("Journal title cannot be empty");
-		}
+		JournalValidator validator = new JournalValidator();
+		validator.validateTitle(title);
 		this.title = title;
 	}
 
@@ -101,9 +92,8 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if author is null or blank
 	 */
 	public void setAuthor(String author) {
-		if (author == null || author.isBlank()) {
-			throw new IllegalArgumentException("Journal author cannot be empty");
-		}
+		JournalValidator validator = new JournalValidator();
+		validator.validateAuthor(author);
 		this.author = author;
 	}
 
@@ -118,9 +108,8 @@ public class Journal implements LoanableItem {
 	 * @param totalCopies the new total number of copies
 	 */
 	public void setTotalCopies(int totalCopies) {
-		if (totalCopies < 1) {
-			throw new IllegalArgumentException("Total copies must be at least 1");
-		}
+		JournalValidator validator = new JournalValidator();
+		validator.validateTotalCopies(totalCopies);
 		this.totalCopies = totalCopies;
 	}
 

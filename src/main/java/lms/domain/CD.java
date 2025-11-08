@@ -2,6 +2,8 @@ package lms.domain;
 
 import java.util.UUID;
 
+import lms.domain.utils.CDValidator;
+
 /**
  * Represents a CD in the library collection.
  *
@@ -15,7 +17,7 @@ import java.util.UUID;
  * required fields must be non-null and non-blank.
  * </p>
  *
- * @author Ahmad
+ * @author Ahmad & Majd Awwad
  * @version 2.0
  */
 public class CD implements LoanableItem {
@@ -49,20 +51,10 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if title or artist is null or blank, or if totalCopies is less than 1
 	 */
 	public CD(String title, String artist, int totalCopies) {
+		CDValidator validator = new CDValidator();
+		validator.validate(title, artist, totalCopies);
+
 		this.id = UUID.randomUUID();
-
-		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("CD title cannot be empty");
-		}
-
-		if (artist == null || artist.isBlank()) {
-			throw new IllegalArgumentException("CD artist cannot be empty");
-		}
-
-		if (totalCopies < 1) {
-			throw new IllegalArgumentException("Total copies must be at least 1");
-		}
-
 		this.title = title;
 		this.artist = artist;
 		this.totalCopies = totalCopies;
@@ -84,9 +76,8 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if title is null or blank
 	 */
 	public void setTitle(String title) {
-		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("CD title cannot be empty");
-		}
+		CDValidator validator = new CDValidator();
+		validator.validateTitle(title);
 		this.title = title;
 	}
 
@@ -101,9 +92,8 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if artist is null or blank
 	 */
 	public void setArtist(String artist) {
-		if (artist == null || artist.isBlank()) {
-			throw new IllegalArgumentException("CD artist cannot be empty");
-		}
+		CDValidator validator = new CDValidator();
+		validator.validateArtist(artist);
 		this.artist = artist;
 	}
 
@@ -118,9 +108,8 @@ public class CD implements LoanableItem {
 	 * @param totalCopies the new total number of copies
 	 */
 	public void setTotalCopies(int totalCopies) {
-		if (totalCopies < 1) {
-			throw new IllegalArgumentException("Total copies must be at least 1");
-		}
+		CDValidator validator = new CDValidator();
+		validator.validateTotalCopies(totalCopies);
 		this.totalCopies = totalCopies;
 	}
 
