@@ -143,7 +143,7 @@ public class UserService {
 		return userRepo.update(user);
 	}
 
-	public boolean deleteUserByUsername(String username) throws UserNotFoundException {
+	public boolean deleteByUsername(String username) throws UserNotFoundException {
 		return userRepo.delete(username);
 
 	}

@@ -5,10 +5,17 @@ import java.util.Scanner;
 
 import lms.application.AuthService;
 import lms.application.BookService;
+import lms.application.CDService;
+import lms.application.JournalService;
 import lms.application.LoanService;
 import lms.application.UserDTO;
 import lms.application.UserService;
+import lms.application.search.SearchContext;
+import lms.application.search.SearchCriteria;
+import lms.application.search.SearchStrategy;
 import lms.domain.Book;
+import lms.domain.CD;
+import lms.domain.Journal;
 import lms.domain.Role;
 import lms.domain.exception.PermissionDeniedException;
 import lms.domain.exception.UserNotFoundException;
@@ -30,6 +37,8 @@ public class AdminCLI implements CLI {
 	private final BookService bookService;
 	private final AuthService authService;
 	private final LoanService loanService;
+	private final CDService cdService;
+	private final JournalService journalService;
 
 	/**
 	 * Creates a new admin CLI.
@@ -37,13 +46,18 @@ public class AdminCLI implements CLI {
 	 * @param userService service for managing users
 	 * @param bookService service for managing books
 	 * @param authService service for authentication and authorization
+	 * @param loanService service for managing loans
+	 * @param cdService service for managing CDs
+	 * @param journalService service for managing journals
 	 */
 	public AdminCLI(UserService userService, BookService bookService, AuthService authService,
-			LoanService loanService) {
+			LoanService loanService, CDService cdService, JournalService journalService) {
 		this.userService = userService;
 		this.bookService = bookService;
 		this.authService = authService;
 		this.loanService = loanService;
+		this.cdService = cdService;
+		this.journalService = journalService;
 	}
 
 	/**
@@ -178,7 +192,7 @@ public class AdminCLI implements CLI {
 	 */
 	private void displaySearchCriteriaMenu() {
 		System.out.println("\nSearch/Filter by:");
-		lms.application.search.SearchCriteria[] criteria = lms.application.search.SearchCriteria.values();
+		SearchCriteria[] criteria = SearchCriteria.values();
 		for (int i = 0; i < criteria.length; i++) {
 			System.out.println((i + 1) + ". " + criteria[i].getDisplayName());
 		}
@@ -245,7 +259,7 @@ public class AdminCLI implements CLI {
 			String confirmation = scanner.nextLine().trim().toLowerCase();
 
 			if ("y".equals(confirmation)) {
-				userService.deleteUserByUsername(user.username()); // new updet
+				userService.deleteByUsername(user.username());
 				System.out.println("✅ User deleted successfully.");
 			} else {
 				System.out.println("❎ Deletion cancelled.");
@@ -267,37 +281,61 @@ public class AdminCLI implements CLI {
 	 * and follows the Single Responsibility Principle.
 	 * </p>
 	 * 
+	 * <p>
+	 * Supports partial matching for flexible searches - users can enter incomplete
+	 * values like the first few characters of an ID, partial title, etc.
+	 * </p>
+	 * 
 	 * @param criteriaChoice the user's choice of search criteria
 	 */
 	private void searchFilterBooks(String criteriaChoice) {
 		try {
-			// Get the appropriate search criterion from the enum
-			lms.application.search.SearchCriteria criterion = 
-				lms.application.search.SearchCriteria.fromChoice(criteriaChoice);
+			SearchCriteria criterion = 
+				SearchCriteria.fromChoice(criteriaChoice);
 			
 			if (criterion == null) {
 				System.out.println("Invalid criteria choice!");
 				return;
 			}
+			displaySearchHint(criterion);
 			
-			// Prompt for search term based on the criterion
 			String promptMessage = getSearchPromptMessage(criterion);
 			System.out.print(promptMessage);
 			String searchTerm = scanner.nextLine().trim();
 			
-			// Create the strategy and execute the search
-			lms.application.search.SearchStrategy<Book> strategy = criterion.createStrategy();
-			lms.application.search.SearchContext<Book> searchContext = 
-				new lms.application.search.SearchContext<>(strategy);
+			if (searchTerm.isEmpty()) {
+				System.out.println("Search term cannot be empty!");
+				return;
+			}
 			
+			SearchStrategy<Book> strategy = criterion.createStrategy();
+			SearchContext<Book> searchContext = new SearchContext<>(strategy);
+
 			List<Book> results = bookService.searchBooks(strategy, searchTerm);
 			
-			// Display results
 			displayBookResults(results);
 			
 		} catch (Exception e) {
 			System.out.println("Error during search/filter: " + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Displays helpful hints about how the search works for each criterion.
+	 * 
+	 * @param criterion the search criterion
+	 */
+	private void displaySearchHint(SearchCriteria criterion) {
+		String hint = switch (criterion) {
+			case ID -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
+			case TITLE -> "Tip: Partial matches work (e.g., 'Clean' finds 'Clean Code')";
+			case AUTHOR -> "Tip: Partial matches work (e.g., 'Martin' finds all Martin authors)";
+			case ISBN -> "Tip: You can enter partial ISBN numbers";
+			case CATEGORY -> "Tip: Partial matches work (e.g., 'Eng' finds 'Engineering')";
+			case YEAR -> "Tip: Enter exact year (e.g., 2020)";
+			case AVAILABILITY -> "Tip: Enter 'y' or 'yes' to show only available books";
+		};
+		System.out.println(hint);
 	}
 
 	/**
@@ -306,7 +344,7 @@ public class AdminCLI implements CLI {
 	 * @param criterion the search criterion
 	 * @return the prompt message
 	 */
-	private String getSearchPromptMessage(lms.application.search.SearchCriteria criterion) {
+	private String getSearchPromptMessage(SearchCriteria criterion) {
 		return switch (criterion) {
 			case ID -> "Enter Book ID: ";
 			case TITLE -> "Enter title to search: ";
@@ -318,14 +356,198 @@ public class AdminCLI implements CLI {
 		};
 	}
 
-	private void searchFilterCDs(String criteria) {
-		// TODO: Implement CD search/filter once CDService is available
-		System.out.println("CD search/filter functionality coming soon!");
+	private void searchFilterCDs(String criteriaChoice) {
+		try {
+			// Map criteria choice to appropriate CD search strategy
+			SearchStrategy<CD> strategy = getCDSearchStrategy(criteriaChoice);
+			
+			if (strategy == null) {
+				System.out.println("Invalid criteria choice!");
+				return;
+			}
+			
+			// Display search hint
+			displayCDSearchHint(criteriaChoice);
+			
+			String promptMessage = getCDSearchPromptMessage(criteriaChoice);
+			System.out.print(promptMessage);
+			String searchTerm = scanner.nextLine().trim();
+			
+			if (searchTerm.isEmpty()) {
+				System.out.println("Search term cannot be empty!");
+				return;
+			}
+			
+			List<CD> results = cdService.searchCDs(strategy, searchTerm);
+			displayCDResults(results);
+			
+		} catch (Exception e) {
+			System.out.println("Error during search/filter: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Gets the appropriate CD search strategy based on user choice.
+	 */
+	private SearchStrategy<CD> getCDSearchStrategy(String choice) {
+		return switch (choice) {
+			case "1" -> new lms.application.search.SearchCDByIdStrategy();
+			case "2" -> new lms.application.search.SearchCDByTitleStrategy();
+			case "3" -> new lms.application.search.SearchCDByArtistStrategy();
+			case "7" -> new lms.application.search.FilterCDByAvailabilityStrategy();
+			default -> null;
+		};
+	}
+	
+	/**
+	 * Displays helpful hints for CD search.
+	 */
+	private void displayCDSearchHint(String choice) {
+		String hint = switch (choice) {
+			case "1" -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
+			case "2" -> "Tip: Partial matches work (e.g., 'Thriller' finds 'Thriller')";
+			case "3" -> "Tip: Partial matches work (e.g., 'Jackson' finds all Jackson artists)";
+			case "7" -> "Tip: Enter 'y' or 'yes' to show only available CDs";
+			default -> "Tip: Enter your search criteria";
+		};
+		System.out.println(hint);
+	}
+	
+	/**
+	 * Gets the appropriate prompt message for CD search.
+	 */
+	private String getCDSearchPromptMessage(String choice) {
+		return switch (choice) {
+			case "1" -> "Enter CD ID: ";
+			case "2" -> "Enter title to search: ";
+			case "3" -> "Enter artist to search: ";
+			case "7" -> "Show only available CDs? (y/n): ";
+			default -> "Enter search term: ";
+		};
+	}
+	
+	/**
+	 * Displays CD search results in a formatted table.
+	 */
+	private void displayCDResults(List<CD> cds) {
+		if (cds.isEmpty()) {
+			System.out.println("No CDs found matching the criteria.");
+			return;
+		}
+
+		System.out.println("\n===== Search/Filter Results =====");
+		System.out.printf("%-10s %-40s %-30s %-15s\n", "ID", "Title", "Artist", "Copies");
+		System.out.println("─".repeat(95));
+
+		for (CD cd : cds) {
+			String cdId = cd.getId().toString();
+			String displayId = cdId.length() > 8 ? cdId.substring(0, 8) : cdId;
+			String displayTitle = cd.getTitle().length() > 38 ? cd.getTitle().substring(0, 38) + ".." : cd.getTitle();
+			String displayArtist = cd.getArtist().length() > 28 ? cd.getArtist().substring(0, 28) + ".." : cd.getArtist();
+			String copies = cd.getAvailableCopies() + "/" + cd.getTotalCopies();
+			
+			System.out.printf("%-10s %-40s %-30s %-15s\n",
+					displayId, displayTitle, displayArtist, copies);
+		}
+		System.out.println("Total results: " + cds.size());
+		System.out.println("=================================\n");
 	}
 
-	private void searchFilterJournals(String criteria) {
-		// TODO: Implement Journal search/filter once JournalService is available
-		System.out.println("Journal search/filter functionality coming soon!");
+	private void searchFilterJournals(String criteriaChoice) {
+		try {
+			// Map criteria choice to appropriate Journal search strategy
+			SearchStrategy<Journal> strategy = getJournalSearchStrategy(criteriaChoice);
+			
+			if (strategy == null) {
+				System.out.println("Invalid criteria choice!");
+				return;
+			}
+			
+			// Display search hint
+			displayJournalSearchHint(criteriaChoice);
+			
+			String promptMessage = getJournalSearchPromptMessage(criteriaChoice);
+			System.out.print(promptMessage);
+			String searchTerm = scanner.nextLine().trim();
+			
+			if (searchTerm.isEmpty()) {
+				System.out.println("Search term cannot be empty!");
+				return;
+			}
+			
+			List<Journal> results = journalService.searchJournals(strategy, searchTerm);
+			displayJournalResults(results);
+			
+		} catch (Exception e) {
+			System.out.println("Error during search/filter: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Gets the appropriate Journal search strategy based on user choice.
+	 */
+	private SearchStrategy<Journal> getJournalSearchStrategy(String choice) {
+		return switch (choice) {
+			case "1" -> new lms.application.search.SearchJournalByIdStrategy();
+			case "2" -> new lms.application.search.SearchJournalByTitleStrategy();
+			case "3" -> new lms.application.search.SearchJournalByAuthorStrategy();
+			case "7" -> new lms.application.search.FilterJournalByAvailabilityStrategy();
+			default -> null;
+		};
+	}
+	
+	/**
+	 * Displays helpful hints for Journal search.
+	 */
+	private void displayJournalSearchHint(String choice) {
+		String hint = switch (choice) {
+			case "1" -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
+			case "2" -> "Tip: Partial matches work (e.g., 'Nature' finds journals with 'Nature')";
+			case "3" -> "Tip: Partial matches work (e.g., 'Springer' finds all Springer journals)";
+			case "7" -> "Tip: Enter 'y' or 'yes' to show only available journals";
+			default -> "Tip: Enter your search criteria";
+		};
+		System.out.println(hint);
+	}
+	
+	/**
+	 * Gets the appropriate prompt message for Journal search.
+	 */
+	private String getJournalSearchPromptMessage(String choice) {
+		return switch (choice) {
+			case "1" -> "Enter Journal ID: ";
+			case "2" -> "Enter title to search: ";
+			case "3" -> "Enter author/publisher to search: ";
+			case "7" -> "Show only available journals? (y/n): ";
+			default -> "Enter search term: ";
+		};
+	}
+	
+	/**
+	 * Displays Journal search results in a formatted table.
+	 */
+	private void displayJournalResults(List<Journal> journals) {
+		if (journals.isEmpty()) {
+			System.out.println("No journals found matching the criteria.");
+			return;
+		}
+
+		System.out.println("\n===== Search/Filter Results =====");
+		System.out.printf("%-10s %-50s %-40s %-15s\n", "ID", "Title", "Author/Publisher", "Copies");
+		System.out.println("─".repeat(115));
+
+		for (Journal journal : journals) {
+			String journalId = journal.getId().toString();
+			String displayId = journalId.length() > 8 ? journalId.substring(0, 8) : journalId;
+			String displayTitle = journal.getTitle().length() > 48 ? journal.getTitle().substring(0, 48) + ".." : journal.getTitle();
+			String displayAuthor = journal.getAuthor().length() > 38 ? journal.getAuthor().substring(0, 38) + ".." : journal.getAuthor();
+			String copies = journal.getAvailableCopies() + "/" + journal.getTotalCopies();
+			
+			System.out.printf("%-10s %-50s %-40s %-15s\n",
+					displayId, displayTitle, displayAuthor, copies);
+		}
+		System.out.println("Total results: " + journals.size());
+		System.out.println("=================================\n");
 	}
 
 	private void displaySingleBook(Book book) {
@@ -382,8 +604,39 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleViewAllCDs() {
-		// TODO: Implement CD viewing once CDService is available
-		System.out.println("CD viewing functionality coming soon!");
+		System.out.println("\n===== All CDs =====");
+
+		List<CD> cds = cdService.getAllCDs();
+
+		if (cds.isEmpty()) {
+			System.out.println("No CDs available in the system.");
+			return;
+		}
+
+		System.out.printf("%-10s %-40s %-30s %-15s\n", "ID", "Title", "Artist", "Copies");
+		System.out.println("─".repeat(95));
+
+		for (CD cd : cds) {
+			String cdId = cd.getId().toString();
+			String displayId = cdId.length() > 8 ? cdId.substring(0, 8) : cdId;
+			String displayTitle = cd.getTitle().length() > 38 ? cd.getTitle().substring(0, 38) + ".." : cd.getTitle();
+			String displayArtist = cd.getArtist().length() > 28 ? cd.getArtist().substring(0, 28) + ".." : cd.getArtist();
+			String copies = cd.getAvailableCopies() + "/" + cd.getTotalCopies();
+			
+			System.out.printf("%-10s %-40s %-30s %-15s\n",
+					displayId, displayTitle, displayArtist, copies);
+		}
+
+		System.out.println("\nTotal CDs: " + cds.size());
+		
+		long availableCDs = cds.stream().filter(CD::isAvailable).count();
+		int totalCopiesCount = cds.stream().mapToInt(CD::getTotalCopies).sum();
+		int availableCopiesCount = cds.stream().mapToInt(CD::getAvailableCopies).sum();
+		
+		System.out.println("CDs with Available Copies: " + availableCDs + "/" + cds.size());
+		System.out.println("Total Copies in Library: " + totalCopiesCount);
+		System.out.println("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
+		System.out.println("==============================\n");
 	}
 
 	private void handleUpdateCD() {
@@ -402,8 +655,39 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleViewAllJournals() {
-		// TODO: Implement Journal viewing once JournalService is available
-		System.out.println("Journal viewing functionality coming soon!");
+		System.out.println("\n===== All Journals =====");
+
+		List<Journal> journals = journalService.getAllJournals();
+
+		if (journals.isEmpty()) {
+			System.out.println("No journals available in the system.");
+			return;
+		}
+
+		System.out.printf("%-38s %-50s %-50s %-15s\n", "ID", "Title", "Author/Publisher", "Copies");
+		System.out.println("─".repeat(153));
+
+		for (Journal journal : journals) {
+			String journalId = journal.getId().toString();
+			String displayId = journalId.length() > 8 ? journalId.substring(0, 8) : journalId;
+			String displayTitle = journal.getTitle().length() > 48 ? journal.getTitle().substring(0, 48) + ".." : journal.getTitle();
+			String displayAuthor = journal.getAuthor().length() > 48 ? journal.getAuthor().substring(0, 48) + ".." : journal.getAuthor();
+			String copies = journal.getAvailableCopies() + "/" + journal.getTotalCopies();
+			
+			System.out.printf("%-38s %-50s %-50s %-15s\n",
+					displayId, displayTitle, displayAuthor, copies);
+		}
+
+		System.out.println("\nTotal Journals: " + journals.size());
+		
+		long availableJournals = journals.stream().filter(Journal::isAvailable).count();
+		int totalCopiesCount = journals.stream().mapToInt(Journal::getTotalCopies).sum();
+		int availableCopiesCount = journals.stream().mapToInt(Journal::getAvailableCopies).sum();
+		
+		System.out.println("Journals with Available Copies: " + availableJournals + "/" + journals.size());
+		System.out.println("Total Copies in Library: " + totalCopiesCount);
+		System.out.println("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
+		System.out.println("==============================\n");
 	}
 
 	private void handleUpdateJournal() {
@@ -574,16 +858,33 @@ private void handleViewLoanStats() {
 			return;
 		}
 
-		System.out.printf("%-5s %-30s %-20s %-15s %-10s %-5s %-10s %-10s\n", "ID", "Title", "Author", "ISBN", "Year",
-				"Copies", "Category", "Shelf");
+		System.out.printf("%-10s %-35s %-25s %-15s %-8s %-12s %-15s %-12s\n", 
+				"ID", "Title", "Author", "ISBN", "Year", "Copies", "Category", "Shelf");
+		System.out.println("─".repeat(132));
 
 		for (Book book : books) {
-			System.out.printf("%-5s %-30s %-20s %-15s %-10d %-5s %-10s %-10s\n",
-					book.getId().toString().substring(0, 5), book.getTitle(), book.getAuthor(), book.getIsbn(),
-					book.getPublicationYear(), book.getAvailableCopies() + "/" + book.getTotalCopies(),
-					book.getCategory(), book.getShelfLocation());
+			String bookId = book.getId().toString();
+			String displayId = bookId.length() > 8 ? bookId.substring(0, 8) : bookId;
+			String displayTitle = book.getTitle().length() > 33 ? book.getTitle().substring(0, 33) + ".." : book.getTitle();
+			String displayAuthor = book.getAuthor().length() > 23 ? book.getAuthor().substring(0, 23) + ".." : book.getAuthor();
+			String displayCategory = book.getCategory().length() > 13 ? book.getCategory().substring(0, 13) + ".." : book.getCategory();
+			String displayShelf = book.getShelfLocation().length() > 10 ? book.getShelfLocation().substring(0, 10) + ".." : book.getShelfLocation();
+			String copies = book.getAvailableCopies() + "/" + book.getTotalCopies();
+			
+			System.out.printf("%-10s %-35s %-25s %-15s %-8d %-12s %-15s %-12s\n",
+					displayId, displayTitle, displayAuthor, book.getIsbn(),
+					book.getPublicationYear(), copies, displayCategory, displayShelf);
 		}
 
+		System.out.println("\nTotal Books: " + books.size());
+		
+		long availableBooks = books.stream().filter(Book::isAvailable).count();
+		int totalCopiesCount = books.stream().mapToInt(Book::getTotalCopies).sum();
+		int availableCopiesCount = books.stream().mapToInt(Book::getAvailableCopies).sum();
+		
+		System.out.println("Books with Available Copies: " + availableBooks + "/" + books.size());
+		System.out.println("Total Copies in Library: " + totalCopiesCount);
+		System.out.println("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
 		System.out.println("==============================\n");
 	}
 
@@ -621,10 +922,6 @@ private void handleViewLoanStats() {
 	}
 
 	private void handleViewReports() {
-		/*// TODO: write the implementation of this method
-	 	System.out.println("Reports: (simulation)");
-		 System.out.println("Total Books: 100");
-		 System.out.println("Total Users: 25");*/
 		
 		System.out.println("\n===== System Reports =====");
 	    int[] loanStats = loanService.getLoanStatistics();
@@ -639,7 +936,6 @@ private void handleViewLoanStats() {
 	    System.out.println("Overdue Loans: " + loanStats[2]);
 	    System.out.println("Overdue Rate: " + String.format("%.1f%%", (loanStats[2] * 100.0 / loanStats[0])));
 	    
-	    // Calculate available books
 	    long availableBooks = books.stream().filter(book -> book.getAvailableCopies() > 0).count();
 	    System.out.println("Available Books: " + availableBooks + "/" + books.size());
 	}

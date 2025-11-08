@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import lms.domain.Journal;
-import lms.domain.JournalRepository;
+import lms.domain.JournalsRepository;
 import lms.domain.Role;
 import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
@@ -31,7 +31,7 @@ import lms.domain.exception.PermissionDeniedException;
 class JournalServiceTest {
 
 	@Mock
-	private JournalRepository journalRepo;
+	private JournalsRepository journalRepo;
 
 	@Mock
 	private UserRepository userRepo;

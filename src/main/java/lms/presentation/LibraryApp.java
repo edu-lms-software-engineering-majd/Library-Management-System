@@ -3,14 +3,19 @@ package lms.presentation;
 import lms.application.AccountService;
 import lms.application.AuthService;
 import lms.application.BookService;
+import lms.application.CDService;
+import lms.application.JournalService;
 import lms.application.LoanService;
+import lms.application.NotificationService;
 import lms.application.UserService;
 import lms.domain.BookRepository;
 import lms.domain.CDRepository;
+import lms.domain.JournalsRepository;
 import lms.domain.LoanRepository;
 import lms.domain.UserRepository;
 import lms.persistence.StaticBookRepository;
 import lms.persistence.StaticCDRepository;
+import lms.persistence.StaticJournalsRepository;
 import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
 
@@ -50,26 +55,30 @@ import lms.persistence.StaticUserRepository;
  * access features based on their roles (admin, librarian, member, etc.).
  * </p>
  *
- * @author Majd
+ * @author Majd Awwad
  * @version 2.0
  */
 public class LibraryApp {
 
 	public static void main(String[] args) {
 
-		UserRepository userRepo = new StaticUserRepository();
-		BookRepository bookRepo = new StaticBookRepository();
-		CDRepository   cdRepo = new StaticCDRepository();
-		JurnalsRepository journalsRepo = new StaticJournalsRepository();
-		LoanRepository loanRepo = new StaticLoanRepository();
+		UserRepository userRepo = StaticUserRepository.getInstance();
+		BookRepository bookRepo = StaticBookRepository.getInstance();
+		CDRepository   cdRepo = StaticCDRepository.getInstance();
+		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();
+		LoanRepository loanRepo = StaticLoanRepository.getInstance();
 		
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
 		BookService bookService = new BookService(bookRepo, userRepo);
+		CDService cdService = new CDService(cdRepo, userRepo);
+		JournalService journalService = new JournalService(journalsRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
-		LoanService loanService = new LoanService(loanRepo, bookRepo, userRepo, accountService);
+		NotificationService notificationService = new NotificationService();
+		
+		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo, notificationService);
 
-		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService);
+		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService);
 		cli.start();
 	}
 }

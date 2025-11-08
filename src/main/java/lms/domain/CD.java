@@ -22,17 +22,33 @@ public class CD implements LoanableItem {
 	private final UUID id;
 	private String title;
 	private String artist;
-	private boolean isBorrowed;
+	private int totalCopies;
+	private int availableCopies;
 
 	/**
 	 * Creates a new {@code CD} with the required fields. The {@code id} is
-	 * automatically generated and {@code isBorrowed} is initialized to false.
+	 * automatically generated and {@code availableCopies} is initialized to
+	 * {@code totalCopies}.
 	 *
 	 * @param title  the title of the CD
 	 * @param artist the artist of the CD
 	 * @throws IllegalArgumentException if title or artist is null or blank
 	 */
 	public CD(String title, String artist) {
+		this(title, artist, 1);
+	}
+
+	/**
+	 * Creates a new {@code CD} with the required fields and specified number of copies.
+	 * The {@code id} is automatically generated and {@code availableCopies} is 
+	 * initialized to {@code totalCopies}.
+	 *
+	 * @param title  the title of the CD
+	 * @param artist the artist of the CD
+	 * @param totalCopies the total number of copies owned by the library
+	 * @throws IllegalArgumentException if title or artist is null or blank, or if totalCopies is less than 1
+	 */
+	public CD(String title, String artist, int totalCopies) {
 		this.id = UUID.randomUUID();
 
 		if (title == null || title.isBlank()) {
@@ -43,9 +59,14 @@ public class CD implements LoanableItem {
 			throw new IllegalArgumentException("CD artist cannot be empty");
 		}
 
+		if (totalCopies < 1) {
+			throw new IllegalArgumentException("Total copies must be at least 1");
+		}
+
 		this.title = title;
 		this.artist = artist;
-		this.isBorrowed = false;
+		this.totalCopies = totalCopies;
+		this.availableCopies = totalCopies;
 	}
 
 	public UUID getId() {
@@ -86,50 +107,84 @@ public class CD implements LoanableItem {
 		this.artist = artist;
 	}
 
-	public boolean isBorrowed() {
-		return isBorrowed;
+	/**
+	 * @return the total number of copies owned by the library
+	 */
+	public int getTotalCopies() {
+		return totalCopies;
 	}
 
-	public void setBorrowed(boolean borrowed) {
-		this.isBorrowed = borrowed;
+	/**
+	 * @param totalCopies the new total number of copies
+	 */
+	public void setTotalCopies(int totalCopies) {
+		if (totalCopies < 1) {
+			throw new IllegalArgumentException("Total copies must be at least 1");
+		}
+		this.totalCopies = totalCopies;
+	}
+
+	/**
+	 * @return the number of copies currently available for borrowing
+	 */
+	public int getAvailableCopies() {
+		return availableCopies;
+	}
+
+	/**
+	 * @param availableCopies the new number of available copies
+	 */
+	public void setAvailableCopies(int availableCopies) {
+		this.availableCopies = availableCopies;
+	}
+
+	/**
+	 * Checks if any copy is currently borrowed.
+	 * 
+	 * @return true if at least one copy is borrowed, false otherwise
+	 */
+	public boolean isBorrowed() {
+		return availableCopies < totalCopies;
 	}
 
 	/**
 	 * Checks if the CD is available for borrowing.
 	 *
-	 * @return true if the CD is not currently borrowed, false otherwise
+	 * @return true if there are available copies, false otherwise
 	 */
 	@Override
 	public boolean isAvailable() {
-		return !isBorrowed;
+		return availableCopies > 0;
 	}
 
 	/**
 	 * Marks the CD as borrowed by decrementing available copies.
-	 * For CDs, this sets the borrowed status to true.
+	 * 
+	 * @throws IllegalStateException if no copies are available to borrow
 	 */
 	@Override
-	public void decrementAvailableCopies() {
-		if (isBorrowed) {
-			throw new IllegalStateException("CD is already borrowed");
+	public void decrementAvailableCopies() throws IllegalStateException {
+		if (availableCopies <= 0) {
+			throw new IllegalStateException("No copies available to borrow.");
 		}
-		this.isBorrowed = true;
+		availableCopies--;
 	}
 
 	/**
 	 * Marks the CD as returned by incrementing available copies.
-	 * For CDs, this sets the borrowed status to false.
+	 * 
+	 * @throws IllegalStateException if all copies are already returned
 	 */
 	@Override
 	public void incrementAvailableCopies() {
-		if (!isBorrowed) {
-			throw new IllegalStateException("CD is not currently borrowed");
+		if (availableCopies >= totalCopies) {
+			throw new IllegalStateException("You Already Have All Copies of this CD");
 		}
-		this.isBorrowed = false;
+		availableCopies++;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("CD: %s by %s (Borrowed: %s)", title, artist, isBorrowed ? "Yes" : "No");
+		return String.format("CD: %s by %s (Available: %d/%d)", title, artist, availableCopies, totalCopies);
 	}
 }

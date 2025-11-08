@@ -183,6 +183,20 @@ public class CDService {
 	}
 
 	/**
+	 * Searches for CDs using a specific search strategy.
+	 *
+	 * @param strategy the search strategy to apply
+	 * @param searchTerm the search term
+	 * @return a list of matching {@link CD} entities
+	 */
+	public List<CD> searchCDs(lms.application.search.SearchStrategy<CD> strategy, String searchTerm) {
+		if (strategy == null) {
+			throw new IllegalArgumentException("Search strategy cannot be null");
+		}
+		return strategy.execute(cdRepo.getAllCDs(), searchTerm);
+	}
+
+	/**
 	 * Checks if a CD is available (not borrowed).
 	 *
 	 * @param cdId the UUID of the CD
@@ -217,11 +231,11 @@ public class CDService {
 		CD cd = cdRepo.getCDById(cdId)
 				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		if (cd.isBorrowed()) {
-			throw new IllegalStateException("CD is already borrowed: " + cd.getTitle());
+		if (!cd.isAvailable()) {
+			throw new IllegalStateException("No copies available to borrow: " + cd.getTitle());
 		}
 
-		cd.setBorrowed(true);
+		cd.decrementAvailableCopies();
 		boolean updated = cdRepo.updateCD(cd);
 		if (!updated) {
 			throw new IllegalStateException("Failed to update CD borrow status");
@@ -241,11 +255,11 @@ public class CDService {
 		CD cd = cdRepo.getCDById(cdId)
 				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		if (!cd.isBorrowed()) {
-			throw new IllegalStateException("CD is not currently borrowed: " + cd.getTitle());
+		if (cd.getAvailableCopies() >= cd.getTotalCopies()) {
+			throw new IllegalStateException("All copies are already returned: " + cd.getTitle());
 		}
 
-		cd.setBorrowed(false);
+		cd.incrementAvailableCopies();
 		boolean updated = cdRepo.updateCD(cd);
 		if (!updated) {
 			throw new IllegalStateException("Failed to update CD return status");

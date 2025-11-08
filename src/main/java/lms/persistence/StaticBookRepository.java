@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lms.domain.Book;
-import lms.domain.BookRepo;
 import lms.domain.BookRepository;
 
 /**
@@ -34,6 +33,8 @@ public class StaticBookRepository implements BookRepository {
 
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
+	
+	private static StaticBookRepository instance;
 
 	static {
 		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
@@ -53,7 +54,10 @@ public class StaticBookRepository implements BookRepository {
 	 *         book with the same ISBN already exists
 	 */
 	
-	StaticBookRepository getInstance() {
+	private StaticBookRepository() {
+	}
+	
+	public static StaticBookRepository getInstance() {
 	
 		if (instance == null) {
 			instance = new StaticBookRepository();

@@ -32,7 +32,7 @@ import lms.domain.BookRepository;
 import lms.domain.CD;
 import lms.domain.CDRepository;
 import lms.domain.Journal;
-import lms.domain.JournalRepository;
+import lms.domain.JournalsRepository;
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
 import lms.domain.User;
@@ -56,7 +56,7 @@ class LoanServiceTest {
 	private CDRepository cdRepo;
 
 	@Mock
-	private JournalRepository journalRepo;
+	private JournalsRepository journalRepo;
 
 	@Mock
 	private LoanRepository loanRepo;

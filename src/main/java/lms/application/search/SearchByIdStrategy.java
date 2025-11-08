@@ -18,13 +18,20 @@ public class SearchByIdStrategy extends BookSearchStrategy {
     
     @Override
     public List<Book> execute(List<Book> books, String searchTerm) {
+        String lowerSearchTerm = searchTerm.toLowerCase().trim();
+        
         try {
             UUID searchId = UUID.fromString(searchTerm);
-            return books.stream()
+            List<Book> exactMatch = books.stream()
                     .filter(book -> book.getId().equals(searchId))
                     .toList();
-        } catch (IllegalArgumentException e) {
-            return List.of();
-        }
+            if (!exactMatch.isEmpty()) {
+                return exactMatch;
+            }
+        } catch (IllegalArgumentException e) {}
+        
+        return books.stream()
+                .filter(book -> book.getId().toString().toLowerCase().contains(lowerSearchTerm))
+                .toList();
     }
 }

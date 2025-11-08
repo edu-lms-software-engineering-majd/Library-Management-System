@@ -9,11 +9,38 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lms.domain.Journal;
-import lms.domain.JournalRepository;
+import lms.domain.JournalsRepository;
 
-public class StaticJournalsRepository implements JournalRepository {
+public class StaticJournalsRepository implements JournalsRepository {
 
-	private final Map<UUID, Journal> journals = new HashMap<>();
+	private static final Map<UUID, Journal> journals = new HashMap<>();
+	
+	private static StaticJournalsRepository instance;
+	
+	static {
+		Journal journal1 = new Journal("Nature", "Springer Nature", 5);
+		Journal journal2 = new Journal("Science", "American Association for the Advancement of Science", 4);
+		Journal journal3 = new Journal("The Lancet", "Elsevier", 3);
+		Journal journal4 = new Journal("Cell", "Cell Press", 2);
+		Journal journal5 = new Journal("The New England Journal of Medicine", "Massachusetts Medical Society", 2);
+		
+		journals.put(journal1.getId(), journal1);
+		journals.put(journal2.getId(), journal2);
+		journals.put(journal3.getId(), journal3);
+		journals.put(journal4.getId(), journal4);
+		journals.put(journal5.getId(), journal5);
+	}
+	
+	private StaticJournalsRepository() {
+	}
+	
+	public static StaticJournalsRepository getInstance() {
+		
+		if (instance == null) {
+			instance = new StaticJournalsRepository();
+		}
+		return instance;
+	}
 
 	@Override
 	public boolean addJournal(Journal journal) {

@@ -10,7 +10,7 @@ import lms.domain.BookRepository;
 import lms.domain.CD;
 import lms.domain.CDRepository;
 import lms.domain.Journal;
-import lms.domain.JournalRepository;
+import lms.domain.JournalsRepository;
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
 import lms.domain.LoanableItem;
@@ -19,6 +19,7 @@ import lms.domain.UserRepository;
 import lms.domain.exception.BorrowNotAllowedException;
 import lms.domain.exception.ItemNotAvailableException;
 import lms.domain.exception.ItemNotFoundException;
+import lms.domain.exception.LoanAlreadyExistsException;
 import lms.domain.exception.LoanNotFoundException;
 import lms.domain.exception.PermissionDeniedException;
 import lms.domain.exception.UserNotFoundException;
@@ -55,12 +56,12 @@ public class LoanService {
 	private final CDRepository cdRepo;
 
 	/** Repository for managing journal data. */
-	private final JournalRepository journalRepo;
+	private final JournalsRepository journalRepo;
 
 	/** Repository for managing loan data. */
 	private final LoanRepository loanRepo;
 
-	private AccountService notificationService;
+	private NotificationService notificationService;
 
 	/**
 	 * Constructs a new LoanService with the required repositories.
@@ -72,7 +73,7 @@ public class LoanService {
 	 * @param loanRepo    the repository for loan operations
 	 */
 	public LoanService(UserRepository userRepo, BookRepository bookRepo, CDRepository cdRepo,
-			JournalRepository journalRepo, LoanRepository loanRepo, AccountService accountService) {
+			JournalsRepository journalRepo, LoanRepository loanRepo, NotificationService accountService) {
 
 		this.userRepo = userRepo;
 		this.bookRepo = bookRepo;
@@ -105,9 +106,10 @@ public class LoanService {
 	 * @throws ItemNotAvailableException if the item is not available for borrowing
 	 * @throws BorrowNotAllowedException if the user has reached their borrowing
 	 *                                   limit
+	 * @throws LoanAlreadyExistsException 
 	 */
 	public Loan loanItem(UserDTO userDTO, UUID itemId, String itemType)
-			throws UserNotFoundException, ItemNotFoundException, ItemNotAvailableException, BorrowNotAllowedException {
+			throws UserNotFoundException, ItemNotFoundException, ItemNotAvailableException, BorrowNotAllowedException, LoanAlreadyExistsException {
 
 		User user = userRepo.getByID(userDTO.userID())
 				.orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userDTO.userID()));
@@ -207,9 +209,11 @@ public class LoanService {
 	 *                                  found
 	 * @throws ItemNotFoundException    if the item associated with the loan is not
 	 *                                  found
+	 * @throws LoanNotFoundException 
+	 * @throws PermissionDeniedException 
 	 */
 	public boolean returnItem(UUID userID, UUID loanID)
-			throws IllegalArgumentException, IllegalStateException, UserNotFoundException, ItemNotFoundException {
+			throws IllegalArgumentException, IllegalStateException, UserNotFoundException, ItemNotFoundException, LoanNotFoundException, PermissionDeniedException {
 
 		if (!AuthorizationService.ensureLibrarian(AuthService.getCurrentUser())) {
 			throw new PermissionDeniedException("Only librarians can process returns.");
@@ -220,7 +224,7 @@ public class LoanService {
 		Loan loan = loanRepo.findById(loanID)
 				.orElseThrow(() -> new LoanNotFoundException("Loan not found - ID: " + loanId));
 
-		if (loan.isReturned()) {
+		if (!loan.isActive()) {
 			throw new IllegalStateException("Item already returned on: " + loan.getReturnDate());
 		}
 
@@ -260,8 +264,9 @@ public class LoanService {
 	/**
 	 * Checks for overdue loans and notifies users. This can be called by a
 	 * scheduled task.
+	 * @throws ItemNotFoundException 
 	 */
-	public void checkAndNotifyOverdueLoans() {
+	public void checkAndNotifyOverdueLoans() throws ItemNotFoundException {
 		List<Loan> overdueLoans = loanRepo.findOverdueLoans();
 
 		for (Loan loan : overdueLoans) {
@@ -278,8 +283,9 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of active loans
+	 * @throws UserNotFoundException 
 	 */
-	public List<Loan> getUserActiveLoans(UUID userId) {
+	public List<Loan> getUserActiveLoans(UUID userId) throws UserNotFoundException {
 		return loanRepo.findActiveLoansByUser(userId);
 	}
 
@@ -288,8 +294,9 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of all user loans
+	 * @throws UserNotFoundException 
 	 */
-	public List<Loan> getUserAllLoans(UUID userId) {
+	public List<Loan> getUserAllLoans(UUID userId) throws UserNotFoundException {
 		return loanRepo.findByUserId(userId);
 	}
 
@@ -323,7 +330,7 @@ public class LoanService {
 	 * @throws ItemNotFoundException    if the item associated with the loan is not
 	 *                                  found
 	 */
-	public Object[] getLoanWithItemInfo(UUID loanId) {
+	public Object[] getLoanWithItemInfo(UUID loanId) throws ItemNotFoundException {
 		Loan loan = getLoan(loanId);
 		LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
 		return new Object[] { loan, item };
@@ -334,8 +341,9 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return total fine amount
+	 * @throws UserNotFoundException 
 	 */
-	public double calculateUserTotalFines(UUID userId) {
+	public double calculateUserTotalFines(UUID userId) throws UserNotFoundException {
 		List<Loan> activeLoans = getUserActiveLoans(userId);
 		return activeLoans.stream().filter(Loan::isOverdue).mapToDouble(Loan::calculateFine).sum();
 	}
@@ -360,7 +368,7 @@ public class LoanService {
 		}
 
 		Loan loan = getLoan(loanId);
-		if (loan.isReturned()) {
+		if (!loan.isActive()) {
 			throw new IllegalStateException("Cannot extend a completed loan");
 		}
 
@@ -378,7 +386,7 @@ public class LoanService {
 	public int[] getLoanStatistics() {
 		List<Loan> allLoans = loanRepo.findAll();
 		int totalLoans = allLoans.size();
-		int activeLoans = (int) allLoans.stream().filter(loan -> !loan.isReturned()).count();
+		int activeLoans = (int) allLoans.stream().filter(loan -> loan.isActive()).count();
 		int overdueLoans = (int) allLoans.stream().filter(Loan::isOverdue).count();
 
 		return new int[] { totalLoans, activeLoans, overdueLoans };
@@ -389,13 +397,14 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of arrays containing [Loan, Book]
+	 * @throws UserNotFoundException 
 	 */
-	public List<Object[]> getUserActiveLoansWithBooks(UUID userId) {
+	public List<Object[]> getUserActiveLoansWithBooks(UUID userId) throws UserNotFoundException {
 		List<Loan> activeLoans = getUserActiveLoans(userId);
 		List<Object[]> result = new ArrayList<>();
 
 		for (Loan loan : activeLoans) {
-			Book book = bookRepo.getBookById(loan.getItemId());
+			Book book = bookRepo.getBookById(loan.getItemId()).orElse(null);
 			if (book != null) {
 				result.add(new Object[] { loan, book });
 			}
