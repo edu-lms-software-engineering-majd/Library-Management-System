@@ -163,7 +163,7 @@ public class Journal implements LoanableItem {
 	@Override
 	public void incrementAvailableCopies() {
 		if (availableCopies >= totalCopies) {
-			throw new IllegalStateException("You Already Have All Copies of this Journal");
+			throw new IllegalStateException("All copies are already returned");
 		}
 		availableCopies++;
 	}

@@ -101,7 +101,6 @@ public class BookService {
 				shelfLocation);
 
 		boolean added = bookRepo.addBook(book);
-		System.out.println(book);
 		if (!added) {
 			throw new IllegalStateException("Book with ISBN already exists: " + isbn);
 		}
