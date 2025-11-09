@@ -15,7 +15,7 @@ public class StaticCDRepository implements CDRepository {
 
 	private static final Map<UUID, CD> cds = new HashMap<>();
 	
-	private static StaticCDRepository instance;
+	private final static StaticCDRepository INSTANCE = new StaticCDRepository();
 	
 	static {
 		CD cd1 = new CD("Thriller", "Michael Jackson", 3);
@@ -35,10 +35,8 @@ public class StaticCDRepository implements CDRepository {
 	}
 	
 	public static StaticCDRepository getInstance() {
-		if (instance == null) {
-			instance = new StaticCDRepository();
-		}
-		return instance;
+		
+		return INSTANCE;
 	}
 
 	@Override

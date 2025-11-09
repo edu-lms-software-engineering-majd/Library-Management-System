@@ -38,7 +38,7 @@ import lms.domain.utils.PasswordUtils;
  */
 public class StaticUserRepository implements UserRepository {
 
-	private static StaticUserRepository instance;
+	private final static StaticUserRepository INSTANCE = new StaticUserRepository();
 	
 	/** Internal list storing all users */
 	private static final List<User> users = new ArrayList<>();
@@ -58,10 +58,7 @@ public class StaticUserRepository implements UserRepository {
 	}
 	
 	public static StaticUserRepository getInstance() {
-		if (instance == null) {
-			instance = new StaticUserRepository();
-		}
-		return instance;
+		return INSTANCE;
 	}
 
 	@Override

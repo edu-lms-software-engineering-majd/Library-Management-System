@@ -34,7 +34,7 @@ public class StaticBookRepository implements BookRepository {
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
 	
-	private static StaticBookRepository instance;
+	private static final StaticBookRepository INSTANCE = new StaticBookRepository();
 
 	static {
 		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
@@ -58,11 +58,8 @@ public class StaticBookRepository implements BookRepository {
 	}
 	
 	public static StaticBookRepository getInstance() {
-	
-		if (instance == null) {
-			instance = new StaticBookRepository();
-		}
-		return instance;
+		
+		return INSTANCE;
 	}
 
 	@Override

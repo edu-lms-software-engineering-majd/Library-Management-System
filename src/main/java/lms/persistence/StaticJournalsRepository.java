@@ -15,7 +15,7 @@ public class StaticJournalsRepository implements JournalsRepository {
 
 	private static final Map<UUID, Journal> journals = new HashMap<>();
 	
-	private static StaticJournalsRepository instance;
+	private final static StaticJournalsRepository INSTANCE = new StaticJournalsRepository();
 	
 	static {
 		Journal journal1 = new Journal("Nature", "Springer Nature", 5);
@@ -36,10 +36,7 @@ public class StaticJournalsRepository implements JournalsRepository {
 	
 	public static StaticJournalsRepository getInstance() {
 		
-		if (instance == null) {
-			instance = new StaticJournalsRepository();
-		}
-		return instance;
+		return INSTANCE;
 	}
 
 	@Override
