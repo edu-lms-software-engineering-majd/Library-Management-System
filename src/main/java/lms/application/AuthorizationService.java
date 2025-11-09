@@ -31,6 +31,7 @@ import lms.domain.exception.PermissionDeniedException;
 public final class AuthorizationService {
 
 	private AuthorizationService() {
+		throw new UnsupportedOperationException("Utility class cannot be instantiated");
 	}
 
 	/**
