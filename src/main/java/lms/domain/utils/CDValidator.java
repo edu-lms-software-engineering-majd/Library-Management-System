@@ -6,15 +6,40 @@ package lms.domain.utils;
  * <p>
  * Provides validation methods for all CD constructor parameters to ensure
  * data integrity and business rules are enforced before object creation.
+ * This validator is stateless and uses a singleton pattern for reuse.
  * </p>
  * 
+ * <p><b>Validation Principles Applied:</b></p>
+ * <ul>
+ * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all CD entities</li>
+ * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
+ * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
+ * </ul>
+ * 
  * @author Majd Awwad
- * @version 1.0
+ * @version 2.0
  */
 public class CDValidator {
 
+	private static final CDValidator INSTANCE = new CDValidator();
+
 	/**
-	 * Validates all CD fields at once.
+	 * Private constructor to prevent instantiation.
+	 */
+	private CDValidator() {
+	}
+
+	/**
+	 * Returns the singleton instance of the validator.
+	 * 
+	 * @return the shared CDValidator instance
+	 */
+	public static CDValidator getInstance() {
+		return INSTANCE;
+	}
+
+	/**
+	 * Validates all CD fields at once (Fail Fast principle).
 	 * 
 	 * @param title       the title of the CD
 	 * @param artist      the artist of the CD

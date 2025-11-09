@@ -51,8 +51,7 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if title or author is null or blank, or if totalCopies is less than 1
 	 */
 	public Journal(String title, String author, int totalCopies) {
-		JournalValidator validator = new JournalValidator();
-		validator.validate(title, author, totalCopies);
+		JournalValidator.getInstance().validate(title, author, totalCopies);
 
 		this.id = UUID.randomUUID();
 		this.title = title;
@@ -76,8 +75,7 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if title is null or blank
 	 */
 	public void setTitle(String title) {
-		JournalValidator validator = new JournalValidator();
-		validator.validateTitle(title);
+		JournalValidator.getInstance().validateTitle(title);
 		this.title = title;
 	}
 
@@ -92,8 +90,7 @@ public class Journal implements LoanableItem {
 	 * @throws IllegalArgumentException if author is null or blank
 	 */
 	public void setAuthor(String author) {
-		JournalValidator validator = new JournalValidator();
-		validator.validateAuthor(author);
+		JournalValidator.getInstance().validateAuthor(author);
 		this.author = author;
 	}
 
@@ -108,8 +105,7 @@ public class Journal implements LoanableItem {
 	 * @param totalCopies the new total number of copies
 	 */
 	public void setTotalCopies(int totalCopies) {
-		JournalValidator validator = new JournalValidator();
-		validator.validateTotalCopies(totalCopies);
+		JournalValidator.getInstance().validateTotalCopies(totalCopies);
 		this.totalCopies = totalCopies;
 	}
 

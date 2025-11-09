@@ -51,8 +51,8 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if title or artist is null or blank, or if totalCopies is less than 1
 	 */
 	public CD(String title, String artist, int totalCopies) {
-		CDValidator validator = new CDValidator();
-		validator.validate(title, artist, totalCopies);
+		// Fail Fast: Validate all fields before object creation
+		CDValidator.getInstance().validate(title, artist, totalCopies);
 
 		this.id = UUID.randomUUID();
 		this.title = title;
@@ -76,8 +76,7 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if title is null or blank
 	 */
 	public void setTitle(String title) {
-		CDValidator validator = new CDValidator();
-		validator.validateTitle(title);
+		CDValidator.getInstance().validateTitle(title);
 		this.title = title;
 	}
 
@@ -92,8 +91,7 @@ public class CD implements LoanableItem {
 	 * @throws IllegalArgumentException if artist is null or blank
 	 */
 	public void setArtist(String artist) {
-		CDValidator validator = new CDValidator();
-		validator.validateArtist(artist);
+		CDValidator.getInstance().validateArtist(artist);
 		this.artist = artist;
 	}
 
@@ -108,8 +106,7 @@ public class CD implements LoanableItem {
 	 * @param totalCopies the new total number of copies
 	 */
 	public void setTotalCopies(int totalCopies) {
-		CDValidator validator = new CDValidator();
-		validator.validateTotalCopies(totalCopies);
+		CDValidator.getInstance().validateTotalCopies(totalCopies);
 		this.totalCopies = totalCopies;
 	}
 

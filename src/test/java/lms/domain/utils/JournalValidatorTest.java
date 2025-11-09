@@ -14,12 +14,11 @@ class JournalValidatorTest {
 
 	@BeforeEach
 	void setUp() {
-		validator = new JournalValidator();
+		validator = JournalValidator.getInstance();
 	}
 
 	@AfterEach
 	void tearDown() {
-		validator = null;
 	}
 
 	@Test

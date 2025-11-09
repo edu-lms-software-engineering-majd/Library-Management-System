@@ -6,15 +6,40 @@ package lms.domain.utils;
  * <p>
  * Provides validation methods for all Journal constructor parameters to ensure
  * data integrity and business rules are enforced before object creation.
+ * This validator is stateless and uses a singleton pattern for reuse.
  * </p>
  * 
+ * <p><b>Validation Principles Applied:</b></p>
+ * <ul>
+ * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all Journal entities</li>
+ * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
+ * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
+ * </ul>
+ * 
  * @author Majd Awwad
- * @version 1.0
+ * @version 2.0
  */
 public class JournalValidator {
 
+	private static final JournalValidator INSTANCE = new JournalValidator();
+
 	/**
-	 * Validates all Journal fields at once.
+	 * Private constructor to prevent instantiation.
+	 */
+	private JournalValidator() {
+	}
+
+	/**
+	 * Returns the singleton instance of the validator.
+	 * 
+	 * @return the shared JournalValidator instance
+	 */
+	public static JournalValidator getInstance() {
+		return INSTANCE;
+	}
+
+	/**
+	 * Validates all Journal fields at once (Fail Fast principle).
 	 * 
 	 * @param title       the title of the journal
 	 * @param author      the author/publisher of the journal

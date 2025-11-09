@@ -2,6 +2,7 @@ package lms.presentation;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 import lms.application.AuthService;
 import lms.application.BookService;
@@ -595,12 +596,132 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateBook() {
-		// TODO Implement this method
+		System.out.print("Enter the Book ID to update: ");
+		String bookIdStr = scanner.nextLine().trim();
+
+		try {
+			UUID bookId = UUID.fromString(bookIdStr);
+			Book existingBook = bookService.getBookById(bookId);
+
+			if (existingBook == null) {
+				System.out.println("No book found with ID: " + bookIdStr);
+				return;
+			}
+
+			System.out.println("\n=== Current Book Details ===");
+			displaySingleBook(existingBook);
+			
+			System.out.println("Enter new values (leave blank to keep current value):");
+
+			System.out.print("New title [" + existingBook.getTitle() + "]: ");
+			String title = scanner.nextLine().trim();
+			if (title.isBlank()) title = null;
+
+			System.out.print("New author [" + existingBook.getAuthor() + "]: ");
+			String author = scanner.nextLine().trim();
+			if (author.isBlank()) author = null;
+
+			System.out.print("New ISBN [" + existingBook.getIsbn() + "]: ");
+			String isbn = scanner.nextLine().trim();
+			if (isbn.isBlank()) isbn = null;
+
+			System.out.print("New publisher [" + existingBook.getPublisher() + "]: ");
+			String publisher = scanner.nextLine().trim();
+			if (publisher.isBlank()) publisher = null;
+
+			System.out.print("New publication year [" + existingBook.getPublicationYear() + "]: ");
+			String yearStr = scanner.nextLine().trim();
+			Integer year = null;
+			if (!yearStr.isBlank()) {
+				try {
+					year = Integer.parseInt(yearStr);
+				} catch (NumberFormatException e) {
+					System.out.println("⚠Invalid year format, keeping current value.");
+				}
+			}
+
+			System.out.print("New category [" + existingBook.getCategory() + "]: ");
+			String category = scanner.nextLine().trim();
+			if (category.isBlank()) category = null;
+
+			System.out.print("New total copies [" + existingBook.getTotalCopies() + "]: ");
+			String copiesStr = scanner.nextLine().trim();
+			Integer totalCopies = null;
+			if (!copiesStr.isBlank()) {
+				try {
+					totalCopies = Integer.parseInt(copiesStr);
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid copies format, keeping current value.");
+				}
+			}
+
+			System.out.print("New language [" + existingBook.getLanguage() + "]: ");
+			String language = scanner.nextLine().trim();
+			if (language.isBlank()) language = null;
+
+			System.out.print("New shelf location [" + existingBook.getShelfLocation() + "]: ");
+			String shelfLocation = scanner.nextLine().trim();
+			if (shelfLocation.isBlank()) shelfLocation = null;
+
+			boolean updated = bookService.updateBook(
+				AuthService.getCurrentUser(),
+				bookId,
+				title,
+				author,
+				isbn,
+				publisher,
+				year,
+				category,
+				totalCopies,
+				language,
+				shelfLocation
+			);
+
+			if (updated) {
+				System.out.println("Book updated successfully.");
+				Book updatedBook = bookService.getBookById(bookId);
+				displaySingleBook(updatedBook);
+			} else {
+				System.out.println("Failed to update book.");
+			}
+
+		} catch (IllegalArgumentException e) {
+			System.out.println("Invalid Book ID format. Please enter a valid UUID.");
+		} catch (PermissionDeniedException e) {
+			System.out.println("You do not have permission to update books. Admin only.");
+		} catch (Exception e) {
+			System.out.println("⚠An error occurred: " + e.getMessage());
+		}
 	}
 
 	private void handleAddCD() {
-		// TODO: Implement CD addition once CD domain class and CDService are available
-		System.out.println("CD addition functionality coming soon!");
+		try {
+			System.out.println("=== Add a New CD ===");
+
+			System.out.print("Enter CD title: ");
+			String title = scanner.nextLine().trim();
+
+			System.out.print("Enter artist: ");
+			String artist = scanner.nextLine().trim();
+
+			System.out.print("Enter total copies: ");
+			int totalCopies = Integer.parseInt(scanner.nextLine().trim());
+
+			CD cd = cdService.addCD(AuthService.getCurrentUser(), title, artist, totalCopies);
+
+			if (cd != null) {
+				System.out.println("✅ CD '" + title + "' by " + artist + " added successfully.");
+			} else {
+				System.out.println("❌ Error: Failed to add CD.");
+			}
+
+		} catch (NumberFormatException e) {
+			System.out.println("❌ Invalid number format. Please enter numeric values for copies.");
+		} catch (PermissionDeniedException e) {
+			System.out.println("⛔ You do not have permission to add CDs. Admin only.");
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			System.out.println("❌ Error: " + e.getMessage());
+		}
 	}
 
 	private void handleViewAllCDs() {
@@ -640,8 +761,68 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateCD() {
-		// TODO: Implement CD update once CDService is available
-		System.out.println("CD update functionality coming soon!");
+		System.out.print("Enter the CD ID to update: ");
+		String cdIdStr = scanner.nextLine().trim();
+
+		try {
+			UUID cdId = UUID.fromString(cdIdStr);
+			CD existingCD = cdService.getCDById(cdId);
+
+			System.out.println("\n=== Current CD Details ===");
+			displaySingleCD(existingCD);
+			
+			System.out.println("Enter new values (leave blank to keep current value):");
+
+			System.out.print("New title [" + existingCD.getTitle() + "]: ");
+			String title = scanner.nextLine().trim();
+			if (title.isBlank()) title = null;
+
+			System.out.print("New artist [" + existingCD.getArtist() + "]: ");
+			String artist = scanner.nextLine().trim();
+			if (artist.isBlank()) artist = null;
+
+			System.out.print("New total copies [" + existingCD.getTotalCopies() + "]: ");
+			String copiesStr = scanner.nextLine().trim();
+			Integer totalCopies = null;
+			if (!copiesStr.isBlank()) {
+				try {
+					totalCopies = Integer.parseInt(copiesStr);
+				} catch (NumberFormatException e) {
+					System.out.println("⚠️ Invalid copies format, keeping current value.");
+				}
+			}
+
+			CD updated = cdService.updateCD(
+				AuthService.getCurrentUser(),
+				cdId,
+				title,
+				artist,
+				totalCopies
+			);
+
+			if (updated != null) {
+				System.out.println("✅ CD updated successfully.");
+				displaySingleCD(updated);
+			} else {
+				System.out.println("❌ Failed to update CD.");
+			}
+
+		} catch (IllegalArgumentException e) {
+			System.out.println("❌ " + e.getMessage());
+		} catch (PermissionDeniedException e) {
+			System.out.println("⛔ You do not have permission to update CDs. Admin only.");
+		} catch (Exception e) {
+			System.out.println("⚠️ An error occurred: " + e.getMessage());
+		}
+	}
+
+	private void displaySingleCD(CD cd) {
+		System.out.println("\n===== CD Details =====");
+		System.out.println("ID: " + cd.getId());
+		System.out.println("Title: " + cd.getTitle());
+		System.out.println("Artist: " + cd.getArtist());
+		System.out.println("Copies: " + cd.getAvailableCopies() + "/" + cd.getTotalCopies());
+		System.out.println("========================\n");
 	}
 
 	private void handleDeleteCD() {
@@ -650,8 +831,33 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleAddJournal() {
-		// TODO: Implement Journal addition once Journal domain class and JournalService are available
-		System.out.println("Journal addition functionality coming soon!");
+		try {
+			System.out.println("=== Add a New Journal ===");
+
+			System.out.print("Enter journal title: ");
+			String title = scanner.nextLine().trim();
+
+			System.out.print("Enter author/publisher: ");
+			String author = scanner.nextLine().trim();
+
+			System.out.print("Enter total copies: ");
+			int totalCopies = Integer.parseInt(scanner.nextLine().trim());
+
+			Journal journal = journalService.addJournal(AuthService.getCurrentUser(), title, author, totalCopies);
+
+			if (journal != null) {
+				System.out.println("Journal '" + title + "' by " + author + " added successfully.");
+			} else {
+				System.out.println("Error: Failed to add journal.");
+			}
+
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid number format. Please enter numeric values for copies.");
+		} catch (PermissionDeniedException e) {
+			System.out.println("You do not have permission to add journals. Admin only.");
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
 	}
 
 	private void handleViewAllJournals() {
@@ -691,8 +897,68 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateJournal() {
-		// TODO: Implement Journal update once JournalService is available
-		System.out.println("Journal update functionality coming soon!");
+		System.out.print("Enter the Journal ID to update: ");
+		String journalIdStr = scanner.nextLine().trim();
+
+		try {
+			UUID journalId = UUID.fromString(journalIdStr);
+			Journal existingJournal = journalService.getJournalById(journalId);
+
+			System.out.println("\n=== Current Journal Details ===");
+			displaySingleJournal(existingJournal);
+			
+			System.out.println("Enter new values (leave blank to keep current value):");
+
+			System.out.print("New title [" + existingJournal.getTitle() + "]: ");
+			String title = scanner.nextLine().trim();
+			if (title.isBlank()) title = null;
+
+			System.out.print("New author/publisher [" + existingJournal.getAuthor() + "]: ");
+			String author = scanner.nextLine().trim();
+			if (author.isBlank()) author = null;
+
+			System.out.print("New total copies [" + existingJournal.getTotalCopies() + "]: ");
+			String copiesStr = scanner.nextLine().trim();
+			Integer totalCopies = null;
+			if (!copiesStr.isBlank()) {
+				try {
+					totalCopies = Integer.parseInt(copiesStr);
+				} catch (NumberFormatException e) {
+					System.out.println("⚠️ Invalid copies format, keeping current value.");
+				}
+			}
+
+			Journal updated = journalService.updateJournal(
+				AuthService.getCurrentUser(),
+				journalId,
+				title,
+				author,
+				totalCopies
+			);
+
+			if (updated != null) {
+				System.out.println("✅ Journal updated successfully.");
+				displaySingleJournal(updated);
+			} else {
+				System.out.println("❌ Failed to update journal.");
+			}
+
+		} catch (IllegalArgumentException e) {
+			System.out.println("❌ " + e.getMessage());
+		} catch (PermissionDeniedException e) {
+			System.out.println("⛔ You do not have permission to update journals. Admin only.");
+		} catch (Exception e) {
+			System.out.println("⚠️ An error occurred: " + e.getMessage());
+		}
+	}
+
+	private void displaySingleJournal(Journal journal) {
+		System.out.println("\n===== Journal Details =====");
+		System.out.println("ID: " + journal.getId());
+		System.out.println("Title: " + journal.getTitle());
+		System.out.println("Author/Publisher: " + journal.getAuthor());
+		System.out.println("Copies: " + journal.getAvailableCopies() + "/" + journal.getTotalCopies());
+		System.out.println("============================\n");
 	}
 
 	private void handleDeleteJournal() {

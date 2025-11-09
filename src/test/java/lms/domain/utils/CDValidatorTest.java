@@ -14,12 +14,11 @@ class CDValidatorTest {
 
 	@BeforeEach
 	void setUp() {
-		validator = new CDValidator();
+		validator = CDValidator.getInstance();
 	}
 
 	@AfterEach
 	void tearDown() {
-		validator = null;
 	}
 
 	@Test

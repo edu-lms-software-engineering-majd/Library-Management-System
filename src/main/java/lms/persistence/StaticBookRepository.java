@@ -67,7 +67,7 @@ public class StaticBookRepository implements BookRepository {
 
 	@Override
 	public boolean addBook(Book book) {
-		if (getBookByIsbn(book.getIsbn()) != null) {
+		if (getBookByIsbn(book.getIsbn()).isPresent()) {
 			return false;
 		}
 		return books.add(book);
