@@ -33,17 +33,17 @@ import lms.domain.utils.PasswordUtils;
  * </ul>
  * </p>
  * 
- * @author Majd
+ * @author Majd Awwad
  * @version 1.1
  */
 public class StaticUserRepository implements UserRepository {
 
-	private static StaticUserRepository instance = null;
+	private final static StaticUserRepository INSTANCE = new StaticUserRepository();
 	
 	/** Internal list storing all users */
 	private static final List<User> users = new ArrayList<>();
 
-	// 🔹 Initialize with demo users
+	// Initialize with demo users
 	static {
 		users.add(new User("Admin", "System", "admin@test.com", "admin", PasswordUtils.hashPassword("admi123"),
 				Role.ADMIN));
@@ -54,11 +54,11 @@ public class StaticUserRepository implements UserRepository {
 				Role.ADMIN));
 	}
 	
+	private StaticUserRepository() {
+	}
+	
 	public static StaticUserRepository getInstance() {
-		if (instance == null) {
-			instance = new StaticUserRepository();
-		}
-		return instance;
+		return INSTANCE;
 	}
 
 	@Override

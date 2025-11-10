@@ -16,7 +16,7 @@ import java.util.UUID;
  * @author
  * @version 1.0
  */
-public interface JournalRepository {
+public interface JournalsRepository {
 
 	/**
 	 * Adds a new journal to the repository.

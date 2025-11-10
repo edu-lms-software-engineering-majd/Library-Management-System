@@ -53,8 +53,7 @@ public class Book implements LoanableItem {
 	 */
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
-		BookValidator validator = new BookValidator();
-		validator.validate(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
+		BookValidator.getInstance().validate(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
 				shelfLocation);
 
 		this.bookId = UUID.randomUUID();
@@ -125,8 +124,14 @@ public class Book implements LoanableItem {
 		return title;
 	}
 
-	/** @param title the new title of the book */
+	/**
+	 * Sets the title of the book.
+	 * 
+	 * @param title the new title of the book
+	 * @throws IllegalArgumentException if title is null or blank
+	 */
 	public void setTitle(String title) {
+		BookValidator.getInstance().validateTitle(title);
 		this.title = title;
 	}
 
@@ -135,8 +140,14 @@ public class Book implements LoanableItem {
 		return author;
 	}
 
-	/** @param author the new author of the book */
+	/**
+	 * Sets the author of the book.
+	 * 
+	 * @param author the new author of the book
+	 * @throws IllegalArgumentException if author is null or blank
+	 */
 	public void setAuthor(String author) {
+		BookValidator.getInstance().validateAuthor(author);
 		this.author = author;
 	}
 
@@ -145,8 +156,14 @@ public class Book implements LoanableItem {
 		return isbn;
 	}
 
-	/** @param isbn the new ISBN of the book */
+	/**
+	 * Sets the ISBN of the book.
+	 * 
+	 * @param isbn the new ISBN of the book
+	 * @throws IllegalArgumentException if ISBN is null or blank
+	 */
 	public void setIsbn(String isbn) {
+		BookValidator.getInstance().validateIsbn(isbn);
 		this.isbn = isbn;
 	}
 
@@ -155,8 +172,14 @@ public class Book implements LoanableItem {
 		return publisher;
 	}
 
-	/** @param publisher the new publisher of the book */
+	/**
+	 * Sets the publisher of the book.
+	 * 
+	 * @param publisher the new publisher of the book
+	 * @throws IllegalArgumentException if publisher is null or blank
+	 */
 	public void setPublisher(String publisher) {
+		BookValidator.getInstance().validatePublisher(publisher);
 		this.publisher = publisher;
 	}
 
@@ -165,8 +188,14 @@ public class Book implements LoanableItem {
 		return publicationYear;
 	}
 
-	/** @param publicationYear the new publication year of the book */
+	/**
+	 * Sets the publication year of the book.
+	 * 
+	 * @param publicationYear the new publication year of the book
+	 * @throws IllegalArgumentException if year is in the future
+	 */
 	public void setPublicationYear(int publicationYear) {
+		BookValidator.getInstance().validatePublicationYear(publicationYear);
 		this.publicationYear = publicationYear;
 	}
 
@@ -175,8 +204,14 @@ public class Book implements LoanableItem {
 		return category;
 	}
 
-	/** @param category the new category or genre of the book */
+	/**
+	 * Sets the category of the book.
+	 * 
+	 * @param category the new category or genre of the book
+	 * @throws IllegalArgumentException if category is null or blank
+	 */
 	public void setCategory(String category) {
+		BookValidator.getInstance().validateCategory(category);
 		this.category = category;
 	}
 
@@ -185,8 +220,14 @@ public class Book implements LoanableItem {
 		return totalCopies;
 	}
 
-	/** @param totalCopies the new total number of copies */
+	/**
+	 * Sets the total number of copies.
+	 * 
+	 * @param totalCopies the new total number of copies
+	 * @throws IllegalArgumentException if total copies is negative
+	 */
 	public void setTotalCopies(int totalCopies) {
+		BookValidator.getInstance().validateTotalCopies(totalCopies);
 		this.totalCopies = totalCopies;
 	}
 
@@ -205,8 +246,14 @@ public class Book implements LoanableItem {
 		return language;
 	}
 
-	/** @param language the new language of the book */
+	/**
+	 * Sets the language of the book.
+	 * 
+	 * @param language the new language of the book
+	 * @throws IllegalArgumentException if language is null or blank
+	 */
 	public void setLanguage(String language) {
+		BookValidator.getInstance().validateLanguage(language);
 		this.language = language;
 	}
 
@@ -225,8 +272,14 @@ public class Book implements LoanableItem {
 		return shelfLocation;
 	}
 
-	/** @param shelfLocation the new shelf location of the book */
+	/**
+	 * Sets the shelf location of the book.
+	 * 
+	 * @param shelfLocation the new shelf location of the book
+	 * @throws IllegalArgumentException if shelf location is null or blank
+	 */
 	public void setShelfLocation(String shelfLocation) {
+		BookValidator.getInstance().validateShelfLocation(shelfLocation);
 		this.shelfLocation = shelfLocation;
 	}
 }

@@ -31,7 +31,7 @@ import lms.domain.LoanRepository;
  */
 public class StaticLoanRepository implements LoanRepository {
 
-    private static StaticLoanRepository instance = null;
+    private final static StaticLoanRepository INSTANCE = new StaticLoanRepository();
     
     /** Internal list storing all loans */
     private static final List<Loan> loans = new ArrayList<>();
@@ -41,11 +41,13 @@ public class StaticLoanRepository implements LoanRepository {
      * 
      * @return the singleton instance
      */
+    
+    private StaticLoanRepository() {
+	}
+    
     public static StaticLoanRepository getInstance() {
-        if (instance == null) {
-            instance = new StaticLoanRepository();
-        }
-        return instance;
+        
+    	return INSTANCE;
     }
 
     @Override
