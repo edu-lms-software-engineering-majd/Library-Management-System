@@ -18,13 +18,6 @@ public class SearchByIdStrategy extends BookSearchStrategy {
     
     @Override
     public List<Book> execute(List<Book> books, String searchTerm) {
-        try {
-            UUID searchId = UUID.fromString(searchTerm);
-            return books.stream()
-                    .filter(book -> book.getId().equals(searchId))
-                    .toList();
-        } catch (IllegalArgumentException e) {
-            return List.of();
-        }
+        return SearchUtils.searchById(books, searchTerm, Book::getId);
     }
 }

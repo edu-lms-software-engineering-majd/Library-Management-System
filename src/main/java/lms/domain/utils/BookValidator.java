@@ -8,15 +8,40 @@ import java.time.Year;
  * <p>
  * Provides validation methods for all Book constructor parameters to ensure
  * data integrity and business rules are enforced before object creation.
+ * This validator is stateless and uses a singleton pattern for reuse.
  * </p>
  * 
+ * <p><b>Validation Principles Applied:</b></p>
+ * <ul>
+ * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all Book entities</li>
+ * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
+ * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
+ * </ul>
+ * 
  * @author Majd Awwad
- * @version 1.0
+ * @version 2.0
  */
 public class BookValidator {
 
+	private static final BookValidator INSTANCE = new BookValidator();
+
 	/**
-	 * Validates all book fields at once.
+	 * Private constructor to prevent instantiation.
+	 */
+	private BookValidator() {
+	}
+
+	/**
+	 * Returns the singleton instance of the validator.
+	 * 
+	 * @return the shared BookValidator instance
+	 */
+	public static BookValidator getInstance() {
+		return INSTANCE;
+	}
+
+	/**
+	 * Validates all book fields at once (Fail Fast principle).
 	 * 
 	 * @param title           the title of the book
 	 * @param author          the author of the book

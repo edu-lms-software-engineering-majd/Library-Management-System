@@ -16,12 +16,11 @@ class BookValidatorTest {
 
 	@BeforeEach
 	void setUp() {
-		validator = new BookValidator();
+		validator = BookValidator.getInstance();
 	}
 
 	@AfterEach
 	void tearDown() {
-		validator = null;
 	}
 
 	@Test

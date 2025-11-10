@@ -2,8 +2,10 @@ package lms.presentation;
 
 import lms.application.AuthService;
 import lms.application.BookService;
-import lms.application.UserService;
+import lms.application.CDService;
+import lms.application.JournalService;
 import lms.application.LoanService;
+import lms.application.UserService;
 
 /**
  * Factory class for creating the appropriate {@link CLI} implementation based
@@ -46,10 +48,10 @@ public class CLIFactory {
 	 * @return a {@link CLI} instance for the current user
 	 * @throws IllegalStateException if the user's role is unsupported
 	 */
-	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService) {
+	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService,CDService cdService, JournalService journalService) {
 		switch (AuthService.getCurrentUser().role()) {
 		case ADMIN:
-			return new AdminCLI(userService, bookService, authService,loanService);
+			return new AdminCLI(userService, bookService, authService,loanService, cdService, journalService);
 		case MEMBER:
 		case LIBRARIAN:
 			return new UserCLI(bookService, loanService);

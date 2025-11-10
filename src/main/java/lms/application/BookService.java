@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import lms.domain.Book;
-import lms.domain.BookRepo;
 import lms.domain.BookRepository;
 import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
@@ -49,7 +48,6 @@ public class BookService {
 	private final UserRepository userRepo;
 
 	private BookService() {
-		// Prevent instantiation without dependencies
 		bookRepo = null;
 		userRepo = null;
 	}
@@ -157,5 +155,83 @@ public class BookService {
 	public boolean isValidBook(UUID bookID) {
 
 		return this.bookRepo.getBookById(bookID).isPresent();
+	}
+
+	/**
+	 * Updates an existing book in the system.
+	 *
+	 * <p>
+	 * This method performs the following steps:
+	 * </p>
+	 * <ol>
+	 * <li>Verifies that the given user is an administrator.</li>
+	 * <li>Retrieves the existing book from the repository.</li>
+	 * <li>Updates only the fields that are not null.</li>
+	 * <li>Persists the updated book using {@link BookRepository}.</li>
+	 * </ol>
+	 *
+	 * <p>
+	 * <b>Note:</b> Field validation is handled by the {@link Book} domain entity's setters,
+	 * following the principle that domain entities encapsulate their own validation rules.
+	 * </p>
+	 *
+	 * @param userDTO the user attempting the action (must be admin)
+	 * @param bookId the ID of the book to update
+	 * @param title new title (null to keep current)
+	 * @param author new author (null to keep current)
+	 * @param isbn new ISBN (null to keep current)
+	 * @param publisher new publisher (null to keep current)
+	 * @param publicationYear new publication year (null to keep current)
+	 * @param category new category (null to keep current)
+	 * @param totalCopies new total copies (null to keep current)
+	 * @param language new language (null to keep current)
+	 * @param shelfLocation new shelf location (null to keep current)
+	 * @return true if the book was updated successfully
+	 * @throws PermissionDeniedException if the user is not an admin
+	 * @throws IllegalArgumentException if the book does not exist or validation fails
+	 */
+	public boolean updateBook(UserDTO userDTO, UUID bookId, String title, String author, String isbn,
+			String publisher, Integer publicationYear, String category, Integer totalCopies, 
+			String language, String shelfLocation) throws PermissionDeniedException {
+		
+		AuthorizationService.ensureAdmin(userDTO);
+		
+		Book book = bookRepo.getBookById(bookId)
+				.orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+		
+		if (title != null) {
+			book.setTitle(title);
+		}
+		if (author != null) {
+			book.setAuthor(author);
+		}
+		if (isbn != null) {
+			book.setIsbn(isbn);
+		}
+		if (publisher != null) {
+			book.setPublisher(publisher);
+		}
+		if (publicationYear != null) {
+			book.setPublicationYear(publicationYear);
+		}
+		if (category != null) {
+			book.setCategory(category);
+		}
+		if (totalCopies != null) {
+			if (totalCopies < book.getAvailableCopies()) {
+				throw new IllegalArgumentException(
+					"New total copies (" + totalCopies + ") cannot be less than available copies (" 
+					+ book.getAvailableCopies() + ")");
+			}
+			book.setTotalCopies(totalCopies);
+		}
+		if (language != null) {
+			book.setLanguage(language);
+		}
+		if (shelfLocation != null) {
+			book.setShelfLocation(shelfLocation);
+		}
+		
+		return bookRepo.updateBook(book);
 	}
 }
