@@ -20,6 +20,8 @@ public class NotificationServiceTest {
 	private NotificationService notificationService;
 	private User testUser;
 
+	private static final UUID SYSTEM_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
 	@BeforeEach
 	void setUp() throws Exception {
 		notificationService = new NotificationService();
@@ -29,7 +31,6 @@ public class NotificationServiceTest {
 
 	@Test
 	void givenUserAndNotification_whenNotify_thenNotificationIsAddedToUser() {
-
 		UUID senderId = UUID.randomUUID();
 		Notification notification = new Notification("Test notification", senderId, NotificationType.OVERDUE);
 
@@ -41,49 +42,20 @@ public class NotificationServiceTest {
 
 	@Test
 	void givenUserAndItemTitle_whenNotifyOverdueItem_thenOverdueNotificationIsAdded() {
-
 		String itemTitle = "Java Programming Book";
 
 		notificationService.notifyOverdueItem(testUser, itemTitle);
 
-		assertEquals(1, testUser.getUnreadNotifications().size());
 		Notification notification = testUser.getUnreadNotifications().get(0);
 		assertNotNull(notification);
 		assertEquals(NotificationType.OVERDUE, notification.getType());
 		assertEquals("Your item '" + itemTitle + "' is overdue. Please return it immediately.",
 				notification.getNotificationContent());
-	}
-
-	@Test
-	void givenNullUser_whenNotify_thenThrowsNullPointerException() {
-
-		UUID senderId = UUID.randomUUID();
-		Notification notification = new Notification("Test notification", senderId, NotificationType.OVERDUE);
-
-		assertThrows(NullPointerException.class, () -> {
-			notificationService.notify(null, notification);
-		});
-	}
-
-	@Test
-	void givenNullNotification_whenNotify_thenThrowsNullPointerException() {
-
-		assertThrows(NullPointerException.class, () -> {
-			notificationService.notify(testUser, null);
-		});
-	}
-
-	@Test
-	void givenNullUser_whenNotifyOverdueItem_thenThrowsNullPointerException() {
-
-		assertThrows(NullPointerException.class, () -> {
-			notificationService.notifyOverdueItem(null, "Some Book");
-		});
+		assertEquals(SYSTEM_ID, notification.getSenderID());
 	}
 
 	@Test
 	void givenMultipleNotifications_whenNotify_thenAllNotificationsAreAdded() {
-
 		UUID senderId = UUID.randomUUID();
 		Notification notification1 = new Notification("First notification", senderId, NotificationType.OVERDUE);
 		Notification notification2 = new Notification("Second notification", senderId, NotificationType.DUE_SOON);
@@ -98,35 +70,38 @@ public class NotificationServiceTest {
 
 	@Test
 	void givenMultipleOverdueItems_whenNotifyOverdueItem_thenAllNotificationsAreAdded() {
-
 		notificationService.notifyOverdueItem(testUser, "Book 1");
 		notificationService.notifyOverdueItem(testUser, "Book 2");
 		notificationService.notifyOverdueItem(testUser, "Book 3");
 
 		assertEquals(3, testUser.getUnreadNotifications().size());
-		assertEquals(NotificationType.OVERDUE, testUser.getUnreadNotifications().get(0).getType());
-		assertEquals(NotificationType.OVERDUE, testUser.getUnreadNotifications().get(1).getType());
-		assertEquals(NotificationType.OVERDUE, testUser.getUnreadNotifications().get(2).getType());
+		for (Notification n : testUser.getUnreadNotifications()) {
+			assertEquals(NotificationType.OVERDUE, n.getType());
+			assertEquals(SYSTEM_ID, n.getSenderID());
+		}
 	}
 
 	@Test
 	void givenEmptyItemTitle_whenNotifyOverdueItem_thenNotificationIsCreated() {
-
 		notificationService.notifyOverdueItem(testUser, "");
 
-		assertEquals(1, testUser.getUnreadNotifications().size());
-		assertEquals("Your item '' is overdue. Please return it immediately.",
-				testUser.getUnreadNotifications().get(0).getNotificationContent());
+		Notification n = testUser.getUnreadNotifications().get(0);
+		assertEquals("Your item '' is overdue. Please return it immediately.", n.getNotificationContent());
+		assertEquals(NotificationType.OVERDUE, n.getType());
+		assertEquals(SYSTEM_ID, n.getSenderID());
 	}
 
 	@Test
-	void givenOverdueNotification_whenNotify_thenSystemIdIsUsed() {
+	void givenNullUserOrNotification_whenNotify_thenThrowsNullPointerException() {
+		UUID senderId = UUID.randomUUID();
+		Notification notification = new Notification("Test", senderId, NotificationType.OVERDUE);
 
-		UUID expectedSystemId = UUID.fromString("00000000-0000-0000-0000-000000000000");
-		
-		notificationService.notifyOverdueItem(testUser, "Test Book");
+		assertThrows(NullPointerException.class, () -> notificationService.notify(null, notification));
+		assertThrows(NullPointerException.class, () -> notificationService.notify(testUser, null));
+	}
 
-		assertEquals(1, testUser.getUnreadNotifications().size());
-		assertEquals(expectedSystemId, testUser.getUnreadNotifications().get(0).getSenderID());
+	@Test
+	void givenNullUser_whenNotifyOverdueItem_thenThrowsNullPointerException() {
+		assertThrows(NullPointerException.class, () -> notificationService.notifyOverdueItem(null, "Some Book"));
 	}
 }

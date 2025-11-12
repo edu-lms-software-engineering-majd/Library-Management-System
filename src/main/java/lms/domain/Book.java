@@ -70,6 +70,7 @@ public class Book implements LoanableItem {
 		this.shelfLocation = shelfLocation;
 	}
 
+	
 	/**
 	 * Creates a new {@code Book} with an optional description.
 	 *

@@ -23,4 +23,5 @@ public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDat
 				loan.getDueDate(), loan.getReturnDate(), loan.isReturned(), loan.isFineApplied(), loan.isOverdue(),
 				loan.getDaysOverdue(), loan.calculateFine());
 	}
+	
 }
