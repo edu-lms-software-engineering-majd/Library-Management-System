@@ -592,7 +592,35 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleDeleteBook() {
-		// TODO Implement this method
+		System.out.print("Enter the Book ID (full or partial): ");
+		String bookIdStr = scanner.nextLine().trim();
+
+		try {
+			Book existingBook = findBookByIdOrSubId(bookIdStr);
+
+			if (existingBook == null) {
+				System.out.println("No book found with ID: " + bookIdStr);
+				return;
+			}
+
+			displayBookForDeletion(existingBook);
+
+			if (!confirmDeletion("book", existingBook.getAvailableCopies(), existingBook.getTotalCopies())) {
+				System.out.println("Deletion cancelled.");
+				return;
+			}
+
+			boolean deleted = bookService.deleteBook(AuthService.getCurrentUser(), existingBook.getId());
+
+			System.out.println(deleted ? "Book deleted successfully." : "Failed to delete book.");
+
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+		} catch (PermissionDeniedException e) {
+			System.out.println("You do not have permission to delete books. Admin only.");
+		} catch (Exception e) {
+			System.out.println("An error occurred: " + e.getMessage());
+		}
 	}
 
 	private void handleUpdateBook() {
@@ -824,8 +852,35 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleDeleteCD() {
-		// TODO: Implement CD deletion once CDService is available
-		System.out.println("CD deletion functionality coming soon!");
+		System.out.print("Enter the CD ID (full or partial): ");
+		String cdIdStr = scanner.nextLine().trim();
+
+		try {
+			CD existingCD = findCDByIdOrSubId(cdIdStr);
+
+			if (existingCD == null) {
+				System.out.println("No CD found with ID: " + cdIdStr);
+				return;
+			}
+
+			displayCDForDeletion(existingCD);
+
+			if (!confirmDeletion("CD", existingCD.getAvailableCopies(), existingCD.getTotalCopies())) {
+				System.out.println("Deletion cancelled.");
+				return;
+			}
+
+			boolean deleted = cdService.deleteCD(AuthService.getCurrentUser(), existingCD.getId());
+
+			System.out.println(deleted ? "CD deleted successfully." : "Failed to delete CD.");
+
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+		} catch (PermissionDeniedException e) {
+			System.out.println("You do not have permission to delete CDs. Admin only.");
+		} catch (Exception e) {
+			System.out.println("An error occurred: " + e.getMessage());
+		}
 	}
 
 	private void handleAddJournal() {
@@ -959,8 +1014,35 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleDeleteJournal() {
-		// TODO: Implement Journal deletion once JournalService is available
-		System.out.println("Journal deletion functionality coming soon!");
+		System.out.print("Enter the Journal ID (full or partial): ");
+		String journalIdStr = scanner.nextLine().trim();
+
+		try {
+			Journal existingJournal = findJournalByIdOrSubId(journalIdStr);
+
+			if (existingJournal == null) {
+				System.out.println("No journal found with ID: " + journalIdStr);
+				return;
+			}
+
+			displayJournalForDeletion(existingJournal);
+
+			if (!confirmDeletion("journal", existingJournal.getAvailableCopies(), existingJournal.getTotalCopies())) {
+				System.out.println("Deletion cancelled.");
+				return;
+			}
+
+			boolean deleted = journalService.deleteJournal(AuthService.getCurrentUser(), existingJournal.getId());
+
+			System.out.println(deleted ? "Journal deleted successfully." : "Failed to delete journal.");
+
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+		} catch (PermissionDeniedException e) {
+			System.out.println("You do not have permission to delete journals. Admin only.");
+		} catch (Exception e) {
+			System.out.println("An error occurred: " + e.getMessage());
+		}
 	}
 
 	private void showAdminMenu() {
@@ -1272,60 +1354,6 @@ private void handleViewLoanStats() {
 	}
 
 	/**
-	 * Displays book details before deletion confirmation.
-	 * 
-	 * @param book the book to display
-	 */
-	private void displayBookForDeletion(Book book) {
-		System.out.println("\n=== Book to Delete ===");
-		displaySingleBook(book);
-	}
-
-	/**
-	 * Displays CD details before deletion confirmation.
-	 * 
-	 * @param cd the CD to display
-	 */
-	private void displayCDForDeletion(CD cd) {
-		System.out.println("\n=== CD to Delete ===");
-		displaySingleCD(cd);
-	}
-
-	/**
-	 * Displays journal details before deletion confirmation.
-	 * 
-	 * @param journal the journal to display
-	 */
-	private void displayJournalForDeletion(Journal journal) {
-		System.out.println("\n=== Journal to Delete ===");
-		displaySingleJournal(journal);
-	}
-
-	/**
-	 * Prompts the user to confirm deletion of an item.
-	 * Shows a warning if the item has copies currently on loan.
-	 * 
-	 * @param itemType the type of item (e.g., "book", "CD", "journal")
-	 * @param availableCopies the number of available copies
-	 * @param totalCopies the total number of copies
-	 * @return true if user confirms deletion, false otherwise
-	 */
-	private boolean confirmDeletion(String itemType, int availableCopies, int totalCopies) {
-		int loanedCopies = totalCopies - availableCopies;
-		
-		if (loanedCopies > 0) {
-			System.out.println("Warning: This " + itemType + " has " + loanedCopies + 
-				" copies currently on loan.");
-			System.out.print("Are you sure you want to delete it? This will affect active loans. (y/n): ");
-		} else {
-			System.out.print("Are you sure you want to delete this " + itemType + "? (y/n): ");
-		}
-
-		String confirmation = scanner.nextLine().trim().toLowerCase();
-		return "y".equals(confirmation) || "yes".equals(confirmation);
-	}
-
-	/**
 	 * Helper method to find a book by full UUID or partial ID.
 	 * Tries full UUID first, then falls back to partial ID search.
 	 * 
@@ -1380,5 +1408,58 @@ private void handleViewLoanStats() {
 		
 		// Fall back to partial ID search
 		return journalService.getJournalBySubId(idStr);
+	}
+
+	/**
+	 * Displays book details before deletion.
+	 * 
+	 * @param book the book to display
+	 */
+	private void displayBookForDeletion(Book book) {
+		System.out.println("\n=== Book to Delete ===");
+		displaySingleBook(book);
+	}
+
+	/**
+	 * Displays CD details before deletion.
+	 * 
+	 * @param cd the CD to display
+	 */
+	private void displayCDForDeletion(CD cd) {
+		System.out.println("\n=== CD to Delete ===");
+		displaySingleCD(cd);
+	}
+
+	/**
+	 * Displays journal details before deletion.
+	 * 
+	 * @param journal the journal to display
+	 */
+	private void displayJournalForDeletion(Journal journal) {
+		System.out.println("\n=== Journal to Delete ===");
+		displaySingleJournal(journal);
+	}
+
+	/**
+	 * Confirms deletion with the user, showing a warning if there are active loans.
+	 * 
+	 * @param itemType the type of item (e.g., "book", "CD", "journal")
+	 * @param availableCopies the number of available copies
+	 * @param totalCopies the total number of copies
+	 * @return true if user confirms deletion, false otherwise
+	 */
+	private boolean confirmDeletion(String itemType, int availableCopies, int totalCopies) {
+		int loanedCopies = totalCopies - availableCopies;
+
+		if (loanedCopies > 0) {
+			System.out.println("Warning: This " + itemType + " has " + loanedCopies
+					+ " copies currently on loan.");
+			System.out.print("Are you sure you want to delete it? This will affect active loans. (y/n): ");
+		} else {
+			System.out.print("Are you sure you want to delete this " + itemType + "? (y/n): ");
+		}
+
+		String confirmation = scanner.nextLine().trim().toLowerCase();
+		return "y".equals(confirmation) || "yes".equals(confirmation);
 	}
 }

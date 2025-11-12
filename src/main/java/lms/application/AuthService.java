@@ -12,16 +12,8 @@ import lms.domain.exception.UserNotFoundException;
  * <p>
  * The {@code AuthService} is responsible for managing login, logout, and
  * retrieving the currently authenticated user. It coordinates with the
-<<<<<<< HEAD
  * {@link UserRepository} from the domain layer to validate credentials and maintain
  * the session state.
-||||||| 7160386
- * {@link UserRepo} from the domain layer to validate credentials and maintain
- * the session state.
-=======
- * {@link UserRepository} from the domain layer to validate credentials and
- * maintain the session state.
->>>>>>> ahmad-salameh
  * </p>
  *
  * <h2>Responsibilities:</h2>

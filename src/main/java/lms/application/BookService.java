@@ -3,6 +3,7 @@ package lms.application;
 import java.util.List;
 import java.util.UUID;
 
+import lms.application.search.SearchStrategy;
 import lms.domain.Book;
 import lms.domain.BookRepository;
 import lms.domain.UserRepository;
@@ -18,13 +19,9 @@ import lms.domain.exception.PermissionDeniedException;
  * <ul>
  * <li>Enforcing authorization rules (e.g., only admins can add books).</li>
  * <li>Delegating book creation to the {@link Book} domain entity, which
- * encapsulates its own validation rules.</li> <<<<<<< HEAD
+ * encapsulates its own validation rules.</li>
  * <li>Interacting with a {@link BookRepository} to persist or retrieve
- * books.</li> ||||||| 7160386
- * <li>Interacting with a {@link BookRepo} to persist or retrieve books.</li>
- * =======
- * <li>Interacting with a {@link BookRepository} to persist or retrieve
- * books.</li> >>>>>>> ahmad-salameh
+ * books.</li>
  * </ul>
  *
  * <p>
@@ -130,7 +127,7 @@ public class BookService {
 	 * @param searchTerm the search term or criteria
 	 * @return list of books matching the search criteria
 	 */
-	public List<Book> searchBooks(lms.application.search.SearchStrategy<Book> strategy, String searchTerm) {
+	public List<Book> searchBooks(SearchStrategy<Book> strategy, String searchTerm) {
 		if (strategy == null) {
 			throw new IllegalArgumentException("Search strategy cannot be null");
 		}
