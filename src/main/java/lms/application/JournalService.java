@@ -143,6 +143,32 @@ public class JournalService {
 	}
 
 	/**
+	 * Retrieves a journal by a partial ID match (substring).
+	 * Useful for CLI interfaces where users can enter shortened IDs.
+	 * 
+	 * @param subId the partial ID to search for (e.g., "00c3c695")
+	 * @return the matching Journal
+	 * @throws IllegalArgumentException if no journal found or multiple matches exist
+	 */
+	public Journal getJournalBySubId(String subId) {
+		List<Journal> allJournals = getAllJournals();
+		List<Journal> matches = allJournals.stream()
+			.filter(journal -> journal.getId().toString().startsWith(subId))
+			.toList();
+		
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("No journal found with ID starting with: " + subId);
+		}
+		
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException("Multiple journals found with ID starting with: " + subId + 
+				". Please provide more characters.");
+		}
+		
+		return matches.get(0);
+	}
+
+	/**
 	 * Updates an existing journal's information, if the requesting user has admin
 	 * privileges.
 	 *
@@ -200,19 +226,19 @@ public class JournalService {
 	/**
 	 * Deletes a journal from the system, if the requesting user has admin privileges.
 	 *
-	 * @param userDTO   the user attempting the action (must be admin)
-	 * @param journalId the UUID of the journal to delete
+	 * @param userDTO the user attempting the action (must be admin)
+	 * @param journalId the ID of the journal to delete
+	 * @return true if the journal was deleted successfully
 	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if the journal is not found
+	 * @throws IllegalArgumentException if the journal does not exist
 	 */
-	public void deleteJournal(UserDTO userDTO, UUID journalId) throws PermissionDeniedException, IllegalArgumentException {
-
+	public boolean deleteJournal(UserDTO userDTO, UUID journalId) throws PermissionDeniedException {
 		AuthorizationService.ensureAdmin(userDTO);
-
-		boolean deleted = journalRepo.deleteJournal(journalId);
-		if (!deleted) {
-			throw new IllegalArgumentException("Journal not found with ID: " + journalId);
-		}
+		
+		Journal journal = journalRepo.getJournalById(journalId)
+				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
+		
+		return journalRepo.deleteJournal(journalId);
 	}
 
 	/**

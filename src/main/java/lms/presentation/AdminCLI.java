@@ -261,14 +261,14 @@ public class AdminCLI implements CLI {
 
 			if ("y".equals(confirmation)) {
 				userService.deleteByUsername(user.username());
-				System.out.println("✅ User deleted successfully.");
+				System.out.println("User deleted successfully.");
 			} else {
-				System.out.println("❎ Deletion cancelled.");
+				System.out.println("Deletion cancelled.");
 			}
 		} catch (UserNotFoundException e) {
-			System.out.println("❌ No user found with username: " + username);
+			System.out.println("No user found with username: " + username);
 		} catch (Exception e) {
-			System.out.println("⚠️ An error occurred: " + e.getMessage());
+			System.out.println("An error occurred: " + e.getMessage());
 		}
 	}
 
@@ -596,12 +596,11 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateBook() {
-		System.out.print("Enter the Book ID to update: ");
+		System.out.print("Enter the Book ID (full or partial): ");
 		String bookIdStr = scanner.nextLine().trim();
 
 		try {
-			UUID bookId = UUID.fromString(bookIdStr);
-			Book existingBook = bookService.getBookById(bookId);
+			Book existingBook = findBookByIdOrSubId(bookIdStr);
 
 			if (existingBook == null) {
 				System.out.println("No book found with ID: " + bookIdStr);
@@ -636,7 +635,7 @@ public class AdminCLI implements CLI {
 				try {
 					year = Integer.parseInt(yearStr);
 				} catch (NumberFormatException e) {
-					System.out.println("⚠Invalid year format, keeping current value.");
+					System.out.println("Invalid year format, keeping current value.");
 				}
 			}
 
@@ -665,7 +664,7 @@ public class AdminCLI implements CLI {
 
 			boolean updated = bookService.updateBook(
 				AuthService.getCurrentUser(),
-				bookId,
+				existingBook.getId(),
 				title,
 				author,
 				isbn,
@@ -679,18 +678,18 @@ public class AdminCLI implements CLI {
 
 			if (updated) {
 				System.out.println("Book updated successfully.");
-				Book updatedBook = bookService.getBookById(bookId);
+				Book updatedBook = bookService.getBookById(existingBook.getId());
 				displaySingleBook(updatedBook);
 			} else {
 				System.out.println("Failed to update book.");
 			}
 
 		} catch (IllegalArgumentException e) {
-			System.out.println("Invalid Book ID format. Please enter a valid UUID.");
+			System.out.println(e.getMessage());
 		} catch (PermissionDeniedException e) {
 			System.out.println("You do not have permission to update books. Admin only.");
 		} catch (Exception e) {
-			System.out.println("⚠An error occurred: " + e.getMessage());
+			System.out.println("An error occurred: " + e.getMessage());
 		}
 	}
 
@@ -710,17 +709,17 @@ public class AdminCLI implements CLI {
 			CD cd = cdService.addCD(AuthService.getCurrentUser(), title, artist, totalCopies);
 
 			if (cd != null) {
-				System.out.println("✅ CD '" + title + "' by " + artist + " added successfully.");
+				System.out.println("CD '" + title + "' by " + artist + " added successfully.");
 			} else {
-				System.out.println("❌ Error: Failed to add CD.");
+				System.out.println("Error: Failed to add CD.");
 			}
 
 		} catch (NumberFormatException e) {
-			System.out.println("❌ Invalid number format. Please enter numeric values for copies.");
+			System.out.println("Invalid number format. Please enter numeric values for copies.");
 		} catch (PermissionDeniedException e) {
-			System.out.println("⛔ You do not have permission to add CDs. Admin only.");
+			System.out.println("You do not have permission to add CDs. Admin only.");
 		} catch (IllegalArgumentException | IllegalStateException e) {
-			System.out.println("❌ Error: " + e.getMessage());
+			System.out.println("Error: " + e.getMessage());
 		}
 	}
 
@@ -761,12 +760,11 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateCD() {
-		System.out.print("Enter the CD ID to update: ");
+		System.out.print("Enter the CD ID (full or partial): ");
 		String cdIdStr = scanner.nextLine().trim();
 
 		try {
-			UUID cdId = UUID.fromString(cdIdStr);
-			CD existingCD = cdService.getCDById(cdId);
+			CD existingCD = findCDByIdOrSubId(cdIdStr);
 
 			System.out.println("\n=== Current CD Details ===");
 			displaySingleCD(existingCD);
@@ -788,31 +786,31 @@ public class AdminCLI implements CLI {
 				try {
 					totalCopies = Integer.parseInt(copiesStr);
 				} catch (NumberFormatException e) {
-					System.out.println("⚠️ Invalid copies format, keeping current value.");
+					System.out.println("Invalid copies format, keeping current value.");
 				}
 			}
 
 			CD updated = cdService.updateCD(
 				AuthService.getCurrentUser(),
-				cdId,
+				existingCD.getId(),
 				title,
 				artist,
 				totalCopies
 			);
 
 			if (updated != null) {
-				System.out.println("✅ CD updated successfully.");
+				System.out.println("CD updated successfully.");
 				displaySingleCD(updated);
 			} else {
-				System.out.println("❌ Failed to update CD.");
+				System.out.println("Failed to update CD.");
 			}
 
 		} catch (IllegalArgumentException e) {
-			System.out.println("❌ " + e.getMessage());
+			System.out.println(e.getMessage());
 		} catch (PermissionDeniedException e) {
-			System.out.println("⛔ You do not have permission to update CDs. Admin only.");
+			System.out.println("You do not have permission to update CDs. Admin only.");
 		} catch (Exception e) {
-			System.out.println("⚠️ An error occurred: " + e.getMessage());
+			System.out.println("An error occurred: " + e.getMessage());
 		}
 	}
 
@@ -897,12 +895,11 @@ public class AdminCLI implements CLI {
 	}
 
 	private void handleUpdateJournal() {
-		System.out.print("Enter the Journal ID to update: ");
+		System.out.print("Enter the Journal ID (full or partial): ");
 		String journalIdStr = scanner.nextLine().trim();
 
 		try {
-			UUID journalId = UUID.fromString(journalIdStr);
-			Journal existingJournal = journalService.getJournalById(journalId);
+			Journal existingJournal = findJournalByIdOrSubId(journalIdStr);
 
 			System.out.println("\n=== Current Journal Details ===");
 			displaySingleJournal(existingJournal);
@@ -924,31 +921,31 @@ public class AdminCLI implements CLI {
 				try {
 					totalCopies = Integer.parseInt(copiesStr);
 				} catch (NumberFormatException e) {
-					System.out.println("⚠️ Invalid copies format, keeping current value.");
+					System.out.println("Invalid copies format, keeping current value.");
 				}
 			}
 
 			Journal updated = journalService.updateJournal(
 				AuthService.getCurrentUser(),
-				journalId,
+				existingJournal.getId(),
 				title,
 				author,
 				totalCopies
 			);
 
 			if (updated != null) {
-				System.out.println("✅ Journal updated successfully.");
+				System.out.println("Journal updated successfully.");
 				displaySingleJournal(updated);
 			} else {
-				System.out.println("❌ Failed to update journal.");
+				System.out.println("Failed to update journal.");
 			}
 
 		} catch (IllegalArgumentException e) {
-			System.out.println("❌ " + e.getMessage());
+			System.out.println(e.getMessage());
 		} catch (PermissionDeniedException e) {
-			System.out.println("⛔ You do not have permission to update journals. Admin only.");
+			System.out.println("You do not have permission to update journals. Admin only.");
 		} catch (Exception e) {
-			System.out.println("⚠️ An error occurred: " + e.getMessage());
+			System.out.println("An error occurred: " + e.getMessage());
 		}
 	}
 
@@ -1251,11 +1248,137 @@ private void handleViewLoanStats() {
 				System.out.println("Failed to update user.");
 
 		} catch (UserNotFoundException e) {
-			System.out.println("❌ No user found with username: " + username);
+			System.out.println("No user found with username: " + username);
 		} catch (IllegalAccessException e) {
-			System.out.println("⛔ You do not have permission to update this user.");
+			System.out.println("You do not have permission to update this user.");
 		} catch (Exception e) {
-			System.out.println("⚠️ An unexpected error occurred: " + e.getMessage());
+			System.out.println("An unexpected error occurred: " + e.getMessage());
 		}
+	}
+
+	/**
+	 * Validates if a string is a valid UUID format.
+	 * 
+	 * @param str the string to validate
+	 * @return true if valid UUID format, false otherwise
+	 */
+	private boolean isValidUUID(String str) {
+		try {
+			UUID.fromString(str);
+			return true;
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Displays book details before deletion confirmation.
+	 * 
+	 * @param book the book to display
+	 */
+	private void displayBookForDeletion(Book book) {
+		System.out.println("\n=== Book to Delete ===");
+		displaySingleBook(book);
+	}
+
+	/**
+	 * Displays CD details before deletion confirmation.
+	 * 
+	 * @param cd the CD to display
+	 */
+	private void displayCDForDeletion(CD cd) {
+		System.out.println("\n=== CD to Delete ===");
+		displaySingleCD(cd);
+	}
+
+	/**
+	 * Displays journal details before deletion confirmation.
+	 * 
+	 * @param journal the journal to display
+	 */
+	private void displayJournalForDeletion(Journal journal) {
+		System.out.println("\n=== Journal to Delete ===");
+		displaySingleJournal(journal);
+	}
+
+	/**
+	 * Prompts the user to confirm deletion of an item.
+	 * Shows a warning if the item has copies currently on loan.
+	 * 
+	 * @param itemType the type of item (e.g., "book", "CD", "journal")
+	 * @param availableCopies the number of available copies
+	 * @param totalCopies the total number of copies
+	 * @return true if user confirms deletion, false otherwise
+	 */
+	private boolean confirmDeletion(String itemType, int availableCopies, int totalCopies) {
+		int loanedCopies = totalCopies - availableCopies;
+		
+		if (loanedCopies > 0) {
+			System.out.println("Warning: This " + itemType + " has " + loanedCopies + 
+				" copies currently on loan.");
+			System.out.print("Are you sure you want to delete it? This will affect active loans. (y/n): ");
+		} else {
+			System.out.print("Are you sure you want to delete this " + itemType + "? (y/n): ");
+		}
+
+		String confirmation = scanner.nextLine().trim().toLowerCase();
+		return "y".equals(confirmation) || "yes".equals(confirmation);
+	}
+
+	/**
+	 * Helper method to find a book by full UUID or partial ID.
+	 * Tries full UUID first, then falls back to partial ID search.
+	 * 
+	 * @param idStr the ID string (full or partial)
+	 * @return the matching Book
+	 * @throws IllegalArgumentException if no book found
+	 */
+	private Book findBookByIdOrSubId(String idStr) {
+		// Try as full UUID first (more efficient if user provides full ID)
+		if (isValidUUID(idStr)) {
+			UUID bookId = UUID.fromString(idStr);
+			return bookService.getBookById(bookId);
+		}
+		
+		// Fall back to partial ID search
+		return bookService.getBookBySubId(idStr);
+	}
+
+	/**
+	 * Helper method to find a CD by full UUID or partial ID.
+	 * Tries full UUID first, then falls back to partial ID search.
+	 * 
+	 * @param idStr the ID string (full or partial)
+	 * @return the matching CD
+	 * @throws IllegalArgumentException if no CD found
+	 */
+	private CD findCDByIdOrSubId(String idStr) {
+		// Try as full UUID first (more efficient if user provides full ID)
+		if (isValidUUID(idStr)) {
+			UUID cdId = UUID.fromString(idStr);
+			return cdService.getCDById(cdId);
+		}
+		
+		// Fall back to partial ID search
+		return cdService.getCDBySubId(idStr);
+	}
+
+	/**
+	 * Helper method to find a journal by full UUID or partial ID.
+	 * Tries full UUID first, then falls back to partial ID search.
+	 * 
+	 * @param idStr the ID string (full or partial)
+	 * @return the matching Journal
+	 * @throws IllegalArgumentException if no journal found
+	 */
+	private Journal findJournalByIdOrSubId(String idStr) {
+		// Try as full UUID first (more efficient if user provides full ID)
+		if (isValidUUID(idStr)) {
+			UUID journalId = UUID.fromString(idStr);
+			return journalService.getJournalById(journalId);
+		}
+		
+		// Fall back to partial ID search
+		return journalService.getJournalBySubId(idStr);
 	}
 }

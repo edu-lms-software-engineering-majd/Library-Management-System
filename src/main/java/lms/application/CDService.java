@@ -143,6 +143,32 @@ public class CDService {
 	}
 
 	/**
+	 * Retrieves a CD by a partial ID match (substring).
+	 * Useful for CLI interfaces where users can enter shortened IDs.
+	 * 
+	 * @param subId the partial ID to search for (e.g., "00c3c695")
+	 * @return the matching CD
+	 * @throws IllegalArgumentException if no CD found or multiple matches exist
+	 */
+	public CD getCDBySubId(String subId) {
+		List<CD> allCDs = getAllCDs();
+		List<CD> matches = allCDs.stream()
+			.filter(cd -> cd.getId().toString().startsWith(subId))
+			.toList();
+		
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("No CD found with ID starting with: " + subId);
+		}
+		
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException("Multiple CDs found with ID starting with: " + subId + 
+				". Please provide more characters.");
+		}
+		
+		return matches.get(0);
+	}
+
+	/**
 	 * Updates an existing CD's information, if the requesting user has admin
 	 * privileges.
 	 *
@@ -201,18 +227,18 @@ public class CDService {
 	 * Deletes a CD from the system, if the requesting user has admin privileges.
 	 *
 	 * @param userDTO the user attempting the action (must be admin)
-	 * @param cdId    the UUID of the CD to delete
+	 * @param cdId the ID of the CD to delete
+	 * @return true if the CD was deleted successfully
 	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if the CD is not found
+	 * @throws IllegalArgumentException if the CD does not exist
 	 */
-	public void deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException, IllegalArgumentException {
-
+	public boolean deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException {
 		AuthorizationService.ensureAdmin(userDTO);
-
-		boolean deleted = cdRepo.deleteCD(cdId);
-		if (!deleted) {
-			throw new IllegalArgumentException("CD not found with ID: " + cdId);
-		}
+		
+		CD cd = cdRepo.getCDById(cdId)
+				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		
+		return cdRepo.deleteCD(cdId);
 	}
 
 	/**

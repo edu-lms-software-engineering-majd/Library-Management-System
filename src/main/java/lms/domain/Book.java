@@ -23,6 +23,7 @@ import lms.domain.utils.BookValidator;
  * @version 1.0
  */
 public class Book implements LoanableItem {
+	
 	private final UUID bookId;
 	private String title;
 	private String author;
