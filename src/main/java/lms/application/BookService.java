@@ -3,6 +3,7 @@ package lms.application;
 import java.util.List;
 import java.util.UUID;
 
+import lms.application.search.SearchStrategy;
 import lms.domain.Book;
 import lms.domain.BookRepository;
 import lms.domain.UserRepository;
@@ -125,7 +126,7 @@ public class BookService {
 	 * @param searchTerm the search term or criteria
 	 * @return list of books matching the search criteria
 	 */
-	public List<Book> searchBooks(lms.application.search.SearchStrategy<Book> strategy, String searchTerm) {
+	public List<Book> searchBooks(SearchStrategy<Book> strategy, String searchTerm) {
 		if (strategy == null) {
 			throw new IllegalArgumentException("Search strategy cannot be null");
 		}
@@ -140,6 +141,32 @@ public class BookService {
 	 */
 	public Book getBookById(UUID bookId) {
 		return bookRepo.getBookById(bookId).orElse(null);
+	}
+
+	/**
+	 * Retrieves a book by a partial ID match (substring).
+	 * Useful for CLI interfaces where users can enter shortened IDs.
+	 * 
+	 * @param subId the partial ID to search for (e.g., "00c3c695")
+	 * @return the matching Book
+	 * @throws IllegalArgumentException if no book found or multiple matches exist
+	 */
+	public Book getBookBySubId(String subId) {
+		List<Book> allBooks = getAllBooks();
+		List<Book> matches = allBooks.stream()
+			.filter(book -> book.getId().toString().startsWith(subId))
+			.toList();
+		
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("No book found with ID starting with: " + subId);
+		}
+		
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException("Multiple books found with ID starting with: " + subId + 
+				". Please provide more characters.");
+		}
+		
+		return matches.get(0);
 	}
 
 	private boolean isAvailableBook(UUID bookID) {
@@ -226,5 +253,23 @@ public class BookService {
 		}
 		
 		return bookRepo.updateBook(book);
+	}
+
+	/**
+	 * Deletes a book from the system, if the requesting user has admin privileges.
+	 *
+	 * @param userDTO the user attempting the action (must be admin)
+	 * @param bookId the ID of the book to delete
+	 * @return true if the book was deleted successfully
+	 * @throws PermissionDeniedException if the user is not an admin
+	 * @throws IllegalArgumentException if the book does not exist
+	 */
+	public boolean deleteBook(UserDTO userDTO, UUID bookId) throws PermissionDeniedException {
+		AuthorizationService.ensureAdmin(userDTO);
+		
+		Book book = bookRepo.getBookById(bookId)
+				.orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+		
+		return bookRepo.deleteBook(bookId);
 	}
 }
