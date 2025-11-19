@@ -8,103 +8,82 @@ import lms.domain.User;
 import lms.domain.UserRepository;
 
 /**
- * Service class responsible for managing user accounts.
+ * Service class for managing user accounts, fines, and borrowing permissions.
+ * Author: Ahmad Salameh
  */
 public class AccountService {
 
 	private final UserRepository userRepo;
-	
-    public AccountService(UserRepository userRepo) {
+
+	public AccountService(UserRepository userRepo) {
+		if (userRepo == null)
+			throw new IllegalArgumentException("UserRepository cannot be null");
 		this.userRepo = userRepo;
-    	
-    }
+	}
 
-    /**
-     * Gets the user's account if it exists, or creates a new one if it does not.
-     *
-     * @param userId the user ID
-     * @return the existing or newly created account
-     */
-    public Account getOrCreateAccount(UUID userId) {
-    	
-    	User user = userRepo.getByID(userId).orElseThrow(() -> 
-			new IllegalArgumentException("User with ID " + userId + " does not exist."));
+	public Account getOrCreateAccount(UUID userId) {
+		if (userId == null)
+			throw new IllegalArgumentException("User ID cannot be null");
 
-    	return user.getAccount();
-		
-    }
+		User user = userRepo.getByID(userId)
+				.orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " does not exist."));
+		return user.getAccount();
+	}
 
-    /**
-     * Adds a fine to the user's account.
-     *
-     * @param userId the user ID
-     * @param amount the fine amount (must be positive)
-     * @param reason the reason for the fine
-     * @throws IllegalArgumentException if amount is not positive
-     */
-    public void addFineToUser(UUID userId, double amount, String reason) {
-        
-    	if (amount <= 0) {
-            throw new IllegalArgumentException("Fine amount must be positive");
-        }
-    	
-        Account account = getOrCreateAccount(userId);
-        account.addFine(amount, reason);
-        
-        userRepo.update(userRepo.getByID(userId).get());
-    }
+	public void addFineToUser(UUID userId, double amount, String reason) {
+		Account account = getOrCreateAccount(userId);
+		account.addFine(amount, reason);
 
-    /**
-     * Allows the user to pay a fine.
-     *
-     * @param userId the user ID
-     * @param amount the payment amount (must be positive)
-     * @throws IllegalArgumentException if amount is not positive
-     */
-    public void payUserFine(UUID userId, double amount) {
-        
-    	if (amount <= 0) {
-            throw new IllegalArgumentException("Payment amount must be positive");
-        }
-    	
-        Account account = getOrCreateAccount(userId);
-        account.payFine(amount);
-        
-        userRepo.update(userRepo.getByID(userId).get());
-    }
+		User user = userRepo.getByID(userId)
+				.orElseThrow(() -> new IllegalStateException("User not found after account creation"));
+		userRepo.update(user);
+	}
 
-    /**
-     * Gets the user's current account balance.
-     *
-     * @param userId the user ID
-     * @return the user's balance
-     */
-    public double getUserTotalFined(UUID userId) {
-        
-    	Account account = getOrCreateAccount(userId);
-        return account.getTotalFines();
-    }
+	public void payUserFine(UUID userId, double amount) {
+		Account account = getOrCreateAccount(userId);
+		account.payFine(amount);
 
-    /**
-     * Gets the current status of the user's account.
-     *
-     * @param userId the user ID
-     * @return the account status
-     */
-    public AccountStatus getUserAccountStatus(UUID userId) {
-        
-    	Account account = getOrCreateAccount(userId);
-        return account.getStatus();
-    }
+		User user = userRepo.getByID(userId)
+				.orElseThrow(() -> new IllegalStateException("User not found after account access"));
+		userRepo.update(user);
+	}
 
-    /**
-     * Retrieves full account information for a given user.
-     *
-     * @param userId the user ID
-     * @return the user's account
-     */
-    public Account getAccountInfo(UUID userId) {
-        return getOrCreateAccount(userId);
-    }
+	public AccountStatus getUserAccountStatus(UUID userId) {
+		return getOrCreateAccount(userId).getStatus();
+	}
+
+	public boolean canUserBorrow(UUID userId) {
+		return getOrCreateAccount(userId).canBorrow();
+	}
+
+	public double getUserBalance(UUID userId) {
+		return getOrCreateAccount(userId).getBalance();
+	}
+
+	public void suspendUserAccount(UUID userId, String reason) {
+		if (reason == null || reason.trim().isEmpty())
+			throw new IllegalArgumentException("Suspension reason cannot be null or empty");
+
+		Account account = getOrCreateAccount(userId);
+		account.suspendAccount(reason);
+
+		User user = userRepo.getByID(userId).orElseThrow(() -> new IllegalStateException("User not found"));
+		userRepo.update(user);
+	}
+
+	public void activateUserAccount(UUID userId) {
+		Account account = getOrCreateAccount(userId);
+		account.activateAccount();
+
+		User user = userRepo.getByID(userId).orElseThrow(() -> new IllegalStateException("User not found"));
+		userRepo.update(user);
+	}
+
+	public double calculateTotalFinesForAllUsers() {
+		return userRepo.getAllUsers().stream().mapToDouble(user -> user.getAccount().getTotalFines()).sum();
+	}
+
+	public int getUsersWithFinesCount() {
+		return (int) userRepo.getAllUsers().stream().filter(user -> user.getAccount().getTotalFines() > 0).count();
+	}
 }
-

@@ -18,6 +18,7 @@ public class ConsoleSchedulerLogger implements SchedulerLogger {
 	}
 
 	@Override
+	
 	public void logSchedulerStop() {
 		System.out.println("Scheduler stopped");
 	}

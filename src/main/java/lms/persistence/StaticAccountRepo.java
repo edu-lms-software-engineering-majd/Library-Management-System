@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lms.domain.Account;
 
-public class StaticAccountRepo implements AccountRepo {
+public class StaticAccountRepo implements AccountRepos {
 	private final Map<UUID, Account> accounts = new HashMap<>();
 	private final Map<UUID, UUID> userToAccountMap = new HashMap<>();
 

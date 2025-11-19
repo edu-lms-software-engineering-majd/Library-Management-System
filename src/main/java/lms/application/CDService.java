@@ -1,3 +1,4 @@
+
 package lms.application;
 
 import java.util.List;
@@ -23,9 +24,9 @@ import lms.domain.exception.PermissionDeniedException;
  * </ul>
  *
  * <p>
- * The service does <b>not</b> contain core validation logic for CD fields.
- * Such domain-specific rules (e.g., non-empty title, valid artist) are
- * enforced directly inside the {@link CD} entity itself.
+ * The service does <b>not</b> contain core validation logic for CD fields. Such
+ * domain-specific rules (e.g., non-empty title, valid artist) are enforced
+ * directly inside the {@link CD} entity itself.
  * </p>
  *
  * <p>
@@ -138,8 +139,7 @@ public class CDService {
 	 * @throws IllegalArgumentException if the CD ID is not found
 	 */
 	public CD getCDById(UUID cdId) {
-		return cdRepo.getCDById(cdId)
-				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 	}
 
 	/**
@@ -197,8 +197,7 @@ public class CDService {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
-		CD cd = cdRepo.getCDById(cdId)
-				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
 		if (newTitle != null) {
 			cd.setTitle(newTitle);
@@ -275,9 +274,7 @@ public class CDService {
 	 * @return true if the CD exists and is not borrowed, false otherwise
 	 */
 	public boolean isAvailableCD(UUID cdId) {
-		return cdRepo.getCDById(cdId)
-				.map(cd -> !cd.isBorrowed())
-				.orElse(false);
+		return cdRepo.getCDById(cdId).map(cd -> !cd.isBorrowed()).orElse(false);
 	}
 
 	/**
@@ -295,13 +292,12 @@ public class CDService {
 	 *
 	 * @param userDTO the user attempting the action
 	 * @param cdId    the UUID of the CD to borrow
-	 * @throws IllegalArgumentException  if the CD is not found
-	 * @throws IllegalStateException     if the CD is already borrowed
+	 * @throws IllegalArgumentException if the CD is not found
+	 * @throws IllegalStateException    if the CD is already borrowed
 	 */
 	public void borrowCD(UserDTO userDTO, UUID cdId) throws IllegalArgumentException, IllegalStateException {
 
-		CD cd = cdRepo.getCDById(cdId)
-				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
 		if (!cd.isAvailable()) {
 			throw new IllegalStateException("No copies available to borrow: " + cd.getTitle());
@@ -324,8 +320,7 @@ public class CDService {
 	 */
 	public void returnCD(UserDTO userDTO, UUID cdId) throws IllegalArgumentException, IllegalStateException {
 
-		CD cd = cdRepo.getCDById(cdId)
-				.orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
 		if (cd.getAvailableCopies() >= cd.getTotalCopies()) {
 			throw new IllegalStateException("All copies are already returned: " + cd.getTitle());

@@ -51,7 +51,9 @@ public final class AuthorizationService {
 			throw new PermissionDeniedException("Action requires admin privileges.");
 		}
 		return true;
+		
 	}
+	
 
 	public static boolean ensureLibrarian(UserDTO userID) throws PermissionDeniedException {
 		

@@ -7,9 +7,6 @@ import java.util.UUID;
 import lms.domain.strategy.FineStrategy;
 import lms.domain.strategy.FineStrategyFactory;
 
-/**
- * Represents a loan in the library system.
- */
 public class Loan {
 
 	private UUID loanId;
@@ -31,12 +28,11 @@ public class Loan {
 		this.returnDate = null;
 	}
 
-	// ✅ Fine calculation using Strategy pattern
+	// ✅ Fine calculation
 	public double calculateFine() {
 		long daysOverdue = getDaysOverdue();
 		if (daysOverdue <= 0)
 			return 0.0;
-
 		FineStrategy strategy = FineStrategyFactory.getStrategy(itemType);
 		return strategy.calculateFine(daysOverdue);
 	}
@@ -51,9 +47,7 @@ public class Loan {
 	}
 
 	public long getDaysOverdue() {
-		if (!isOverdue())
-			return 0;
-		return ChronoUnit.DAYS.between(dueDate, LocalDate.now());
+		return isOverdue() ? ChronoUnit.DAYS.between(dueDate, LocalDate.now()) : 0;
 	}
 
 	public boolean isOverdue() {
@@ -66,6 +60,33 @@ public class Loan {
 		this.returnDate = LocalDate.now();
 	}
 
+	public boolean isReturned() {
+		return returnDate != null;
+	}
+
+	public void markFineApplied() {
+		this.fineApplied = true;
+	}
+
+	public boolean isFineApplied() {
+		return fineApplied;
+	}
+
+	public boolean isActive() {
+		return returnDate == null;
+	}
+
+	public boolean canExtend() {
+		return isActive() && !isOverdue();
+	}
+
+	public void extendLoan(int days) {
+		if (!canExtend())
+			throw new IllegalStateException("Cannot extend overdue or returned loan");
+		this.dueDate = this.dueDate.plusDays(days);
+	}
+
+	// Getters
 	public UUID getLoanId() {
 		return loanId;
 	}
@@ -92,27 +113,5 @@ public class Loan {
 
 	public LocalDate getReturnDate() {
 		return returnDate;
-	}
-
-	public boolean isFineApplied() {
-		return fineApplied;
-	}
-
-	public void markFineApplied() {
-		this.fineApplied = true;
-	}
-
-	public boolean isActive() {
-		return returnDate == null;
-	}
-
-	public boolean canExtend() {
-		return isActive() && !isOverdue();
-	}
-
-	public void extendLoan(int days) {
-		if (!canExtend())
-			throw new IllegalStateException("Cannot extend overdue or returned loan");
-		this.dueDate = this.dueDate.plusDays(days);
 	}
 }

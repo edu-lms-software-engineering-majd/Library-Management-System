@@ -33,7 +33,8 @@ public class StaticBookRepository implements BookRepository {
 
 	/** Internal list storing all books */
 	private static final List<Book> books = new ArrayList<>();
-	
+
+	/** Singleton instance */
 	private static final StaticBookRepository INSTANCE = new StaticBookRepository();
 
 	static {
@@ -46,19 +47,16 @@ public class StaticBookRepository implements BookRepository {
 				"Software Design", 2, "English", "Shelf C3"));
 	}
 
-	/**
-	 * Adds a new book to the repository if the ISBN is unique.
-	 *
-	 * @param book the {@link Book} to add
-	 * @return {@code true} if the book was added successfully, {@code false} if a
-	 *         book with the same ISBN already exists
-	 */
-	
+	/** Private constructor to enforce singleton pattern */
 	private StaticBookRepository() {
 	}
-	
+
+	/**
+	 * Returns the single shared instance of the repository.
+	 *
+	 * @return the singleton {@link StaticBookRepository} instance
+	 */
 	public static StaticBookRepository getInstance() {
-		
 		return INSTANCE;
 	}
 
@@ -72,7 +70,6 @@ public class StaticBookRepository implements BookRepository {
 
 	@Override
 	public Optional<Book> getBookById(UUID bookId) {
-		
 		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
 	}
 

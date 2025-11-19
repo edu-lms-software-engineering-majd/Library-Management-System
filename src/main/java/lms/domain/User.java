@@ -6,13 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import lms.application.UserDTO;
-import lms.domain.exception.PasswordReuseException;
-import lms.domain.utils.PasswordUtils;
-
-/**
- * Domain entity representing a user of the Library Management System.
- */
 public class User {
 
 	private String firstName;
@@ -41,48 +34,26 @@ public class User {
 		this.registrationDate = LocalDate.now();
 		this.userID = UUID.randomUUID();
 
+		this.loans = new ArrayList<>(MAX_BORROW_LIMIT);
+		this.account = new Account(this.userID);
 		this.unreadNotifications = new ArrayList<>();
 		this.readNotifications = new ArrayList<>();
-		this.loans = new ArrayList<>(User.MAX_BORROW_LIMIT);
-		this.account = new Account(this.userID);
-
 	}
 
-	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role,
-			List<Loan> loans, Account account) {
-		this(firstName, lastName, email, username, hashedPassword, role);
-		this.loans = loans;
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
 		this.account = account;
 	}
 
-	public boolean verifyPassword(String rawPassword) {
-		return PasswordUtils.verifyPassword(rawPassword, this.hashedPassword);
+	public UUID getUserID() {
+		return userID;
 	}
 
-	public UserDTO toDTO() {
-		return new UserDTO(this.userID, this.username, this.firstName, this.lastName, this.role);
-	}
-
-	public void changePassword(String newPassword) throws IllegalArgumentException, PasswordReuseException {
-		if (newPassword == null || newPassword.length() < 8) {
-			throw new IllegalArgumentException("Password too weak.");
-		}
-		if (this.verifyPassword(newPassword)) {
-			throw new PasswordReuseException("New password cannot be the same as the old password.");
-		}
-		this.hashedPassword = PasswordUtils.hashPassword(newPassword);
-	}
-
-	public void changeRole(Role newRole) {
-		if (newRole == null)
-			throw new IllegalArgumentException("Role cannot be null");
-		this.role = newRole;
-	}
-
-	public void changeEmail(String newEmail) {
-		if (newEmail == null || !newEmail.contains("@"))
-			throw new IllegalArgumentException("Invalid email");
-		this.email = newEmail;
+	public String getUsername() {
+		return username;
 	}
 
 	public boolean hasFine() {
@@ -94,15 +65,15 @@ public class User {
 	}
 
 	public void addLoan(Loan loan) {
-		this.loans.add(loan);
+		loans.add(loan);
 	}
 
 	public void removeLoan(Loan loan) {
-		this.loans.remove(loan);
+		loans.remove(loan);
 	}
 
 	public void addNotification(Notification notification) {
-		this.unreadNotifications.add(notification);
+		unreadNotifications.add(notification);
 	}
 
 	public void markAsRead(Notification notification) {
@@ -111,56 +82,8 @@ public class User {
 		}
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public UUID getUserID() {
-		return userID;
-	}
-
 	public List<Loan> getLoans() {
 		return Collections.unmodifiableList(loans);
-	}
-
-	public LocalDate getRegistrationDate() {
-		return registrationDate;
-	}
-
-	public Role getRole() {
-		return role;
-	}
-
-	public Account getAccount() {
-		return account;
 	}
 
 	public List<Notification> getUnreadNotifications() {

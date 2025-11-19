@@ -48,13 +48,13 @@ public class BookService {
 		bookRepo = null;
 		userRepo = null;
 	}
+	
 
 	/**
 	 * Creates a new {@code BookService} with the given repository.
 	 *
 	 * @param bookRepo the repository used for persisting and retrieving books
 	 */
-
 	public BookService(BookRepository bookRepo, UserRepository userService) {
 		this.bookRepo = bookRepo;
 		this.userRepo = userService;
@@ -87,7 +87,6 @@ public class BookService {
 	 * @throws IllegalArgumentException  if {@link Book} validation fails
 	 * @throws IllegalStateException     if a book with the same ISBN already exists
 	 */
-
 	public Book addBook(UserDTO userDTO, String title, String author, String isbn, String publisher,
 			int publicationYear, String category, int totalCopies, String language, String shelfLocation)
 			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
@@ -171,12 +170,10 @@ public class BookService {
 	}
 
 	private boolean isAvailableBook(UUID bookID) {
-
 		return bookRepo.getBookById(bookID).get().getAvailableCopies() > 0;
 	}
 
 	public boolean isValidBook(UUID bookID) {
-
 		return this.bookRepo.getBookById(bookID).isPresent();
 	}
 

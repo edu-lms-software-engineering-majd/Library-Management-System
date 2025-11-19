@@ -105,6 +105,7 @@ class CDServiceTest {
 		verify(cdRepo, never()).addCD(any(CD.class));
 	}
 
+	
 	@Test
 	void givenNullArtist_whenAddCD_thenThrowIllegalArgumentException() {
 		Exception exception = assertThrows(IllegalArgumentException.class, () ->
@@ -458,6 +459,7 @@ class CDServiceTest {
 		assertTrue(exception.getMessage().contains("CD not found"));
 		verify(cdRepo).getCDById(cdId);
 	}
+	
 
 	@Test
 	void givenRepositoryFailure_whenBorrowCD_thenThrowIllegalStateException() {
