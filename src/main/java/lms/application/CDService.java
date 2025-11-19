@@ -1,4 +1,3 @@
-
 package lms.application;
 
 import java.util.List;
@@ -24,17 +23,11 @@ import lms.domain.exception.PermissionDeniedException;
  * </ul>
  *
  * <p>
- * The service does <b>not</b> contain core validation logic for CD fields. Such
- * domain-specific rules (e.g., non-empty title, valid artist) are enforced
- * directly inside the {@link CD} entity itself.
- * </p>
- *
- * <p>
  * This design ensures a clear separation of concerns: <i>services coordinate,
  * entities validate themselves, repositories persist</i>.
  * </p>
  *
- * @author Majd Awwad
+ * @author Majd
  * @version 1.0
  */
 public class CDService {
@@ -42,46 +35,17 @@ public class CDService {
 	private final CDRepository cdRepo;
 	private final UserRepository userRepo;
 
-	@SuppressWarnings("unused")
 	private CDService() {
 		cdRepo = null;
 		userRepo = null;
 	}
 
-	/**
-	 * Creates a new {@code CDService} with the given repositories.
-	 *
-	 * @param cdRepo   the repository used for persisting and retrieving CDs
-	 * @param userRepo the repository for user-related operations
-	 */
 	public CDService(CDRepository cdRepo, UserRepository userRepo) {
 		this.cdRepo = cdRepo;
 		this.userRepo = userRepo;
 	}
 
-	/**
-	 * Adds a new CD to the system, if the requesting user has admin privileges.
-	 *
-	 * <p>
-	 * This method performs the following steps:
-	 * </p>
-	 * <ol>
-	 * <li>Verifies that the given user is an administrator.</li>
-	 * <li>Constructs a {@link CD}, which performs its own validation.</li>
-	 * <li>Attempts to persist the CD using {@link CDRepository}.</li>
-	 * </ol>
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param title   the title of the CD
-	 * @param artist  the artist of the CD
-	 * @return the newly created {@link CD}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if {@link CD} validation fails
-	 * @throws IllegalStateException     if the CD could not be added to the
-	 *                                   repository
-	 */
-	public CD addCD(UserDTO userDTO, String title, String artist)
-			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
+	public CD addCD(UserDTO userDTO, String title, String artist) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
@@ -95,20 +59,7 @@ public class CDService {
 		return cd;
 	}
 
-	/**
-	 * Adds a new CD to the system with a specified number of copies, if the requesting user has admin privileges.
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param title   the title of the CD
-	 * @param artist  the artist of the CD
-	 * @param totalCopies the total number of copies owned by the library
-	 * @return the newly created {@link CD}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if {@link CD} validation fails
-	 * @throws IllegalStateException     if the CD could not be added to the repository
-	 */
-	public CD addCD(UserDTO userDTO, String title, String artist, int totalCopies)
-			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
+	public CD addCD(UserDTO userDTO, String title, String artist, int totalCopies) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
@@ -122,52 +73,35 @@ public class CDService {
 		return cd;
 	}
 
-	/**
-	 * Retrieves all CDs currently in the repository.
-	 *
-	 * @return a list of all {@link CD} entities
-	 */
 	public List<CD> getAllCDs() {
 		return cdRepo.getAllCDs();
 	}
 
-	/**
-	 * Retrieves a CD by its unique identifier.
-	 *
-	 * @param cdId the UUID of the CD
-	 * @return the {@link CD} if found
-	 * @throws IllegalArgumentException if the CD ID is not found
-	 */
 	public CD getCDById(UUID cdId) {
 		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 	}
 
 	/**
-	 * Updates an existing CD's information, if the requesting user has admin
-	 * privileges.
-	 *
-	 * <p>
-	 * This method performs the following steps:
-	 * </p>
-	 * <ol>
-	 * <li>Verifies that the given user is an administrator.</li>
-	 * <li>Retrieves the existing CD from the repository.</li>
-	 * <li>Updates only the fields that are not null, with validation.</li>
-	 * <li>Persists the updated CD using {@link CDRepository}.</li>
-	 * </ol>
-	 *
-	 * @param userDTO   the user attempting the action (must be admin)
-	 * @param cdId      the UUID of the CD to update
-	 * @param newTitle  the new title (if null, keeps existing)
-	 * @param newArtist the new artist (if null, keeps existing)
-	 * @param newTotalCopies the new total copies (if null, keeps existing)
-	 * @return the updated {@link CD}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if the CD is not found or validation fails
-	 * @throws IllegalStateException     if the update fails
+	 * Retrieves a CD by a partial ID match (substring).
 	 */
+	public CD getCDBySubId(String subId) {
+		List<CD> allCDs = getAllCDs();
+		List<CD> matches = allCDs.stream().filter(cd -> cd.getId().toString().startsWith(subId)).toList();
+
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("No CD found with ID starting with: " + subId);
+		}
+
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException(
+					"Multiple CDs found with ID starting with: " + subId + ". Please provide more characters.");
+		}
+
+		return matches.get(0);
+	}
+
 	public CD updateCD(UserDTO userDTO, UUID cdId, String newTitle, String newArtist, Integer newTotalCopies)
-			throws PermissionDeniedException, IllegalArgumentException, IllegalStateException {
+			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
@@ -181,9 +115,8 @@ public class CDService {
 		}
 		if (newTotalCopies != null) {
 			if (newTotalCopies < cd.getAvailableCopies()) {
-				throw new IllegalArgumentException(
-					"New total copies (" + newTotalCopies + ") cannot be less than available copies (" 
-					+ cd.getAvailableCopies() + ")");
+				throw new IllegalArgumentException("New total copies (" + newTotalCopies
+						+ ") cannot be less than available copies (" + cd.getAvailableCopies() + ")");
 			}
 			cd.setTotalCopies(newTotalCopies);
 		}
@@ -196,30 +129,14 @@ public class CDService {
 		return cd;
 	}
 
-	/**
-	 * Deletes a CD from the system, if the requesting user has admin privileges.
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param cdId    the UUID of the CD to delete
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if the CD is not found
-	 */
-	public void deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException, IllegalArgumentException {
-
+	public boolean deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException {
 		AuthorizationService.ensureAdmin(userDTO);
 
-		boolean deleted = cdRepo.deleteCD(cdId);
-		if (!deleted) {
-			throw new IllegalArgumentException("CD not found with ID: " + cdId);
-		}
+		cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+
+		return cdRepo.deleteCD(cdId);
 	}
 
-	/**
-	 * Searches for CDs by keyword (matches title or artist).
-	 *
-	 * @param keyword the search keyword
-	 * @return a list of matching {@link CD} entities
-	 */
 	public List<CD> searchCDs(String keyword) {
 		if (keyword == null || keyword.isBlank()) {
 			return getAllCDs();
@@ -227,13 +144,6 @@ public class CDService {
 		return cdRepo.searchCDs(keyword);
 	}
 
-	/**
-	 * Searches for CDs using a specific search strategy.
-	 *
-	 * @param strategy the search strategy to apply
-	 * @param searchTerm the search term
-	 * @return a list of matching {@link CD} entities
-	 */
 	public List<CD> searchCDs(lms.application.search.SearchStrategy<CD> strategy, String searchTerm) {
 		if (strategy == null) {
 			throw new IllegalArgumentException("Search strategy cannot be null");
@@ -241,35 +151,15 @@ public class CDService {
 		return strategy.execute(cdRepo.getAllCDs(), searchTerm);
 	}
 
-	/**
-	 * Checks if a CD is available (not borrowed).
-	 *
-	 * @param cdId the UUID of the CD
-	 * @return true if the CD exists and is not borrowed, false otherwise
-	 */
 	public boolean isAvailableCD(UUID cdId) {
 		return cdRepo.getCDById(cdId).map(cd -> !cd.isBorrowed()).orElse(false);
 	}
 
-	/**
-	 * Validates if a CD exists in the repository.
-	 *
-	 * @param cdId the UUID of the CD
-	 * @return true if the CD exists, false otherwise
-	 */
 	public boolean isValidCD(UUID cdId) {
 		return cdRepo.getCDById(cdId).isPresent();
 	}
 
-	/**
-	 * Marks a CD as borrowed.
-	 *
-	 * @param userDTO the user attempting the action
-	 * @param cdId    the UUID of the CD to borrow
-	 * @throws IllegalArgumentException if the CD is not found
-	 * @throws IllegalStateException    if the CD is already borrowed
-	 */
-	public void borrowCD(UserDTO userDTO, UUID cdId) throws IllegalArgumentException, IllegalStateException {
+	public void borrowCD(UserDTO userDTO, UUID cdId) {
 
 		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
@@ -284,20 +174,12 @@ public class CDService {
 		}
 	}
 
-	/**
-	 * Marks a CD as returned.
-	 *
-	 * @param userDTO the user attempting the action
-	 * @param cdId    the UUID of the CD to return
-	 * @throws IllegalArgumentException if the CD is not found
-	 * @throws IllegalStateException    if the CD was not borrowed
-	 */
-	public void returnCD(UserDTO userDTO, UUID cdId) throws IllegalArgumentException, IllegalStateException {
+	public void returnCD(UserDTO userDTO, UUID cdId) {
 
 		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
 		if (cd.getAvailableCopies() >= cd.getTotalCopies()) {
-			throw new IllegalStateException("All copies are already returned: " + cd.getTitle());
+			throw new IllegalStateException("All copies already returned: " + cd.getTitle());
 		}
 
 		cd.incrementAvailableCopies();

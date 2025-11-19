@@ -3,6 +3,7 @@ package lms.application;
 import java.util.List;
 import java.util.UUID;
 
+import lms.application.search.SearchStrategy;
 import lms.domain.Book;
 import lms.domain.BookRepository;
 import lms.domain.UserRepository;
@@ -34,7 +35,7 @@ import lms.domain.exception.PermissionDeniedException;
  * entities validate themselves, repositories persist</i>.
  * </p>
  *
- * @author Majd Awwad
+ * @author Majd
  * @version 2.0
  */
 
@@ -47,13 +48,7 @@ public class BookService {
 		bookRepo = null;
 		userRepo = null;
 	}
-	
 
-	/**
-	 * Creates a new {@code BookService} with the given repository.
-	 *
-	 * @param bookRepo the repository used for persisting and retrieving books
-	 */
 	public BookService(BookRepository bookRepo, UserRepository userService) {
 		this.bookRepo = bookRepo;
 		this.userRepo = userService;
@@ -61,34 +56,10 @@ public class BookService {
 
 	/**
 	 * Adds a new book to the system, if the requesting user has admin privileges.
-	 *
-	 * <p>
-	 * This method performs the following steps:
-	 * </p>
-	 * <ol>
-	 * <li>Verifies that the given user is an administrator.</li>
-	 * <li>Constructs a {@link Book}, which performs its own validation.</li>
-	 * <li>Attempts to persist the book using {@link BookRepository}.</li>
-	 * </ol>
-	 *
-	 * @param userDTO         the user attempting the action (must be admin)
-	 * @param title           book title
-	 * @param author          book author
-	 * @param isbn            ISBN number (must be unique)
-	 * @param publisher       publisher name
-	 * @param publicationYear year of publication
-	 * @param category        category/genre
-	 * @param totalCopies     total number of copies in stock
-	 * @param language        language of the book
-	 * @param shelfLocation   physical shelf location in the library
-	 * @return the newly created {@link Book}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if {@link Book} validation fails
-	 * @throws IllegalStateException     if a book with the same ISBN already exists
 	 */
 	public Book addBook(UserDTO userDTO, String title, String author, String isbn, String publisher,
 			int publicationYear, String category, int totalCopies, String language, String shelfLocation)
-			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
+			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
@@ -103,43 +74,38 @@ public class BookService {
 		return book;
 	}
 
-	/**
-	 * Retrieves all books currently in the repository.
-	 *
-	 * @return a list of all {@link Book} entities
-	 */
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
 	}
 
-	/**
-	 * Searches/filters books using the specified search strategy.
-	 * 
-	 * <p>
-	 * This method implements the Strategy pattern, allowing different search
-	 * algorithms to be applied at runtime without modifying the service code.
-	 * This follows the Open/Closed Principle - open for extension, closed for modification.
-	 * </p>
-	 *
-	 * @param strategy the search strategy to apply
-	 * @param searchTerm the search term or criteria
-	 * @return list of books matching the search criteria
-	 */
-	public List<Book> searchBooks(lms.application.search.SearchStrategy<Book> strategy, String searchTerm) {
+	public List<Book> searchBooks(SearchStrategy<Book> strategy, String searchTerm) {
 		if (strategy == null) {
 			throw new IllegalArgumentException("Search strategy cannot be null");
 		}
 		return strategy.execute(bookRepo.getAllBooks(), searchTerm);
 	}
 
-	/**
-	 * Retrieves a book by its ID.
-	 *
-	 * @param bookId the UUID of the book
-	 * @return the Book if found, null otherwise
-	 */
 	public Book getBookById(UUID bookId) {
 		return bookRepo.getBookById(bookId).orElse(null);
+	}
+
+	/**
+	 * Retrieves a book by a partial ID match (substring).
+	 */
+	public Book getBookBySubId(String subId) {
+		List<Book> allBooks = getAllBooks();
+		List<Book> matches = allBooks.stream().filter(book -> book.getId().toString().startsWith(subId)).toList();
+
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("No book found with ID starting with: " + subId);
+		}
+
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException(
+					"Multiple books found with ID starting with: " + subId + ". Please provide more characters.");
+		}
+
+		return matches.get(0);
 	}
 
 	private boolean isAvailableBook(UUID bookID) {
@@ -150,81 +116,57 @@ public class BookService {
 		return this.bookRepo.getBookById(bookID).isPresent();
 	}
 
-	/**
-	 * Updates an existing book in the system.
-	 *
-	 * <p>
-	 * This method performs the following steps:
-	 * </p>
-	 * <ol>
-	 * <li>Verifies that the given user is an administrator.</li>
-	 * <li>Retrieves the existing book from the repository.</li>
-	 * <li>Updates only the fields that are not null.</li>
-	 * <li>Persists the updated book using {@link BookRepository}.</li>
-	 * </ol>
-	 *
-	 * <p>
-	 * <b>Note:</b> Field validation is handled by the {@link Book} domain entity's setters,
-	 * following the principle that domain entities encapsulate their own validation rules.
-	 * </p>
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param bookId the ID of the book to update
-	 * @param title new title (null to keep current)
-	 * @param author new author (null to keep current)
-	 * @param isbn new ISBN (null to keep current)
-	 * @param publisher new publisher (null to keep current)
-	 * @param publicationYear new publication year (null to keep current)
-	 * @param category new category (null to keep current)
-	 * @param totalCopies new total copies (null to keep current)
-	 * @param language new language (null to keep current)
-	 * @param shelfLocation new shelf location (null to keep current)
-	 * @return true if the book was updated successfully
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException if the book does not exist or validation fails
-	 */
-	public boolean updateBook(UserDTO userDTO, UUID bookId, String title, String author, String isbn,
-			String publisher, Integer publicationYear, String category, Integer totalCopies, 
-			String language, String shelfLocation) throws PermissionDeniedException {
-		
+	public boolean updateBook(UserDTO userDTO, UUID bookId, String title, String author, String isbn, String publisher,
+			Integer publicationYear, String category, Integer totalCopies, String language, String shelfLocation)
+			throws PermissionDeniedException {
+
 		AuthorizationService.ensureAdmin(userDTO);
-		
+
 		Book book = bookRepo.getBookById(bookId)
 				.orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
-		
-		if (title != null) {
+
+		if (title != null)
 			book.setTitle(title);
-		}
-		if (author != null) {
+
+		if (author != null)
 			book.setAuthor(author);
-		}
-		if (isbn != null) {
+
+		if (isbn != null)
 			book.setIsbn(isbn);
-		}
-		if (publisher != null) {
+
+		if (publisher != null)
 			book.setPublisher(publisher);
-		}
-		if (publicationYear != null) {
+
+		if (publicationYear != null)
 			book.setPublicationYear(publicationYear);
-		}
-		if (category != null) {
+
+		if (category != null)
 			book.setCategory(category);
-		}
+
 		if (totalCopies != null) {
 			if (totalCopies < book.getAvailableCopies()) {
-				throw new IllegalArgumentException(
-					"New total copies (" + totalCopies + ") cannot be less than available copies (" 
-					+ book.getAvailableCopies() + ")");
+				throw new IllegalArgumentException("New total copies (" + totalCopies
+						+ ") cannot be less than available copies (" + book.getAvailableCopies() + ")");
 			}
 			book.setTotalCopies(totalCopies);
 		}
-		if (language != null) {
+
+		if (language != null)
 			book.setLanguage(language);
-		}
-		if (shelfLocation != null) {
+
+		if (shelfLocation != null)
 			book.setShelfLocation(shelfLocation);
-		}
-		
+
 		return bookRepo.updateBook(book);
+	}
+
+	public boolean deleteBook(UserDTO userDTO, UUID bookId) throws PermissionDeniedException {
+
+		AuthorizationService.ensureAdmin(userDTO);
+
+		Book book = bookRepo.getBookById(bookId)
+				.orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+
+		return bookRepo.deleteBook(bookId);
 	}
 }
