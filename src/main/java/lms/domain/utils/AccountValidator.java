@@ -9,10 +9,34 @@ package lms.domain.utils;
  * enforced.
  * </p>
  * 
+ * <p><b>Validation Principles Applied:</b></p>
+ * <ul>
+ * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all Account entities</li>
+ * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
+ * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
+ * </ul>
+ * 
  * @author Majd Awwad
- * @version 1.0
+ * @version 2.0
  */
 public class AccountValidator {
+
+	private static final AccountValidator INSTANCE = new AccountValidator();
+
+	/**
+	 * Private constructor to prevent instantiation.
+	 */
+	private AccountValidator() {
+	}
+
+	/**
+	 * Returns the singleton instance of the validator.
+	 * 
+	 * @return the shared AccountValidator instance
+	 */
+	public static AccountValidator getInstance() {
+		return INSTANCE;
+	}
 
 	/**
 	 * Validates a fine amount before adding it to an account.

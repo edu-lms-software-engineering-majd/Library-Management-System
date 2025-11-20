@@ -17,9 +17,8 @@ import java.util.UUID;
  * provide consistent behavior for the defined methods.
  * </p>
  * 
- * @author Library Management System
+ * @author Majd Awwad
  * @version 1.0
- * @since 2025-11-20
  */
 public interface AccountRepository {
 

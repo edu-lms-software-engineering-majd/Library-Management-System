@@ -11,12 +11,35 @@ import lms.domain.Role;
  * enforced.
  * </p>
  * 
+ * <p><b>Validation Principles Applied:</b></p>
+ * <ul>
+ * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all User entities</li>
+ * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
+ * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
+ * </ul>
+ * 
  * @author Majd Awwad
- * @version 1.0
+ * @version 2.0
  */
 public class UserValidator {
 
+	private static final UserValidator INSTANCE = new UserValidator();
 	private static final int MIN_PASSWORD_LENGTH = 8;
+
+	/**
+	 * Private constructor to prevent instantiation.
+	 */
+	private UserValidator() {
+	}
+
+	/**
+	 * Returns the singleton instance of the validator.
+	 * 
+	 * @return the shared UserValidator instance
+	 */
+	public static UserValidator getInstance() {
+		return INSTANCE;
+	}
 
 	/**
 	 * Validates a user's first name.

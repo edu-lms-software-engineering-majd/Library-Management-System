@@ -12,7 +12,7 @@ import lms.domain.AccountRepository;
  * In-memory implementation of {@link AccountRepository} for testing and simple usage.
  * 
  * <p>
- * This repository stores accounts in a static map and provides basic CRUD
+ * This repository stores accounts in static maps and provides basic CRUD
  * operations: create, read, update, delete. It maintains two maps:
  * <ul>
  * <li>One for quick account lookup by account ID</li>
@@ -25,9 +25,8 @@ import lms.domain.AccountRepository;
  * For production use, consider a database-backed implementation.
  * </p>
  * 
- * @author Library Management System
+ * @author Majd Awwad
  * @version 1.0
- * @since 2025-11-20
  */
 public class StaticAccountRepository implements AccountRepository {
 	

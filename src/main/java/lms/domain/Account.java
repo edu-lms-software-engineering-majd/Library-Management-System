@@ -32,9 +32,8 @@ import lms.domain.utils.AccountValidator;
  * reactivated when all fines are paid.
  * </p>
  * 
- * @author Library Management System
+ * @author Majd Awwad
  * @version 1.0
- * @since 2025-10-22
  */
 public class Account {
 
@@ -175,8 +174,7 @@ public class Account {
 	 */
 	public void addFine(double amount, String reason) throws IllegalArgumentException {
 
-		AccountValidator validator = new AccountValidator();
-		validator.validateFineAmount(amount);
+		AccountValidator.getInstance().validateFineAmount(amount);
 
 		this.totalFines += amount;
 		this.updatedAt = LocalDate.now();
@@ -212,8 +210,7 @@ public class Account {
 	 */
 	public void payFine(double amount) {
 
-		AccountValidator validator = new AccountValidator();
-		validator.validatePaymentAmount(amount, this.totalFines);
+		AccountValidator.getInstance().validatePaymentAmount(amount, this.totalFines);
 
 		this.totalFines -= amount;
 		this.updatedAt = LocalDate.now();
@@ -228,17 +225,21 @@ public class Account {
 	}
 
 	/**
-	 * Sets the account status.
+	 * Checks if the account has any outstanding balance.
 	 * 
-	 * <p>
-	 * Updates the account status and records the modification time.
-	 * </p>
-	 * 
-	 * @param status the new account status
+	 * @return true if the account has fines owed, false otherwise
 	 */
-	public void setStatus(AccountStatus status) {
-		this.status = status;
-		this.updatedAt = LocalDate.now();
+	public boolean hasOutstandingBalance() {
+		return totalFines > 0;
+	}
+
+	/**
+	 * Determines if the user can borrow books based on account status.
+	 * 
+	 * @return true if the account is active and has no outstanding fines
+	 */
+	public boolean canBorrowBooks() {
+		return status == AccountStatus.ACTIVE && totalFines == 0;
 	}
 
 	/**
@@ -251,7 +252,7 @@ public class Account {
 	 * </p>
 	 */
 	private void suspendAccount() {
-		setStatus(AccountStatus.SUSPENDED);
+		this.status = AccountStatus.SUSPENDED;
 		this.updatedAt = LocalDate.now();
 	}
 
@@ -264,7 +265,7 @@ public class Account {
 	 * </p>
 	 */
 	private void activateAccount() {
-		setStatus(AccountStatus.ACTIVE);
+		this.status = AccountStatus.ACTIVE;
 		this.updatedAt = LocalDate.now();
 	}
 

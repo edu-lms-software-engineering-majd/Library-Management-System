@@ -4,23 +4,33 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import lms.application.UserDTO;
 import lms.domain.exception.PasswordReuseException;
 import lms.domain.utils.PasswordUtils;
+import lms.domain.utils.UserValidator;
 
 /**
  * Domain entity representing a user of the Library Management System.
+ * 
+ * <p>
+ * Manages user identity, authentication, borrowing limits, and notifications.
+ * Enforces business rules such as maximum borrow limits and fine restrictions.
+ * </p>
+ * 
+ * @author Majd Awwad
+ * @version 2.0
  */
 public class User {
 
 	private String firstName;
 	private String lastName;
 	private String email;
-	private String username;
+	private final String username; // Immutable after creation
 	private String hashedPassword;
-	private UUID userID;
+	private final UUID userID; // Immutable
 	private final LocalDate registrationDate;
 	private Role role;
 	private List<Loan> loans;
@@ -30,7 +40,27 @@ public class User {
 	private List<Notification> unreadNotifications = new ArrayList<>();
 	private List<Notification> readNotifications = new ArrayList<>();
 
+	/**
+	 * Creates a new User with validation.
+	 * 
+	 * @param firstName the user's first name
+	 * @param lastName the user's last name
+	 * @param email the user's email address
+	 * @param username the unique username (immutable)
+	 * @param hashedPassword the hashed password
+	 * @param role the user's role (ADMIN or MEMBER)
+	 * @throws IllegalArgumentException if any field fails validation
+	 */
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role) {
+		// Validate all inputs using existing validator
+		UserValidator validator = UserValidator.getInstance();
+		validator.validateFirstName(firstName);
+		validator.validateLastName(lastName);
+		validator.validateEmail(email);
+		validator.validateUsername(username);
+		validator.validateHashedPassword(hashedPassword);
+		validator.validateRole(role);
+
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -79,10 +109,30 @@ public class User {
 		this.role = newRole;
 	}
 
+	/**
+	 * Updates the user's email address with validation.
+	 * 
+	 * @param newEmail the new email address
+	 * @throws IllegalArgumentException if email format is invalid
+	 */
 	public void changeEmail(String newEmail) {
-		if (newEmail == null || !newEmail.contains("@"))
-			throw new IllegalArgumentException("Invalid email");
+		UserValidator.getInstance().validateEmail(newEmail);
 		this.email = newEmail;
+	}
+
+	/**
+	 * Updates the user's name information.
+	 * 
+	 * @param newFirstName the new first name
+	 * @param newLastName the new last name
+	 * @throws IllegalArgumentException if names are invalid
+	 */
+	public void updateName(String newFirstName, String newLastName) {
+		UserValidator validator = UserValidator.getInstance();
+		validator.validateFirstName(newFirstName);
+		validator.validateLastName(newLastName);
+		this.firstName = newFirstName;
+		this.lastName = newLastName;
 	}
 
 	public boolean hasFine() {
@@ -115,33 +165,19 @@ public class User {
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
 	public String getLastName() {
 		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	// NOTE: Username is immutable after creation - no setter provided
 
 	public UUID getUserID() {
 		return userID;
