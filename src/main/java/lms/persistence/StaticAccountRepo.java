@@ -1,60 +1,84 @@
 package lms.persistence;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
 import lms.domain.Account;
 
 public class StaticAccountRepo implements AccountRepos {
+
+	// Maps are final but mutable → safe for in-memory storage
 	private final Map<UUID, Account> accounts = new HashMap<>();
 	private final Map<UUID, UUID> userToAccountMap = new HashMap<>();
 
 	@Override
 	public Optional<Account> findByUserId(UUID userId) {
+		if (userId == null)
+			return Optional.empty();
 		UUID accountId = userToAccountMap.get(userId);
-		if (accountId != null) {
-			return Optional.ofNullable(accounts.get(accountId));
-		}
-		return Optional.empty();
+		return Optional.ofNullable(accounts.get(accountId));
 	}
 
 	@Override
 	public Optional<Account> findById(UUID accountId) {
+		if (accountId == null)
+			return Optional.empty();
 		return Optional.ofNullable(accounts.get(accountId));
 	}
 
 	@Override
 	public boolean save(Account account) {
-		if (accounts.containsKey(account.getAccountId()) || userToAccountMap.containsKey(account.getUserId())) {
+		if (account == null)
+			return false;
+
+		UUID accountId = account.getAccountId();
+		UUID userId = account.getUserId();
+
+		// Avoid duplicates (same user OR same account ID)
+		if (accounts.containsKey(accountId) || userToAccountMap.containsKey(userId)) {
 			return false;
 		}
-		accounts.put(account.getAccountId(), account);
-		userToAccountMap.put(account.getUserId(), account.getAccountId());
+
+		accounts.put(accountId, account);
+		userToAccountMap.put(userId, accountId);
 		return true;
 	}
 
 	@Override
 	public boolean update(Account account) {
-		if (!accounts.containsKey(account.getAccountId())) {
+		if (account == null)
+			return false;
+
+		UUID accountId = account.getAccountId();
+		if (!accounts.containsKey(accountId)) {
 			return false;
 		}
-		accounts.put(account.getAccountId(), account);
+
+		accounts.put(accountId, account);
 		return true;
 	}
 
 	@Override
 	public boolean delete(UUID accountId) {
-		Account account = accounts.get(accountId);
-		if (account != null) {
-			userToAccountMap.remove(account.getUserId());
-			accounts.remove(accountId);
+		if (accountId == null)
+			return false;
+
+		Account removed = accounts.remove(accountId);
+		if (removed != null) {
+			userToAccountMap.remove(removed.getUserId());
 			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Returns an unmodifiable snapshot of the account storage. Prevents external
+	 * modification.
+	 */
 	public Map<UUID, Account> getAllAccounts() {
-		return new HashMap<>(accounts);
+		return Collections.unmodifiableMap(new HashMap<>(accounts));
 	}
 }
