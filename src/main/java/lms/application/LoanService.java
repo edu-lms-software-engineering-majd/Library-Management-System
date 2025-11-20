@@ -101,15 +101,15 @@ public class LoanService {
 	 * @param itemId   the unique identifier of the item to loan
 	 * @param itemType the type of item (e.g., "book", "cd", "journal")
 	 * @return the created Loan object
-	 * @throws UserNotFoundException     if the user does not exist
-	 * @throws ItemNotFoundException     if the item does not exist
-	 * @throws ItemNotAvailableException if the item is not available for borrowing
-	 * @throws BorrowNotAllowedException if the user has reached their borrowing
-	 *                                   limit
-	 * @throws LoanAlreadyExistsException 
+	 * @throws UserNotFoundException      if the user does not exist
+	 * @throws ItemNotFoundException      if the item does not exist
+	 * @throws ItemNotAvailableException  if the item is not available for borrowing
+	 * @throws BorrowNotAllowedException  if the user has reached their borrowing
+	 *                                    limit
+	 * @throws LoanAlreadyExistsException
 	 */
-	public Loan loanItem(UserDTO userDTO, UUID itemId, String itemType)
-			throws UserNotFoundException, ItemNotFoundException, ItemNotAvailableException, BorrowNotAllowedException, LoanAlreadyExistsException {
+	public Loan loanItem(UserDTO userDTO, UUID itemId, String itemType) throws UserNotFoundException,
+			ItemNotFoundException, ItemNotAvailableException, BorrowNotAllowedException, LoanAlreadyExistsException {
 
 		User user = userRepo.getByID(userDTO.userID())
 				.orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userDTO.userID()));
@@ -203,20 +203,20 @@ public class LoanService {
 	 *
 	 * @param loanId the unique identifier of the loan to return
 	 * @return true if the return operation is successful
-	 * @throws IllegalArgumentException if the loan does not exist
-	 * @throws IllegalStateException    if the item has already been returned
-	 * @throws UserNotFoundException    if the user associated with the loan is not
-	 *                                  found
-	 * @throws ItemNotFoundException    if the item associated with the loan is not
-	 *                                  found
-	 * @throws LoanNotFoundException 
-	 * @throws PermissionDeniedException 
+	 * @throws IllegalArgumentException  if the loan does not exist
+	 * @throws IllegalStateException     if the item has already been returned
+	 * @throws UserNotFoundException     if the user associated with the loan is not
+	 *                                   found
+	 * @throws ItemNotFoundException     if the item associated with the loan is not
+	 *                                   found
+	 * @throws LoanNotFoundException
+	 * @throws PermissionDeniedException
 	 */
-	public boolean returnItem(UUID userID, UUID loanID)
-			throws IllegalArgumentException, IllegalStateException, UserNotFoundException, ItemNotFoundException, LoanNotFoundException, PermissionDeniedException {
+	public boolean returnItem(UUID userID, UUID loanID) throws IllegalArgumentException, IllegalStateException,
+			UserNotFoundException, ItemNotFoundException, LoanNotFoundException, PermissionDeniedException {
 
-		if (!AuthorizationService.ensureLibrarian(AuthService.getCurrentUser())) {
-			throw new PermissionDeniedException("Only librarians can process returns.");
+		if (!AuthorizationService.isLibrarian(AuthService.getCurrentUser())) {
+			throw new IllegalStateException("Only librarians can process returns.");
 		}
 
 		UUID loanId = loanID;
@@ -264,7 +264,8 @@ public class LoanService {
 	/**
 	 * Checks for overdue loans and notifies users. This can be called by a
 	 * scheduled task.
-	 * @throws ItemNotFoundException 
+	 * 
+	 * @throws ItemNotFoundException
 	 */
 	public void checkAndNotifyOverdueLoans() throws ItemNotFoundException {
 		List<Loan> overdueLoans = loanRepo.findOverdueLoans();
@@ -283,7 +284,7 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of active loans
-	 * @throws UserNotFoundException 
+	 * @throws UserNotFoundException
 	 */
 	public List<Loan> getUserActiveLoans(UUID userId) throws UserNotFoundException {
 		return loanRepo.findActiveLoansByUser(userId);
@@ -294,7 +295,7 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of all user loans
-	 * @throws UserNotFoundException 
+	 * @throws UserNotFoundException
 	 */
 	public List<Loan> getUserAllLoans(UUID userId) throws UserNotFoundException {
 		return loanRepo.findByUserId(userId);
@@ -341,7 +342,7 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return total fine amount
-	 * @throws UserNotFoundException 
+	 * @throws UserNotFoundException
 	 */
 	public double calculateUserTotalFines(UUID userId) throws UserNotFoundException {
 		List<Loan> activeLoans = getUserActiveLoans(userId);
@@ -397,7 +398,7 @@ public class LoanService {
 	 *
 	 * @param userId the user ID
 	 * @return list of arrays containing [Loan, Book]
-	 * @throws UserNotFoundException 
+	 * @throws UserNotFoundException
 	 */
 	public List<Object[]> getUserActiveLoansWithBooks(UUID userId) throws UserNotFoundException {
 		List<Loan> activeLoans = getUserActiveLoans(userId);

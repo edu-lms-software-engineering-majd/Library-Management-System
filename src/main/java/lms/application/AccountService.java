@@ -40,11 +40,11 @@ public class AccountService {
 	}
 
 	public double getUserBalance(UUID userId) {
-		return getAccount(userId).getBalance();
+		return getAccount(userId).getTotalFines();
 	}
 
 	public boolean canUserBorrow(UUID userId) {
-		return getAccount(userId).canBorrow();
+		return getAccount(userId).canBorrowBooks();
 	}
 
 	public void addFineToUser(UUID userId, double amount, String reason) {
@@ -88,4 +88,5 @@ public class AccountService {
 	public int getUsersWithFinesCount() {
 		return (int) userRepo.getAllUsers().stream().filter(u -> u.getAccount().getTotalFines() > 0).count();
 	}
+
 }

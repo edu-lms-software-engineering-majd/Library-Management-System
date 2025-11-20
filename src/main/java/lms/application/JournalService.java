@@ -24,19 +24,21 @@ import lms.domain.exception.PermissionDeniedException;
  * </ul>
  *
  * <p>
- * The service does <b>not</b> contain core validation logic for journal fields.
- * Such domain-specific rules (e.g., non-empty title, valid author) are enforced
- * directly inside the {@link Journal} entity itself.
+ * The service does <b>not</b> contain core validation logic. Domain-specific
+ * validation rules (e.g., valid title/author/copies) are enforced by the
+ * {@link Journal} entity.
  * </p>
  *
  * <p>
- * This design ensures a clear separation of concerns: <i>services coordinate,
- * entities validate themselves, repositories persist</i>.
+ * This design ensures separation of concerns: <i>services coordinate, entities
+ * validate, repositories persist</i>.
  * </p>
  *
- * @author Majd Awwad
- * @version 1.0
- * 
+ * <p>
+ * Original Author: Majd Awwad Refactored by: Ahmad Salameh
+ * </p>
+ *
+ * @version 1.1
  */
 public class JournalService {
 
@@ -49,281 +51,163 @@ public class JournalService {
 		userRepo = null;
 	}
 
-	/**
-	 * Creates a new {@code JournalService} with the given repositories.
-	 *
-	 * @param journalRepo the repository used for persisting and retrieving journals
-	 * @param userRepo    the repository for user-related operations
-	 */
 	public JournalService(JournalsRepository journalRepo, UserRepository userRepo) {
 		this.journalRepo = journalRepo;
 		this.userRepo = userRepo;
 	}
 
-	/**
-	 * Adds a new journal to the system, if the requesting user has admin
-	 * privileges.
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param title   the title of the journal
-	 * @param author  the author of the journal
-	 * @return the newly created {@link Journal}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if {@link Journal} validation fails
-	 * @throws IllegalStateException     if the journal could not be added to the
-	 *                                   repository
-	 */
-	public Journal addJournal(UserDTO userDTO, String title, String author)
-			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
+	// ============================================================
+	// CREATE
+	// ============================================================
+
+	public Journal addJournal(UserDTO userDTO, String title, String author) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
 		Journal journal = new Journal(title, author);
 
 		boolean added = journalRepo.addJournal(journal);
-		if (!added) {
-			throw new IllegalStateException("Failed to add journal: " + title + " by " + author);
-		}
+		if (!added)
+			throw new IllegalStateException("Failed to add journal: " + title);
 
 		return journal;
 	}
 
-	/**
-	 * Adds a new journal to the system with a specified number of copies, if the
-	 * requesting user has admin privileges.
-	 *
-	 * @param userDTO     the user attempting the action (must be admin)
-	 * @param title       the title of the journal
-	 * @param author      the author of the journal
-	 * @param totalCopies the total number of copies owned by the library
-	 * @return the newly created {@link Journal}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if {@link Journal} validation fails
-	 * @throws IllegalStateException     if the journal could not be added to the
-	 *                                   repository
-	 */
 	public Journal addJournal(UserDTO userDTO, String title, String author, int totalCopies)
-			throws PermissionDeniedException, IllegalStateException, IllegalArgumentException {
+			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
 		Journal journal = new Journal(title, author, totalCopies);
 
 		boolean added = journalRepo.addJournal(journal);
-		if (!added) {
-			throw new IllegalStateException("Failed to add journal: " + title + " by " + author);
-		}
+		if (!added)
+			throw new IllegalStateException("Failed to add journal: " + title);
 
 		return journal;
 	}
 
-	/**
-	 * Retrieves all journals currently in the repository.
-	 *
-	 * @return a list of all {@link Journal} entities
-	 */
+	// ============================================================
+	// READ
+	// ============================================================
+
 	public List<Journal> getAllJournals() {
 		return journalRepo.getAllJournals();
 	}
 
-	/**
-	 * Retrieves a journal by its unique identifier.
-	 *
-	 * @param journalId the UUID of the journal
-	 * @return the {@link Journal} if found
-	 * @throws IllegalArgumentException if the journal ID is not found
-	 */
 	public Journal getJournalById(UUID journalId) {
 		return journalRepo.getJournalById(journalId)
 				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
 	}
 
-	/**
-	 * Retrieves a journal by a partial ID match (substring).
-	 * Useful for CLI interfaces where users can enter shortened IDs.
-	 * 
-	 * @param subId the partial ID to search for (e.g., "00c3c695")
-	 * @return the matching Journal
-	 * @throws IllegalArgumentException if no journal found or multiple matches exist
-	 */
 	public Journal getJournalBySubId(String subId) {
-		List<Journal> allJournals = getAllJournals();
-		List<Journal> matches = allJournals.stream()
-			.filter(journal -> journal.getId().toString().startsWith(subId))
-			.toList();
-		
-		if (matches.isEmpty()) {
-			throw new IllegalArgumentException("No journal found with ID starting with: " + subId);
-		}
-		
-		if (matches.size() > 1) {
-			throw new IllegalArgumentException("Multiple journals found with ID starting with: " + subId + 
-				". Please provide more characters.");
-		}
-		
+		List<Journal> matches = getAllJournals().stream().filter(j -> j.getId().toString().startsWith(subId)).toList();
+
+		if (matches.isEmpty())
+			throw new IllegalArgumentException("No journal found starting with: " + subId);
+
+		if (matches.size() > 1)
+			throw new IllegalArgumentException("Multiple journals match prefix: " + subId);
+
 		return matches.get(0);
 	}
 
-	/**
-	 * Updates an existing journal's information, if the requesting user has admin
-	 * privileges.
-	 *
-	 * @param userDTO        the user attempting the action (must be admin)
-	 * @param journalId      the UUID of the journal to update
-	 * @param newTitle       the new title (if null, keeps existing)
-	 * @param newAuthor      the new author (if null, keeps existing)
-	 * @param newTotalCopies the new total copies (if null, keeps existing)
-	 * @return the updated {@link Journal}
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException  if the journal is not found or validation
-	 *                                   fails
-	 * @throws IllegalStateException     if the update fails
-	 */
+	// ============================================================
+	// UPDATE
+	// ============================================================
+
 	public Journal updateJournal(UserDTO userDTO, UUID journalId, String newTitle, String newAuthor,
-			Integer newTotalCopies) throws PermissionDeniedException, IllegalArgumentException, IllegalStateException {
+			Integer newTotalCopies) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
-		Journal journal = journalRepo.getJournalById(journalId)
-				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
+		Journal journal = getJournalById(journalId);
 
-		if (newTitle != null) {
+		if (newTitle != null)
 			journal.setTitle(newTitle);
-		}
-		if (newAuthor != null) {
+
+		if (newAuthor != null)
 			journal.setAuthor(newAuthor);
-		}
+
 		if (newTotalCopies != null) {
-			if (newTotalCopies < journal.getAvailableCopies()) {
-				throw new IllegalArgumentException("New total copies (" + newTotalCopies
-						+ ") cannot be less than available copies (" + journal.getAvailableCopies() + ")");
-			}
+			if (newTotalCopies < journal.getAvailableCopies())
+				throw new IllegalArgumentException("Total copies cannot be less than available copies");
+
 			journal.setTotalCopies(newTotalCopies);
 		}
 
 		boolean updated = journalRepo.updateJournal(journal);
-		if (!updated) {
-			throw new IllegalStateException("Failed to update journal with ID: " + journalId);
-		}
+		if (!updated)
+			throw new IllegalStateException("Failed to update journal " + journalId);
 
 		return journal;
 	}
 
-	/**
-	 * 
-	 * 
-	 * Deletes a journal from the system, if the requesting user has admin
-	 * privileges.
-	 *
-	 * @param userDTO the user attempting the action (must be admin)
-	 * @param journalId the ID of the journal to delete
-	 * @return true if the journal was deleted successfully
-	 * @throws PermissionDeniedException if the user is not an admin
-	 * @throws IllegalArgumentException if the journal does not exist
-	 */
-	public void deleteJournal(UserDTO userDTO, UUID journalId)
-			throws PermissionDeniedException, IllegalArgumentException {
+	// ============================================================
+	// DELETE
+	// ============================================================
+
+	public boolean deleteJournal(UserDTO userDTO, UUID journalId) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
-		
-		Journal journal = journalRepo.getJournalById(journalId)
-				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
-		
+
+		getJournalById(journalId); // throw if not exists
+
 		return journalRepo.deleteJournal(journalId);
 	}
 
-	/**
-	 * Searches for journals by keyword (matches title or author).
-	 *
-	 * @param keyword the search keyword
-	 * @return a list of matching {@link Journal} entities
-	 */
+	// ============================================================
+	// SEARCH
+	// ============================================================
+
 	public List<Journal> searchJournals(String keyword) {
-		if (keyword == null || keyword.isBlank()) {
+		if (keyword == null || keyword.isBlank())
 			return getAllJournals();
-		}
 		return journalRepo.searchJournals(keyword);
 	}
 
-	/**
-	 * Searches for journals using a specific search strategy.
-	 *
-	 * @param strategy   the search strategy to apply
-	 * @param searchTerm the search term
-	 * @return a list of matching {@link Journal} entities
-	 */
 	public List<Journal> searchJournals(lms.application.search.SearchStrategy<Journal> strategy, String searchTerm) {
-		if (strategy == null) {
+		if (strategy == null)
 			throw new IllegalArgumentException("Search strategy cannot be null");
-		}
+
 		return strategy.execute(journalRepo.getAllJournals(), searchTerm);
 	}
 
-	/**
-	 * Checks if a journal is available (not borrowed).
-	 *
-	 * @param journalId the UUID of the journal
-	 * @return true if the journal exists and is not borrowed, false otherwise
-	 */
+	// ============================================================
+	// BORROW / RETURN
+	// ============================================================
+
 	public boolean isAvailableJournal(UUID journalId) {
-		return journalRepo.getJournalById(journalId).map(journal -> !journal.isBorrowed()).orElse(false);
+		return journalRepo.getJournalById(journalId).map(j -> !j.isBorrowed()).orElse(false);
 	}
 
-	/**
-	 * Validates if a journal exists in the repository.
-	 *
-	 * @param journalId the UUID of the journal
-	 * @return true if the journal exists, false otherwise
-	 */
 	public boolean isValidJournal(UUID journalId) {
 		return journalRepo.getJournalById(journalId).isPresent();
 	}
 
-	/**
-	 * Marks a journal as borrowed.
-	 *
-	 * @param userDTO   the user attempting the action
-	 * @param journalId the UUID of the journal to borrow
-	 * @throws IllegalArgumentException if the journal is not found
-	 * @throws IllegalStateException    if the journal is already borrowed
-	 */
-	public void borrowJournal(UserDTO userDTO, UUID journalId) throws IllegalArgumentException, IllegalStateException {
+	public void borrowJournal(UserDTO userDTO, UUID journalId) {
 
-		Journal journal = journalRepo.getJournalById(journalId)
-				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
+		Journal journal = getJournalById(journalId);
 
-		if (!journal.isAvailable()) {
-			throw new IllegalStateException("No copies available to borrow: " + journal.getTitle());
-		}
+		if (!journal.isAvailable())
+			throw new IllegalStateException("No copies available");
 
 		journal.decrementAvailableCopies();
-		boolean updated = journalRepo.updateJournal(journal);
-		if (!updated) {
-			throw new IllegalStateException("Failed to update journal borrow status");
-		}
+
+		if (!journalRepo.updateJournal(journal))
+			throw new IllegalStateException("Failed to update borrow status");
 	}
 
-	/**
-	 * Marks a journal as returned.
-	 *
-	 * @param userDTO   the user attempting the action
-	 * @param journalId the UUID of the journal to return
-	 * @throws IllegalArgumentException if the journal is not found
-	 * @throws IllegalStateException    if the journal was not borrowed
-	 */
-	public void returnJournal(UserDTO userDTO, UUID journalId) throws IllegalArgumentException, IllegalStateException {
+	public void returnJournal(UserDTO userDTO, UUID journalId) {
 
-		Journal journal = journalRepo.getJournalById(journalId)
-				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
+		Journal journal = getJournalById(journalId);
 
-		if (journal.getAvailableCopies() >= journal.getTotalCopies()) {
-			throw new IllegalStateException("All copies are already returned: " + journal.getTitle());
-		}
+		if (journal.getAvailableCopies() >= journal.getTotalCopies())
+			throw new IllegalStateException("All copies already returned");
 
 		journal.incrementAvailableCopies();
-		boolean updated = journalRepo.updateJournal(journal);
-		if (!updated) {
-			throw new IllegalStateException("Failed to update journal return status");
-		}
+
+		if (!journalRepo.updateJournal(journal))
+			throw new IllegalStateException("Failed to update return status");
 	}
 }

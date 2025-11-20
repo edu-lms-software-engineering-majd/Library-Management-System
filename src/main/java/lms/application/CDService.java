@@ -5,46 +5,56 @@ import java.util.UUID;
 
 import lms.domain.CD;
 import lms.domain.CDRepository;
-import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
 
 /**
- * Application service for coordinating CD management use cases.
+ * Application-level service responsible for managing CD-related use cases.
  *
  * <p>
- * This service acts as an orchestrator between the user-facing layer and the
- * domain/persistence layers. It is responsible for:
+ * This service acts as the orchestrator between the presentation layer and the
+ * domain/persistence layers. It coordinates:
  * </p>
+ *
  * <ul>
- * <li>Enforcing authorization rules (e.g., only admins can add CDs).</li>
- * <li>Delegating CD creation to the {@link CD} domain entity, which
- * encapsulates its own validation rules.</li>
- * <li>Interacting with a {@link CDRepository} to persist or retrieve CDs.</li>
+ * <li>Authorization and admin checks</li>
+ * <li>Delegating validation rules to the {@link CD} entity</li>
+ * <li>Persisting and retrieving CDs from the {@link CDRepository}</li>
  * </ul>
  *
  * <p>
- * This design ensures a clear separation of concerns: <i>services coordinate,
- * entities validate themselves, repositories persist</i>.
+ * Core principle: <i>Services coordinate, domain entities validate,
+ * repositories persist.</i>
  * </p>
  *
- * @author Majd
- * @version 1.0
+ * <p>
+ * Original Author: Majd Refactored by: Ahmad Salameh (2025)
+ * </p>
+ *
+ * @version 2.0
  */
 public class CDService {
 
 	private final CDRepository cdRepo;
-	private final UserRepository userRepo;
 
-	private CDService() {
-		cdRepo = null;
-		userRepo = null;
-	}
-
-	public CDService(CDRepository cdRepo, UserRepository userRepo) {
+	/**
+	 * Creates a {@code CDService} instance with the required repository.
+	 *
+	 * @param cdRepo the repository used for CD persistence operations
+	 * @throws IllegalArgumentException if the repository is null
+	 */
+	public CDService(CDRepository cdRepo) {
+		if (cdRepo == null)
+			throw new IllegalArgumentException("CDRepository cannot be null");
 		this.cdRepo = cdRepo;
-		this.userRepo = userRepo;
 	}
 
+	// =====================================================
+	// Creation
+	// =====================================================
+
+	/**
+	 * Creates and stores a new CD (admin-only).
+	 */
 	public CD addCD(UserDTO userDTO, String title, String artist) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -52,13 +62,15 @@ public class CDService {
 		CD cd = new CD(title, artist);
 
 		boolean added = cdRepo.addCD(cd);
-		if (!added) {
+		if (!added)
 			throw new IllegalStateException("Failed to add CD: " + title + " by " + artist);
-		}
 
 		return cd;
 	}
 
+	/**
+	 * Creates and stores a new CD with total copies (admin-only).
+	 */
 	public CD addCD(UserDTO userDTO, String title, String artist, int totalCopies) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -66,40 +78,49 @@ public class CDService {
 		CD cd = new CD(title, artist, totalCopies);
 
 		boolean added = cdRepo.addCD(cd);
-		if (!added) {
+		if (!added)
 			throw new IllegalStateException("Failed to add CD: " + title + " by " + artist);
-		}
 
 		return cd;
 	}
 
+	// =====================================================
+	// Retrieval
+	// =====================================================
+
+	/** Returns all CDs in the system. */
 	public List<CD> getAllCDs() {
 		return cdRepo.getAllCDs();
 	}
 
+	/** Retrieves a CD by ID or throws an error. */
 	public CD getCDById(UUID cdId) {
 		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 	}
 
 	/**
-	 * Retrieves a CD by a partial ID match (substring).
+	 * Retrieves a CD by ID prefix (substring match).
 	 */
 	public CD getCDBySubId(String subId) {
-		List<CD> allCDs = getAllCDs();
-		List<CD> matches = allCDs.stream().filter(cd -> cd.getId().toString().startsWith(subId)).toList();
+		List<CD> matches = cdRepo.getAllCDs().stream().filter(cd -> cd.getId().toString().startsWith(subId)).toList();
 
-		if (matches.isEmpty()) {
+		if (matches.isEmpty())
 			throw new IllegalArgumentException("No CD found with ID starting with: " + subId);
-		}
 
-		if (matches.size() > 1) {
+		if (matches.size() > 1)
 			throw new IllegalArgumentException(
-					"Multiple CDs found with ID starting with: " + subId + ". Please provide more characters.");
-		}
+					"Multiple CDs found with ID starting with: " + subId + ". Provide more characters.");
 
 		return matches.get(0);
 	}
 
+	// =====================================================
+	// Update
+	// =====================================================
+
+	/**
+	 * Updates a CD's details (admin-only).
+	 */
 	public CD updateCD(UserDTO userDTO, UUID cdId, String newTitle, String newArtist, Integer newTotalCopies)
 			throws PermissionDeniedException {
 
@@ -107,29 +128,33 @@ public class CDService {
 
 		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		if (newTitle != null) {
+		if (newTitle != null)
 			cd.setTitle(newTitle);
-		}
-		if (newArtist != null) {
+		if (newArtist != null)
 			cd.setArtist(newArtist);
-		}
+
 		if (newTotalCopies != null) {
-			if (newTotalCopies < cd.getAvailableCopies()) {
+			if (newTotalCopies < cd.getAvailableCopies())
 				throw new IllegalArgumentException("New total copies (" + newTotalCopies
 						+ ") cannot be less than available copies (" + cd.getAvailableCopies() + ")");
-			}
 			cd.setTotalCopies(newTotalCopies);
 		}
 
-		boolean updated = cdRepo.updateCD(cd);
-		if (!updated) {
+		if (!cdRepo.updateCD(cd))
 			throw new IllegalStateException("Failed to update CD with ID: " + cdId);
-		}
 
 		return cd;
 	}
 
+	// =====================================================
+	// Delete
+	// =====================================================
+
+	/**
+	 * Deletes a CD from the system (admin-only).
+	 */
 	public boolean deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException {
+
 		AuthorizationService.ensureAdmin(userDTO);
 
 		cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
@@ -137,55 +162,68 @@ public class CDService {
 		return cdRepo.deleteCD(cdId);
 	}
 
+	// =====================================================
+	// Searching
+	// =====================================================
+
 	public List<CD> searchCDs(String keyword) {
-		if (keyword == null || keyword.isBlank()) {
+		if (keyword == null || keyword.isBlank())
 			return getAllCDs();
-		}
 		return cdRepo.searchCDs(keyword);
 	}
 
 	public List<CD> searchCDs(lms.application.search.SearchStrategy<CD> strategy, String searchTerm) {
-		if (strategy == null) {
+		if (strategy == null)
 			throw new IllegalArgumentException("Search strategy cannot be null");
-		}
+
 		return strategy.execute(cdRepo.getAllCDs(), searchTerm);
 	}
 
+	// =====================================================
+	// Availability
+	// =====================================================
+
 	public boolean isAvailableCD(UUID cdId) {
-		return cdRepo.getCDById(cdId).map(cd -> !cd.isBorrowed()).orElse(false);
+		return cdRepo.getCDById(cdId).map(cd -> cd.getAvailableCopies() > 0).orElse(false);
 	}
 
 	public boolean isValidCD(UUID cdId) {
 		return cdRepo.getCDById(cdId).isPresent();
 	}
 
+	// =====================================================
+	// Borrowing
+	// =====================================================
+
+	/**
+	 * Decreases available copies when a CD is borrowed.
+	 */
 	public void borrowCD(UserDTO userDTO, UUID cdId) {
 
 		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		if (!cd.isAvailable()) {
-			throw new IllegalStateException("No copies available to borrow: " + cd.getTitle());
-		}
+		if (!cd.isAvailable())
+			throw new IllegalStateException("No available copies to borrow: " + cd.getTitle());
 
 		cd.decrementAvailableCopies();
-		boolean updated = cdRepo.updateCD(cd);
-		if (!updated) {
+
+		if (!cdRepo.updateCD(cd))
 			throw new IllegalStateException("Failed to update CD borrow status");
-		}
 	}
 
+	/**
+	 * Increases available copies when a CD is returned.
+	 */
 	public void returnCD(UserDTO userDTO, UUID cdId) {
 
 		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
 
-		if (cd.getAvailableCopies() >= cd.getTotalCopies()) {
+		if (cd.getAvailableCopies() >= cd.getTotalCopies())
 			throw new IllegalStateException("All copies already returned: " + cd.getTitle());
-		}
 
 		cd.incrementAvailableCopies();
-		boolean updated = cdRepo.updateCD(cd);
-		if (!updated) {
+
+		if (!cdRepo.updateCD(cd))
 			throw new IllegalStateException("Failed to update CD return status");
-		}
 	}
 }

@@ -8,8 +8,24 @@ import lms.domain.NotificationType;
 import lms.domain.User;
 
 /**
- * Service for managing and sending notifications to users. Implements the
- * Observer pattern to handle notification events.
+ * Service for managing and sending notifications to users.
+ * 
+ * <p>
+ * This class implements the Observer pattern to dispatch notification events to
+ * users inside the system. It integrates with the {@link User} domain entity
+ * and delegates message storage to the user object itself.
+ * </p>
+ *
+ * <h2>Responsibilities:</h2>
+ * <ul>
+ * <li>Create and send different types of notifications</li>
+ * <li>Integrate with domain observer interface</li>
+ * <li>Support system-generated notification events</li>
+ * </ul>
+ *
+ * @author Majd
+ * @refactoredBy Ahmad Salameh
+ * @version 1.0
  */
 public class NotificationService implements NotificationObserver {
 
@@ -26,9 +42,9 @@ public class NotificationService implements NotificationObserver {
 	}
 
 	/**
-	 * Notifies a user about an overdue item.
+	 * Sends an overdue notification regarding the specified item.
 	 *
-	 * @param user      the user with overdue items
+	 * @param user      the user who should receive the notification
 	 * @param itemTitle the title of the overdue item
 	 */
 	public void notifyOverdueItem(User user, String itemTitle) {
@@ -38,6 +54,7 @@ public class NotificationService implements NotificationObserver {
 		Notification notification = new Notification(
 				"Your item '" + itemTitle + "' is overdue. Please return it immediately.", SYSTEM_ID,
 				NotificationType.OVERDUE);
+
 		notify(user, notification);
 	}
 }

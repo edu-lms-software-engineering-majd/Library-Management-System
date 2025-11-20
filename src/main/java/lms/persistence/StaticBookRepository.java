@@ -1,7 +1,6 @@
 package lms.persistence;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,102 +8,158 @@ import java.util.UUID;
 import lms.domain.Book;
 import lms.domain.BookRepository;
 
-public class StaticBookRepository implements BookRepository {
+/**
+ * In-memory implementation of {@link BookRepository}.
+ *
+ * <p>
+ * Stores {@link Book} objects in a static list for lightweight usage,
+ * testing, or prototyping. This repository is NOT thread-safe and should
+ * not be used in production.
+ * </p>
+ *
+ * <h3>Key Features:</h3>
+ * <ul>
+ *   <li>Store, update, delete books in memory</li>
+ *   <li>Search by ID or ISBN</li>
+ *   <li>Prevent duplicate ISBN values</li>
+ *   <li>Validation for all input records</li>
+ * </ul>
+ *
+ * @author Ahmad Salameh
+ * @version 2.1
+ */
+public final class StaticBookRepository implements BookRepository {
 
-	private final static StaticBookRepository INSTANCE = new StaticBookRepository();
+    /** Singleton instance */
+    private static final StaticBookRepository INSTANCE = new StaticBookRepository();
 
-	/** In-memory book storage */
-	private static final List<Book> books = new ArrayList<>();
+    /** Internal in-memory storage */
+    private static final List<Book> books = new ArrayList<>();
 
-	private StaticBookRepository() {
-	}
+    /** Private constructor for Singleton */
+    private StaticBookRepository() {}
 
-	public static StaticBookRepository getInstance() {
-		return INSTANCE;
-	}
+    /**
+     * Returns the Singleton instance of the repository.
+     *
+     * @return the shared {@link StaticBookRepository} instance
+     */
+    public static StaticBookRepository getInstance() {
+        return INSTANCE;
+    }
 
-	// ============================================
-	// Validation
-	// ============================================
-	private void validateBook(Book book) {
-		if (book == null)
-			throw new IllegalArgumentException("Book cannot be null");
+    // ============================================================
+    // Validation
+    // ============================================================
 
-		if (book.getTitle() == null || book.getTitle().isBlank())
-			throw new IllegalArgumentException("Book title cannot be empty");
+    /**
+     * Ensures the provided book is valid and ready for persistence.
+     *
+     * @param book the book object to validate
+     * @throws IllegalArgumentException if validation fails
+     */
+    private void validate(Book book) {
+        if (book == null)
+            throw new IllegalArgumentException("Book cannot be null.");
 
-		if (book.getIsbn() == null || book.getIsbn().isBlank())
-			throw new IllegalArgumentException("ISBN cannot be empty");
+        if (book.getTitle() == null || book.getTitle().isBlank())
+            throw new IllegalArgumentException("Book title cannot be empty.");
 
-		if (book.getTotalCopies() < 0)
-			throw new IllegalArgumentException("Total copies cannot be negative");
-	}
+        if (book.getIsbn() == null || book.getIsbn().isBlank())
+            throw new IllegalArgumentException("ISBN cannot be empty.");
 
-	private boolean isbnExists(String isbn) {
-		return books.stream().anyMatch(b -> b.getIsbn().equalsIgnoreCase(isbn));
-	}
+        if (book.getTotalCopies() < 0)
+            throw new IllegalArgumentException("Total copies cannot be negative.");
+    }
 
-	// ============================================
-	// CRUD Operations
-	// ============================================
+    /**
+     * Checks whether an ISBN is already used by any other book.
+     *
+     * @param isbn the ISBN to check
+     * @return true if exists, false otherwise
+     */
+    private boolean isbnExists(String isbn) {
+        return books.stream()
+				.anyMatch(b -> b.getIsbn().equalsIgnoreCase(isbn));
+    }
 
-	@Override
-	public boolean addBook(Book book) {
-		validateBook(book);
+    // ============================================================
+    // CRUD Operations
+    // ============================================================
 
-		if (isbnExists(book.getIsbn()))
-			throw new IllegalArgumentException("A book with ISBN already exists: " + book.getIsbn());
+    @Override
+    public boolean addBook(Book book) {
+        validate(book);
 
-		return books.add(book);
-	}
+        if (isbnExists(book.getIsbn())) {
+            throw new IllegalArgumentException(
+                "A book with ISBN '" + book.getIsbn() + "' already exists."
+            );
+        }
 
-	@Override
-	public Optional<Book> getBookById(UUID bookId) {
-		if (bookId == null)
-			return Optional.empty();
+        books.add(book);
+        return true;
+    }
 
-		return books.stream().filter(b -> b.getId().equals(bookId)).findFirst();
-	}
+    @Override
+    public Optional<Book> getBookById(UUID bookId) {
+        if (bookId == null)
+            return Optional.empty();
 
-	@Override
-	public Optional<Book> getBookByIsbn(String isbn) {
-		if (isbn == null)
-			return Optional.empty();
+        return books.stream()
+                .filter(b -> b.getId().equals(bookId))
+                .findFirst();
+    }
 
-		return books.stream().filter(b -> b.getIsbn().equalsIgnoreCase(isbn)).findFirst();
-	}
+    @Override
+    public Optional<Book> getBookByIsbn(String isbn) {
+        if (isbn == null)
+            return Optional.empty();
 
-	@Override
-	public boolean updateBook(Book updatedBook) {
-		validateBook(updatedBook);
+        return books.stream()
+                .filter(b -> b.getIsbn().equalsIgnoreCase(isbn))
+                .findFirst();
+    }
 
-		for (int i = 0; i < books.size(); i++) {
-			if (books.get(i).getId().equals(updatedBook.getId())) {
+    @Override
+    public boolean updateBook(Book updatedBook) {
+        validate(updatedBook);
 
-				// Prevent using an existing ISBN for a different book
-				if (!books.get(i).getIsbn().equalsIgnoreCase(updatedBook.getIsbn())
-						&& isbnExists(updatedBook.getIsbn())) {
-					throw new IllegalArgumentException("Updated ISBN already exists for another book.");
-				}
+        for (int i = 0; i < books.size(); i++) {
+            Book current = books.get(i);
 
-				books.set(i, updatedBook);
-				return true;
-			}
-		}
+            if (current.getId().equals(updatedBook.getId())) {
 
-		return false;
-	}
+                // Prevent using another existing book's ISBN
+                boolean isbnChanged = !current.getIsbn().equalsIgnoreCase(updatedBook.getIsbn());
+                boolean isbnConflict = isbnChanged && isbnExists(updatedBook.getIsbn());
 
-	@Override
-	public boolean deleteBook(UUID bookId) {
-		if (bookId == null)
-			throw new IllegalArgumentException("Book ID cannot be null");
+                if (isbnConflict) {
+                    throw new IllegalArgumentException(
+                        "Cannot update book — ISBN '" +
+                        updatedBook.getIsbn() +
+                        "' already belongs to another book."
+                    );
+                }
 
-		return books.removeIf(b -> b.getId().equals(bookId));
-	}
+                books.set(i, updatedBook);
+                return true;
+            }
+        }
 
-	@Override
-	public List<Book> getAllBooks() {
-		return Collections.unmodifiableList(books);
-	}
+        return false;
+    }
+
+    @Override
+    public boolean deleteBook(UUID bookId) {
+        if (bookId == null)
+            throw new IllegalArgumentException("Book ID cannot be null.");
+
+        return books.removeIf(b -> b.getId().equals(bookId));
+    }
+
+    @Override
+    public List<Book> getAllBooks() {
+        return List.copyOf(books);
+    }
 }

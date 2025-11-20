@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
+import lms.domain.exception.UserNotFoundException;
 
 public class LoanStatsService {
 
@@ -17,7 +18,6 @@ public class LoanStatsService {
 	public LoanStatsService(LoanRepository loanRepo) {
 		if (loanRepo == null)
 			throw new IllegalArgumentException("LoanRepository cannot be null");
-
 		this.loanRepo = loanRepo;
 	}
 
@@ -25,50 +25,50 @@ public class LoanStatsService {
 	// Basic Counts
 	// =============================================================
 	public long countTotalLoans() {
-		return loanRepo.getAllLoans().size();
+		return loanRepo.findAll().size();
 	}
 
 	public long countActiveLoans() {
-		return loanRepo.getAllLoans().stream().filter(l -> !l.isReturned()).count();
+		return loanRepo.countActiveLoans();
 	}
 
 	public long countReturnedLoans() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned).count();
+		return loanRepo.findReturnedLoans().size();
 	}
 
 	public long countOverdueLoans() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isOverdue).count();
+		return loanRepo.countOverdueLoans();
 	}
 
 	public long countLoansByItemType(String itemType) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getItemType().equalsIgnoreCase(itemType)).count();
+		return loanRepo.countLoansByItemType(itemType);
 	}
 
-	public long countLoansByUser(UUID userId) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getUserId().equals(userId)).count();
+	public long countLoansByUser(UUID userId) throws UserNotFoundException {
+		return loanRepo.findByUserId(userId).size();
 	}
 
 	// =============================================================
 	// Aggregations & Grouping
 	// =============================================================
 	public Map<String, Long> countLoansPerItemType() {
-		return loanRepo.getAllLoans().stream().collect(Collectors.groupingBy(Loan::getItemType, Collectors.counting()));
+		return loanRepo.findAll().stream().collect(Collectors.groupingBy(Loan::getItemType, Collectors.counting()));
 	}
 
 	public Map<UUID, Long> countLoansPerUser() {
-		return loanRepo.getAllLoans().stream().collect(Collectors.groupingBy(Loan::getUserId, Collectors.counting()));
+		return loanRepo.findAll().stream().collect(Collectors.groupingBy(Loan::getUserId, Collectors.counting()));
 	}
 
 	// =============================================================
 	// Date Range Statistics
 	// =============================================================
 	public long countLoansBorrowedBetween(LocalDate start, LocalDate end) {
-		return loanRepo.getAllLoans().stream().filter(l -> !l.getBorrowDate().isBefore(start))
+		return loanRepo.findAll().stream().filter(l -> !l.getBorrowDate().isBefore(start))
 				.filter(l -> !l.getBorrowDate().isAfter(end)).count();
 	}
 
 	public long countLoansReturnedBetween(LocalDate start, LocalDate end) {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned).filter(l -> !l.getReturnDate().isBefore(start))
+		return loanRepo.findReturnedLoans().stream().filter(l -> !l.getReturnDate().isBefore(start))
 				.filter(l -> !l.getReturnDate().isAfter(end)).count();
 	}
 
@@ -76,7 +76,7 @@ public class LoanStatsService {
 	// Top borrowed items
 	// =============================================================
 	public List<Map.Entry<UUID, Long>> getTopBorrowedItems(int limit) {
-		return loanRepo.getAllLoans().stream().collect(Collectors.groupingBy(Loan::getItemId, Collectors.counting()))
+		return loanRepo.findAll().stream().collect(Collectors.groupingBy(Loan::getItemId, Collectors.counting()))
 				.entrySet().stream().sorted(Map.Entry.<UUID, Long>comparingByValue().reversed()).limit(limit).toList();
 	}
 
@@ -84,7 +84,7 @@ public class LoanStatsService {
 	// Loan duration statistics
 	// =============================================================
 	public double getAverageLoanDuration() {
-		List<Long> durations = loanRepo.getAllLoans().stream().filter(Loan::isReturned)
+		List<Long> durations = loanRepo.findReturnedLoans().stream()
 				.map(l -> ChronoUnit.DAYS.between(l.getBorrowDate(), l.getReturnDate())).toList();
 
 		if (durations.isEmpty())
@@ -94,12 +94,12 @@ public class LoanStatsService {
 	}
 
 	public long getMaxLoanDuration() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned)
+		return loanRepo.findReturnedLoans().stream()
 				.mapToLong(l -> ChronoUnit.DAYS.between(l.getBorrowDate(), l.getReturnDate())).max().orElse(0);
 	}
 
 	public long getMinLoanDuration() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned)
+		return loanRepo.findReturnedLoans().stream()
 				.mapToLong(l -> ChronoUnit.DAYS.between(l.getBorrowDate(), l.getReturnDate())).min().orElse(0);
 	}
 
@@ -107,10 +107,6 @@ public class LoanStatsService {
 	// Loans due soon stats
 	// =============================================================
 	public long countLoansDueSoon(int days) {
-		LocalDate now = LocalDate.now();
-		LocalDate target = now.plusDays(days);
-
-		return loanRepo.getAllLoans().stream().filter(l -> !l.isReturned())
-				.filter(l -> l.getDueDate().isAfter(now) && l.getDueDate().isBefore(target)).count();
+		return loanRepo.findLoansDueSoon(days).size();
 	}
 }

@@ -15,85 +15,63 @@ public class LoanQueryService {
 	public LoanQueryService(LoanRepository loanRepo) {
 		if (loanRepo == null)
 			throw new IllegalArgumentException("LoanRepository cannot be null");
-
 		this.loanRepo = loanRepo;
 	}
 
-	// ================================================================
+	// ===============================
 	// Basic Filters
-	// ================================================================
+	// ===============================
+
 	public List<Loan> getActiveLoans() {
-		return loanRepo.getAllLoans().stream().filter(l -> !l.isReturned()).collect(Collectors.toList());
-	}
-
-	public List<Loan> getReturnedLoans() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned).collect(Collectors.toList());
-	}
-
-	public List<Loan> getLoansByUser(UUID userId) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getUserId().equals(userId)).collect(Collectors.toList());
-	}
-
-	public List<Loan> getLoansByItem(UUID itemId) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getItemId().equals(itemId)).collect(Collectors.toList());
+		return loanRepo.findAll().stream().filter(l -> !l.isReturned()).collect(Collectors.toList());
 	}
 
 	public List<Loan> getLoansByItemType(String itemType) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getItemType().equalsIgnoreCase(itemType))
+		return loanRepo.findAll().stream().filter(l -> l.getItemType().equalsIgnoreCase(itemType))
 				.collect(Collectors.toList());
 	}
 
-	// ================================================================
-	// Overdue & Due Soon
-	// ================================================================
-	public List<Loan> getOverdueLoans() {
-		return loanRepo.getAllLoans().stream().filter(Loan::isOverdue).collect(Collectors.toList());
+	public List<Loan> getReturnedLoans() {
+		return loanRepo.findAll().stream().filter(Loan::isReturned).collect(Collectors.toList());
 	}
 
-	public List<Loan> getOverdueLoansByUser(UUID userId) {
-		return loanRepo.getAllLoans().stream().filter(l -> l.getUserId().equals(userId)).filter(Loan::isOverdue)
+	public List<Loan> getLoansByUser(UUID userId) {
+		return loanRepo.findAll().stream().filter(l -> l.getUserId().equals(userId)).collect(Collectors.toList());
+	}
+
+	public List<Loan> getLoansByItem(UUID itemId) {
+		return loanRepo.findAll().stream().filter(l -> l.getItemId().equals(itemId)).collect(Collectors.toList());
+	}
+
+	public List<Loan> getOverdueLoans() {
+		return loanRepo.findAll().stream().filter(Loan::isOverdue).collect(Collectors.toList());
+	}
+
+	public List<Loan> getLoansByBorrowDate(LocalDate borrowDate) {
+		return loanRepo.findAll().stream().filter(l -> l.getBorrowDate().equals(borrowDate))
+				.collect(Collectors.toList());
+	}
+
+	public List<Loan> getLoansByDueDate(LocalDate dueDate) {
+		return loanRepo.findAll().stream().filter(l -> l.getDueDate().equals(dueDate)).collect(Collectors.toList());
+	}
+
+	public List<Loan> getLoansByReturnDate(LocalDate returnDate) {
+		return loanRepo.findAll().stream().filter(l -> returnDate.equals(l.getReturnDate()))
 				.collect(Collectors.toList());
 	}
 
 	public List<Loan> getLoansDueSoon(int days) {
 		LocalDate now = LocalDate.now();
-		LocalDate target = now.plusDays(days);
+		LocalDate limit = now.plusDays(days);
 
-		return loanRepo.getAllLoans().stream().filter(l -> !l.isReturned())
-				.filter(l -> l.getDueDate().isAfter(now) && l.getDueDate().isBefore(target))
+		return loanRepo.findAll().stream().filter(l -> !l.isReturned() && !l.getDueDate().isAfter(limit))
 				.collect(Collectors.toList());
 	}
 
-	// ================================================================
-	// Date Range Filters
-	// ================================================================
-	public List<Loan> getLoansBorrowedBetween(LocalDate start, LocalDate end) {
-		return loanRepo.getAllLoans().stream().filter(l -> !l.getBorrowDate().isBefore(start))
-				.filter(l -> !l.getBorrowDate().isAfter(end)).collect(Collectors.toList());
-	}
-
-	public List<Loan> getLoansDueBetween(LocalDate start, LocalDate end) {
-		return loanRepo.getAllLoans().stream().filter(l -> !l.getDueDate().isBefore(start))
-				.filter(l -> !l.getDueDate().isAfter(end)).collect(Collectors.toList());
-	}
-
-	public List<Loan> getLoansReturnedBetween(LocalDate start, LocalDate end) {
-		return loanRepo.getAllLoans().stream().filter(Loan::isReturned).filter(l -> !l.getReturnDate().isBefore(start))
-				.filter(l -> !l.getReturnDate().isAfter(end)).collect(Collectors.toList());
-	}
-
-	// ================================================================
-	// Searching
-	// ================================================================
-	public List<Loan> searchLoans(String keyword) {
-		if (keyword == null || keyword.isBlank())
-			return loanRepo.getAllLoans();
-
-		String lower = keyword.toLowerCase();
-
-		return loanRepo
-				.getAllLoans().stream().filter(l -> l.getItemType().toLowerCase().contains(lower)
-						|| l.getUserId().toString().contains(lower) || l.getItemId().toString().contains(lower))
+	public List<Loan> getLoansBorrowedInRange(LocalDate start, LocalDate end) {
+		return loanRepo.findAll().stream()
+				.filter(l -> !l.getBorrowDate().isBefore(start) && !l.getBorrowDate().isAfter(end))
 				.collect(Collectors.toList());
 	}
 }
