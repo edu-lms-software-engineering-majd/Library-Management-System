@@ -158,16 +158,7 @@ public class Book implements LoanableItem {
 		return isbn;
 	}
 
-	/**
-	 * Sets the ISBN of the book.
-	 * 
-	 * @param isbn the new ISBN of the book
-	 * @throws IllegalArgumentException if ISBN is null or blank
-	 */
-	public void setIsbn(String isbn) {
-		BookValidator.getInstance().validateIsbn(isbn);
-		this.isbn = isbn;
-	}
+	// NOTE: ISBN is immutable - no setter provided as it's a unique identifier
 
 	/** @return the publisher of the book */
 	public String getPublisher() {
@@ -238,9 +229,22 @@ public class Book implements LoanableItem {
 		return availableCopies;
 	}
 
-	/** @param availableCopies the new number of available copies */
-	public void setAvailableCopies(int availableCopies) {
-		this.availableCopies = availableCopies;
+	/**
+	 * Checks if at least one copy of the book is available for borrowing.
+	 * 
+	 * @return true if available copies > 0
+	 */
+	public boolean hasAvailableCopies() {
+		return availableCopies > 0;
+	}
+
+	/**
+	 * Checks if all copies of the book are currently borrowed.
+	 * 
+	 * @return true if no copies are available
+	 */
+	public boolean isFullyBorrowed() {
+		return availableCopies == 0;
 	}
 
 	/** @return the language of the book */

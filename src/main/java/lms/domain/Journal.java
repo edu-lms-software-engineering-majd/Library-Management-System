@@ -116,12 +116,7 @@ public class Journal implements LoanableItem {
 		return availableCopies;
 	}
 
-	/**
-	 * @param availableCopies the new number of available copies
-	 */
-	public void setAvailableCopies(int availableCopies) {
-		this.availableCopies = availableCopies;
-	}
+	// NOTE: Available copies managed through domain methods (decrementAvailableCopies/incrementAvailableCopies)
 
 	/**
 	 * Checks if any copy is currently borrowed.

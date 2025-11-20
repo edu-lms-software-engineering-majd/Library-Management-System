@@ -3,6 +3,8 @@ package lms.domain;
 import java.time.Instant;
 import java.util.UUID;
 
+import lms.domain.utils.NotificationValidator;
+
 /**
  * Represents a notification sent to a user in the library management system.
  * <p>
@@ -13,14 +15,14 @@ import java.util.UUID;
  * <li>Loan approvals/rejections</li>
  * </ul>
  * 
- * @author majd-awwad
+ * @author Majd Awwad
  */
 public class Notification {
 
-	private Instant timestamp;
-	private String notificationContent;
-	private UUID senderID;
-	private NotificationType type;
+	private final Instant timestamp;
+	private final String notificationContent;
+	private final UUID senderID;
+	private final NotificationType type;
 
 	/**
 	 * Constructs a new notification with the specified content and sender. The
@@ -29,8 +31,12 @@ public class Notification {
 	 * @param content  the notification message content
 	 * @param senderID the UUID of the sender (e.g., system or admin)
 	 * @param type     the type of notification
+	 * @throws IllegalArgumentException if any parameter is null or content is blank
 	 */
 	public Notification(String content, UUID senderID, NotificationType type) {
+		// Validate all inputs using NotificationValidator (DRY principle)
+		NotificationValidator.getInstance().validate(content, senderID, type);
+
 		this.timestamp = Instant.now();
 		this.notificationContent = content;
 		this.senderID = senderID;
@@ -41,9 +47,7 @@ public class Notification {
 		return notificationContent;
 	}
 
-	public void setNotificationContent(String notificationContent) {
-		this.notificationContent = notificationContent;
-	}
+	// NOTE: Notification content is immutable - no setter provided
 
 	public Instant getTimestamp() {
 		return timestamp;

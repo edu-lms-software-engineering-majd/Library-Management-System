@@ -3,6 +3,8 @@ package lms.application;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lms.domain.exception.ItemNotFoundException;
+
 /**
  * Manages scheduled background tasks for the library management system.
  * <p>
@@ -53,8 +55,12 @@ public class SchedulerService {
 			@Override
 			public void run() {
 				logger.logTaskStart();
-				loanService.checkAndNotifyOverdueLoans();
-				logger.logTaskComplete();
+				try {
+					loanService.checkAndNotifyOverdueLoans();
+					logger.logTaskComplete();
+				} catch (ItemNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
 		};
 	}
