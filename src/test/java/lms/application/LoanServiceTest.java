@@ -107,6 +107,7 @@ class LoanServiceTest {
 		verify(userRepo).update(testUser);
 	}
 
+	
 	@Test
 	void givenValidUserAndAvailableCD_whenLoanItem_thenLoanIsCreated() throws Exception {
 		when(userRepo.getByID(testUserId)).thenReturn(Optional.of(testUser));

@@ -69,7 +69,6 @@ public class AuthService {
 	 * 
 	 * @param userRepo the repository used to retrieve user data
 	 */
-
 	public AuthService(UserRepository userRepo) {
 		this.userRepo = userRepo;
 	}
@@ -84,16 +83,16 @@ public class AuthService {
 	 *                                  username
 	 * @throws InvalidPasswordException if the password is incorrect
 	 */
-
 	public boolean login(String userName, String rawPassword) throws UserNotFoundException, InvalidPasswordException {
-
 		User user = userRepo.getByUserName(userName)
 				.orElseThrow(() -> new UserNotFoundException("User '" + userName + "' does not exist."));
 
 		if (!user.verifyPassword(rawPassword)) {
 			throw new InvalidPasswordException("Incorrect password.");
 		}
+		
 
+		
 		UserDTO userDTO = user.toDTO();
 		AuthService.currentUser = userDTO;
 
@@ -105,7 +104,6 @@ public class AuthService {
 	 *
 	 * @throws IllegalStateException if no user is currently logged in
 	 */
-
 	public void logout() throws IllegalStateException {
 		if (currentUser == null) {
 			throw new IllegalStateException("No user is logged in");
@@ -119,7 +117,6 @@ public class AuthService {
 	 * @return the {@link UserDTO} of the current user, or {@code null} if no user
 	 *         is logged in
 	 */
-
 	public static UserDTO getCurrentUser() {
 		return currentUser;
 	}

@@ -17,16 +17,24 @@ public class NotificationService implements NotificationObserver {
 
 	@Override
 	public void notify(User user, Notification notification) {
+		if (user == null)
+			throw new NullPointerException("User cannot be null");
+		if (notification == null)
+			throw new NullPointerException("Notification cannot be null");
+
 		user.addNotification(notification);
 	}
 
 	/**
 	 * Notifies a user about an overdue item.
-	 * 
+	 *
 	 * @param user      the user with overdue items
 	 * @param itemTitle the title of the overdue item
 	 */
 	public void notifyOverdueItem(User user, String itemTitle) {
+		if (user == null)
+			throw new NullPointerException("User cannot be null");
+
 		Notification notification = new Notification(
 				"Your item '" + itemTitle + "' is overdue. Please return it immediately.", SYSTEM_ID,
 				NotificationType.OVERDUE);

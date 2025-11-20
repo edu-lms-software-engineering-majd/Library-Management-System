@@ -40,6 +40,7 @@ public class FineTransaction {
 		this.transactionId = UUID.randomUUID();
 		this.amount = amount;
 		this.description = description;
+		
 		this.transactionDate = LocalDate.now();
 		this.type = type;
 	}

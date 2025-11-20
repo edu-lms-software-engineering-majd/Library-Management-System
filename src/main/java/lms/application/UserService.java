@@ -56,6 +56,7 @@ public class UserService {
 	 *
 	 * @param userRepo the repository used for persisting and retrieving users
 	 */
+	
 
 	public UserService(UserRepository userRepo) {
 		this.userRepo = userRepo;
@@ -121,7 +122,7 @@ public class UserService {
 	public boolean updateUser(UserDTO currentUser, UUID userID, String newUsername, String newEmail, String newPassword,
 			Role newRole) throws IllegalAccessException, UserNotFoundException {
 
-		if (currentUser.role() != Role.ADMIN || currentUser.userID() != userID)
+		if (currentUser.role() != Role.ADMIN && currentUser.userID() != userID)
 			throw new IllegalAccessException("You are not allowed to update this user");
 
 		Optional<User> userOptional = userRepo.getByID(userID);
