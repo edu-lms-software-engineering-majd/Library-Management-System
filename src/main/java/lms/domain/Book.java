@@ -53,10 +53,7 @@ public class Book implements LoanableItem {
 	 * @param shelfLocation   the physical location of the book in the library
 	 */
 
-	public String getIsbn() {
-		return isbn;
-	}
-
+	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
 		BookValidator.getInstance().validate(title, author, isbn, publisher, publicationYear, category, totalCopies,
@@ -90,6 +87,14 @@ public class Book implements LoanableItem {
 	 * @param description     a short description or summary of the book
 	 * @param shelfLocation   the physical location of the book in the library
 	 */
+	
+	
+	public String getIsbn() {
+		return isbn;
+	}
+
+	
+	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String description, String shelfLocation) {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);

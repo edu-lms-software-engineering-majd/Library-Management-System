@@ -20,6 +20,12 @@ import lms.domain.exception.UserNotFoundException;
 
 public class StaticLoanRepository implements LoanRepository {
 
+	private static final StaticLoanRepository INSTANCE = new StaticLoanRepository();
+
+	public static StaticLoanRepository getInstance() {
+		return INSTANCE;
+	}
+
 	private static final Map<UUID, Loan> loans = new HashMap<>();
 
 	// ===============================

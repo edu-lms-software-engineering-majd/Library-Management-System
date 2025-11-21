@@ -30,6 +30,7 @@ class LoanTest {
 		cdLoan = new Loan(testUserId, testItemId, "cd", LocalDate.now());
 		journalLoan = new Loan(testUserId, testItemId, "journal", LocalDate.now());
 	}
+	
 
 	@AfterEach
 	void tearDown() {

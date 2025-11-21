@@ -46,6 +46,7 @@ class AccountTest {
 		assertNotNull(account.getUpdatedAt());
 		assertTrue(account.getFineTransactions().isEmpty());
 	}
+	
 
 	@Test
 	void givenValidAmount_whenAddFine_thenFineIsAssigned() {

@@ -21,42 +21,6 @@ import lms.persistence.StaticUserRepository;
 
 /**
  * Entry point for the Library Management System (LMS).
- *
- * <p>
- * This class acts as the application bootstrapper. It is responsible for
- * creating the necessary repository and service instances, wiring them
- * together, and starting the main {@link LibraryCLI} interface.
- * </p>
- *
- * <h2>Responsibilities:</h2>
- * <ul>
- * <li>Instantiate repositories ({@link StaticUserRepository},
- * {@link StaticBookRepository})</li>
- * <li>Initialize core services ({@link AuthService}, {@link UserService},
- * {@link BookService})</li>
- * <li>Inject dependencies into the CLI layer</li>
- * <li>Launch the CLI-based user interface</li>
- * </ul>
- *
- * <p>
- * This class belongs to the <b>presentation layer</b> but also serves as the
- * composition root for dependency injection. In larger applications, a DI
- * framework (e.g., Spring) would take over this role.
- * </p>
- *
- * <h2>Usage:</h2>
- * 
- * <pre>{@code
- *   java lms.presentation.LibraryApp
- * }</pre>
- *
- * <p>
- * After execution, the main menu is displayed, allowing users to log in and
- * access features based on their roles (admin, librarian, member, etc.).
- * </p>
- *
- * @author Majd Awwad
- * @version 2.0
  */
 public class LibraryApp {
 
@@ -64,19 +28,20 @@ public class LibraryApp {
 
 		UserRepository userRepo = StaticUserRepository.getInstance();
 		BookRepository bookRepo = StaticBookRepository.getInstance();
-		CDRepository   cdRepo = StaticCDRepository.getInstance();
+		CDRepository cdRepo = StaticCDRepository.getInstance();
 		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();
 		LoanRepository loanRepo = StaticLoanRepository.getInstance();
-		
+
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
-		BookService bookService = new BookService(bookRepo, userRepo);
-		CDService cdService = new CDService(cdRepo, userRepo);
+		BookService bookService = new BookService(bookRepo);
+		CDService cdService = new CDService(cdRepo);
 		JournalService journalService = new JournalService(journalsRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
 		NotificationService notificationService = new NotificationService();
-		
-		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo, notificationService);
+
+		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo,
+				notificationService);
 
 		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService);
 		cli.start();

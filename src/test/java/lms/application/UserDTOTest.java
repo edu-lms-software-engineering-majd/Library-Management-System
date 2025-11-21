@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import lms.domain.Role;
 
 class UserDTOTest {
+	
 
 	@Test
 	void testUserDTO_CreationAndGetters() {

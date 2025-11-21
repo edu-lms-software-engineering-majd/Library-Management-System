@@ -27,6 +27,7 @@ class BookTest {
 	void tearDown() {
 		book = null;
 	}
+	
 
 	@Test
 	void givenValidParameters_whenCreateBook_thenBookIsInitializedCorrectly() {

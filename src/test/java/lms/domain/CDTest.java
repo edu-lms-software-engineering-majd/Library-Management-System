@@ -20,6 +20,7 @@ class CDTest {
 	void setUp() {
 		cd = new CD("Thriller", "Michael Jackson", 3);
 	}
+	
 
 	@AfterEach
 	void tearDown() {
