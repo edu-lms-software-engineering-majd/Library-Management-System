@@ -23,7 +23,7 @@ import lms.domain.utils.BookValidator;
  * @version 1.0
  */
 public class Book implements LoanableItem {
-	
+
 	private final UUID bookId;
 	private String title;
 	private String author;
@@ -52,10 +52,12 @@ public class Book implements LoanableItem {
 	 * @param language        the language the book is written in
 	 * @param shelfLocation   the physical location of the book in the library
 	 */
+
+	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
-		BookValidator.getInstance().validate(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
-				shelfLocation);
+		BookValidator.getInstance().validate(title, author, isbn, publisher, publicationYear, category, totalCopies,
+				language, shelfLocation);
 
 		this.bookId = UUID.randomUUID();
 		this.title = title;
@@ -71,7 +73,6 @@ public class Book implements LoanableItem {
 		this.shelfLocation = shelfLocation;
 	}
 
-	
 	/**
 	 * Creates a new {@code Book} with an optional description.
 	 *
@@ -86,6 +87,14 @@ public class Book implements LoanableItem {
 	 * @param description     a short description or summary of the book
 	 * @param shelfLocation   the physical location of the book in the library
 	 */
+	
+	
+	public String getIsbn() {
+		return isbn;
+	}
+
+	
+	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String description, String shelfLocation) {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);
@@ -154,8 +163,8 @@ public class Book implements LoanableItem {
 	}
 
 	/** @return the ISBN of the book */
-	public String getIsbn() {
-		return isbn;
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
 	}
 
 	// NOTE: ISBN is immutable - no setter provided as it's a unique identifier

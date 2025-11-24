@@ -7,19 +7,23 @@ import lms.domain.exception.ItemNotFoundException;
 
 /**
  * Manages scheduled background tasks for the library management system.
+ * 
  * <p>
  * This service provides automated periodic execution of maintenance tasks such
  * as checking for overdue loans and triggering user notifications. It uses
  * Java's built-in {@link Timer} mechanism to schedule tasks at fixed intervals.
  * </p>
+ * 
  * <p>
- * The scheduler runs as a daemon thread, which means it will not prevent the
- * JVM from shutting down when the main application exits.
+ * The scheduler runs as a daemon thread, meaning it will not prevent the JVM
+ * from shutting down when the main application exits.
  * </p>
  *
- * @author majd-awwad
+ * @author Majd Awwad
+ * @refactoredBy Ahmad Salameh
  * @see LoanService
  * @see Timer
+ * @version 1.1
  */
 public class SchedulerService {
 
@@ -32,9 +36,10 @@ public class SchedulerService {
 	private Timer timer;
 
 	/**
-	 * Constructs a new scheduler service with the specified loan service.
+	 * Constructs a new scheduler service with the required dependencies.
 	 *
 	 * @param loanService the loan service used to check for overdue loans
+	 * @param logger      optional logger; if null, a console logger is used
 	 * @throws IllegalArgumentException if loanService is null
 	 */
 	public SchedulerService(LoanService loanService, SchedulerLogger logger) {
@@ -46,9 +51,9 @@ public class SchedulerService {
 	}
 
 	/**
-	 * Creates a timer task for checking overdue loans.
-	 * 
-	 * @return a new TimerTask that checks for overdue loans
+	 * Creates the TimerTask that performs overdue-loan checks.
+	 *
+	 * @return TimerTask instance
 	 */
 	private TimerTask createOverdueCheckTask() {
 		return new TimerTask() {
@@ -66,21 +71,9 @@ public class SchedulerService {
 	}
 
 	/**
-	 * Starts the automated overdue loan checker that runs at fixed intervals.
-	 * <p>
-	 * The task performs the following operations:
-	 * <ul>
-	 * <li>Identifies all loans that have exceeded their due date</li>
-	 * <li>Sends notifications to users with overdue items</li>
-	 * <li>Logs the execution status to the console</li>
-	 * </ul>
-	 * </p>
-	 * <p>
-	 * The first execution occurs one minute after this method is called, followed
-	 * by subsequent executions every 24 hours.
-	 * </p>
+	 * Starts the scheduler with default intervals (run every 24 hours).
 	 *
-	 * @throws IllegalStateException if the scheduler is already running
+	 * @throws IllegalStateException if already running
 	 */
 	public void startOverdueCheckScheduler() {
 		if (timer != null) {
@@ -88,25 +81,21 @@ public class SchedulerService {
 		}
 
 		timer = new Timer(true);
-		TimerTask timerTask = createOverdueCheckTask();
+		TimerTask task = createOverdueCheckTask();
 
-		timer.scheduleAtFixedRate(timerTask, ONE_MINUTE_MS, TWENTY_FOUR_HOURS_MS);
+		timer.scheduleAtFixedRate(task, ONE_MINUTE_MS, TWENTY_FOUR_HOURS_MS);
 
 		logger.logSchedulerStart("Overdue loan checker scheduled to run every 24 hours");
 	}
 
 	/**
-	 * Starts the automated overdue loan checker with custom scheduling intervals.
-	 * <p>
-	 * This method allows for flexible configuration of when and how often the
-	 * overdue check task should execute.
-	 * </p>
+	 * Starts the scheduler with custom intervals.
 	 *
-	 * @param initialDelayMs the delay before the first execution in milliseconds
-	 * @param periodMs       the interval between successive executions in
-	 *                       milliseconds
-	 * @throws IllegalArgumentException if initialDelayMs or periodMs is negative
-	 * @throws IllegalStateException    if the scheduler is already running
+	 * @param initialDelayMs delay before first run
+	 * @param periodMs       interval between runs
+	 *
+	 * @throws IllegalArgumentException for invalid periods
+	 * @throws IllegalStateException    if already running
 	 */
 	public void startOverdueCheckScheduler(long initialDelayMs, long periodMs) {
 
@@ -124,25 +113,16 @@ public class SchedulerService {
 		}
 
 		timer = new Timer(true);
-		TimerTask timerTask = createOverdueCheckTask();
+		TimerTask task = createOverdueCheckTask();
 
-		timer.scheduleAtFixedRate(timerTask, initialDelayMs, periodMs);
+		timer.scheduleAtFixedRate(task, initialDelayMs, periodMs);
 
-		logger.logSchedulerStart(
-				String.format("Overdue loan checker scheduled to run every %d ms after an initial delay of %d ms",
-						periodMs, initialDelayMs));
+		logger.logSchedulerStart(String.format("Overdue loan checker scheduled every %d ms (initial delay: %d ms)",
+				periodMs, initialDelayMs));
 	}
 
 	/**
-	 * Stops the scheduler and cancels all pending scheduled tasks.
-	 * <p>
-	 * After calling this method, no further scheduled tasks will execute. To
-	 * restart scheduling, call {@link #startOverdueCheckScheduler()} again.
-	 * </p>
-	 * <p>
-	 * This method is idempotent; calling it multiple times has no additional
-	 * effect.
-	 * </p>
+	 * Stops all scheduled tasks safely.
 	 */
 	public void stop() {
 		if (timer != null) {
@@ -153,9 +133,7 @@ public class SchedulerService {
 	}
 
 	/**
-	 * Checks whether the scheduler is currently running.
-	 *
-	 * @return {@code true} if the scheduler is active, {@code false} otherwise
+	 * @return true if scheduler is active
 	 */
 	public boolean isRunning() {
 		return timer != null;

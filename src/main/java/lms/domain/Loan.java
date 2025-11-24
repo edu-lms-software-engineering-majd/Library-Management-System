@@ -201,4 +201,9 @@ public class Loan {
 		LoanValidator.getInstance().validateExtensionDays(days);
 		this.dueDate = this.dueDate.plusDays(days);
 	}
+	
+	public boolean isReturned() {
+	    return returnDate != null;
+	}
+
 }

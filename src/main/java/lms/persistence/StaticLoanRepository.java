@@ -2,281 +2,254 @@ package lms.persistence;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
+import lms.domain.exception.ItemNotFoundException;
+import lms.domain.exception.ItemTypeNotFoundException;
+import lms.domain.exception.LoanAlreadyExistsException;
+import lms.domain.exception.LoanNotFoundException;
+import lms.domain.exception.UserNotFoundException;
 
-/**
- * In-memory implementation of {@link LoanRepository} for testing and simple
- * usage.
- * 
- * <p>
- * This repository stores loans in a static list and provides basic CRUD
- * operations: create, read, update, delete. It also provides various query
- * methods for filtering loans by different criteria.
- * </p>
- * 
- * <p>
- * Note: This is not thread-safe and intended for demo or testing purposes only.
- * For production use, replace with a database-backed repository.
- * </p>
- * 
- * @author Majd Awwad
- * @version 1.0
- */
 public class StaticLoanRepository implements LoanRepository {
 
-    private final static StaticLoanRepository INSTANCE = new StaticLoanRepository();
-    
-    /** Internal list storing all loans */
-    private static final List<Loan> loans = new ArrayList<>();
+	private static final StaticLoanRepository INSTANCE = new StaticLoanRepository();
 
-    /**
-     * Gets the singleton instance of the repository.
-     * 
-     * @return the singleton instance
-     */
-    
-    private StaticLoanRepository() {
+	public static StaticLoanRepository getInstance() {
+		return INSTANCE;
 	}
-    
-    public static StaticLoanRepository getInstance() {
-        
-    	return INSTANCE;
-    }
 
-    @Override
-    public Optional<Loan> findById(UUID loanId) {
-        return loans.stream()
-                .filter(loan -> loan.getLoanId().equals(loanId))
-                .findFirst();
-    }
+	private static final Map<UUID, Loan> loans = new HashMap<>();
 
-    @Override
-    public boolean save(Loan loan) {
-        if (loan == null || findById(loan.getLoanId()).isPresent()) {
-            return false;
-        }
-        return loans.add(loan);
-    }
+	// ===============================
+	// Helpers
+	// ===============================
+	private void validateLoanExists(UUID loanId) throws LoanNotFoundException {
+		if (!loans.containsKey(loanId))
+			throw new LoanNotFoundException("Loan not found: " + loanId);
+	}
 
-    @Override
-    public boolean update(Loan loan) {
-        if (loan == null) {
-            throw new IllegalArgumentException("Loan cannot be null");
-        }
-        
-        for (int i = 0; i < loans.size(); i++) {
-            if (loans.get(i).getLoanId().equals(loan.getLoanId())) {
-                loans.set(i, loan);
-                return true;
-            }
-        }
-        return false;
-    }
+	private void validateUserExists(UUID userId) throws UserNotFoundException {
+		boolean exists = loans.values().stream().anyMatch(l -> l.getUserId().equals(userId));
+		if (!exists)
+			throw new UserNotFoundException("User has no loans: " + userId);
+	}
 
-    @Override
-    public boolean delete(UUID loanId) {
-        return loans.removeIf(loan -> loan.getLoanId().equals(loanId));
-    }
+	private void validateItemExists(UUID itemId) throws ItemNotFoundException {
+		boolean exists = loans.values().stream().anyMatch(l -> l.getItemId().equals(itemId));
+		if (!exists)
+			throw new ItemNotFoundException("Item has no loans: " + itemId);
+	}
 
-    @Override
-    public List<Loan> findAll() {
-        return Collections.unmodifiableList(loans);
-    }
+	// ===============================
+	// CRUD
+	// ===============================
 
+	@Override
+	public Optional<Loan> findById(UUID loanId) {
+		return Optional.ofNullable(loans.get(loanId));
+	}
 
-    @Override
-    public List<Loan> findByUserId(UUID userId) {
-        return loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public boolean save(Loan loan) throws LoanAlreadyExistsException {
+		if (loans.containsKey(loan.getLoanId()))
+			throw new LoanAlreadyExistsException();
 
-    @Override
-    public List<Loan> findActiveLoansByUser(UUID userId) {
-        return loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .filter(Loan::isActive)
-                .collect(Collectors.toList());
-    }
+		loans.put(loan.getLoanId(), loan);
+		return true;
+	}
 
-    @Override
-    public List<Loan> findReturnedLoansByUser(UUID userId) {
-        return loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .filter(loan -> !loan.isActive())
-                .collect(Collectors.toList());
-    }
+	@Override
+	public boolean update(Loan loan) throws LoanNotFoundException {
+		validateLoanExists(loan.getLoanId());
+		loans.put(loan.getLoanId(), loan);
+		return true;
+	}
 
-    @Override
-    public List<Loan> findOverdueLoansByUser(UUID userId) {
-        return loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .filter(Loan::isOverdue)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public boolean delete(UUID loanId) throws LoanNotFoundException {
+		validateLoanExists(loanId);
+		loans.remove(loanId);
+		return true;
+	}
 
-    @Override
-    public int countActiveLoansByUser(UUID userId) {
-        return (int) loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .filter(Loan::isActive)
-                .count();
-    }
+	@Override
+	public List<Loan> findAll() {
+		return new ArrayList<>(loans.values());
+	}
 
-    @Override
-    public List<Loan> findByItemId(UUID itemId) {
-        return loans.stream()
-                .filter(loan -> loan.getItemId().equals(itemId))
-                .collect(Collectors.toList());
-    }
+	// ===============================
+	// User-based queries
+	// ===============================
 
-    @Override
-    public Optional<Loan> findActiveLoanByItemId(UUID itemId) {
-        return loans.stream()
-                .filter(loan -> loan.getItemId().equals(itemId))
-                .filter(Loan::isActive)
-                .findFirst();
-    }
+	@Override
+	public List<Loan> findByUserId(UUID userId) throws UserNotFoundException {
+		validateUserExists(userId);
+		return loans.values().stream().filter(l -> l.getUserId().equals(userId)).collect(Collectors.toList());
+	}
 
-    @Override
-    public List<Loan> findByItemType(String itemType) {
-        return loans.stream()
-                .filter(loan -> loan.getItemType().equalsIgnoreCase(itemType))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findActiveLoansByUser(UUID userId) throws UserNotFoundException {
+		validateUserExists(userId);
+		return loans.values().stream().filter(l -> l.getUserId().equals(userId) && !l.isReturned())
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public List<Loan> findOverdueLoans() {
-        return loans.stream()
-                .filter(Loan::isOverdue)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findReturnedLoansByUser(UUID userId) throws UserNotFoundException {
+		validateUserExists(userId);
+		return loans.values().stream().filter(l -> l.getUserId().equals(userId) && l.isReturned())
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public List<Loan> findActiveLoans() {
-        return loans.stream()
-                .filter(Loan::isActive)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findOverdueLoansByUser(UUID userId) throws UserNotFoundException {
+		validateUserExists(userId);
+		return loans.values().stream().filter(l -> l.getUserId().equals(userId) && l.isOverdue())
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public List<Loan> findReturnedLoans() {
-        return loans.stream()
-                .filter(loan -> !loan.isActive())
-                .collect(Collectors.toList());
-    }
+	@Override
+	public int countActiveLoansByUser(UUID userId) throws UserNotFoundException {
+		return findActiveLoansByUser(userId).size();
+	}
 
-    @Override
-    public List<Loan> findLoansWithFines() {
-        return loans.stream()
-                .filter(Loan::isFineApplied)
-                .collect(Collectors.toList());
-    }
+	// ===============================
+	// Item-based queries
+	// ===============================
 
-    @Override
-    public List<Loan> findByBorrowDate(LocalDate borrowDate) {
-    	return loans.stream()
-                .filter(loan -> loan.getBorrowDate().equals(borrowDate))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findByItemId(UUID itemId) throws ItemNotFoundException {
+		validateItemExists(itemId);
+		return loans.values().stream().filter(l -> l.getItemId().equals(itemId)).collect(Collectors.toList());
+	}
 
-    @Override
-    public List<Loan> findByDueDate(LocalDate dueDate) {
-        return loans.stream()
-                .filter(loan -> loan.getDueDate().equals(dueDate))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public Optional<Loan> findActiveLoanByItemId(UUID itemId) throws ItemNotFoundException {
+		validateItemExists(itemId);
+		return loans.values().stream().filter(l -> l.getItemId().equals(itemId) && !l.isReturned()).findFirst();
+	}
 
-    @Override
-    public List<Loan> findByReturnDate(LocalDate returnDate) {
-        return loans.stream()
-                .filter(loan -> loan.getReturnDate() != null)
-                .filter(loan -> loan.getReturnDate().equals(returnDate))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findByItemType(String itemType) throws ItemTypeNotFoundException {
+		List<Loan> found = loans.values().stream().filter(l -> l.getItemType().equalsIgnoreCase(itemType))
+				.collect(Collectors.toList());
 
-    @Override
-    public List<Loan> findByBorrowDateRange(LocalDate startDate, LocalDate endDate) {
-        return loans.stream()
-                .filter(loan -> !loan.getBorrowDate().isBefore(startDate))
-                .filter(loan -> !loan.getBorrowDate().isAfter(endDate))
-                .collect(Collectors.toList());
-    }
+		if (found.isEmpty())
+			throw new ItemTypeNotFoundException("No loans with item type: " + itemType);
 
-    @Override
-    public List<Loan> findByDueDateRange(LocalDate startDate, LocalDate endDate) {
-        return loans.stream()
-                .filter(loan -> !loan.getDueDate().isBefore(startDate))
-                .filter(loan -> !loan.getDueDate().isAfter(endDate))
-                .collect(Collectors.toList());
-    }
+		return found;
+	}
 
-    @Override
-    public long countTotalLoans() {
-        return loans.size();
-    }
+	// ===============================
+	// General filters
+	// ===============================
 
-    @Override
-    public long countActiveLoans() {
-        return loans.stream()
-                .filter(Loan::isActive)
-                .count();
-    }
+	@Override
+	public List<Loan> findOverdueLoans() {
+		return loans.values().stream().filter(Loan::isOverdue).toList();
+	}
 
-    @Override
-    public long countOverdueLoans() {
-        return loans.stream()
-                .filter(Loan::isOverdue)
-                .count();
-    }
+	@Override
+	public List<Loan> findActiveLoans() {
+		return loans.values().stream().filter(l -> !l.isReturned()).toList();
+	}
 
-    @Override
-    public long countLoansByItemType(String itemType) {
-        return loans.stream()
-                .filter(loan -> loan.getItemType().equalsIgnoreCase(itemType))
-                .count();
-    }
+	@Override
+	public List<Loan> findReturnedLoans() {
+		return loans.values().stream().filter(Loan::isReturned).toList();
+	}
 
-    @Override
-    public boolean isItemOnLoan(UUID itemId) {
-        return loans.stream()
-                .anyMatch(loan -> loan.getItemId().equals(itemId) && loan.isActive());
-    }
+	@Override
+	public List<Loan> findLoansWithFines() {
+		return loans.values().stream().filter(Loan::isFineApplied).toList();
+	}
 
-    @Override
-    public boolean hasOverdueLoans(UUID userId) {
-        return loans.stream()
-                .anyMatch(loan -> loan.getUserId().equals(userId) && loan.isOverdue());
-    }
+	@Override
+	public List<Loan> findByBorrowDate(LocalDate borrowDate) {
+		return loans.values().stream().filter(l -> l.getBorrowDate().equals(borrowDate)).toList();
+	}
 
-    @Override
-    public List<Loan> findLoansDueSoon(int days) {
-        LocalDate checkDate = LocalDate.now().plusDays(days);
-        return loans.stream()
-                .filter(Loan::isActive)
-                .filter(loan -> !loan.getDueDate().isAfter(checkDate))
-                .filter(loan -> !loan.getDueDate().isBefore(LocalDate.now()))
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<Loan> findByDueDate(LocalDate dueDate) {
+		return loans.values().stream().filter(l -> l.getDueDate().equals(dueDate)).toList();
+	}
 
-    @Override
-    public Optional<Loan> findMostRecentLoanByUser(UUID userId) {
-        return loans.stream()
-                .filter(loan -> loan.getUserId().equals(userId))
-                .max((loan1, loan2) -> loan1.getBorrowDate().compareTo(loan2.getBorrowDate()));
-    }
+	@Override
+	public List<Loan> findByReturnDate(LocalDate returnDate) {
+		return loans.values().stream().filter(l -> returnDate.equals(l.getReturnDate())).toList();
+	}
 
-    @Override
-    public Optional<Loan> findMostRecentLoanByItem(UUID itemId) {
-        return loans.stream()
-                .filter(loan -> loan.getItemId().equals(itemId))
-                .max((loan1, loan2) -> loan1.getBorrowDate().compareTo(loan2.getBorrowDate()));
-    }
+	@Override
+	public List<Loan> findByBorrowDateRange(LocalDate start, LocalDate end) {
+		return loans.values().stream()
+				.filter(l -> !l.getBorrowDate().isBefore(start) && !l.getBorrowDate().isAfter(end)).toList();
+	}
+
+	@Override
+	public List<Loan> findByDueDateRange(LocalDate start, LocalDate end) {
+		return loans.values().stream().filter(l -> !l.getDueDate().isBefore(start) && !l.getDueDate().isAfter(end))
+				.toList();
+	}
+
+	// ===============================
+	// Stats
+	// ===============================
+
+	@Override
+	public long countTotalLoans() {
+		return loans.size();
+	}
+
+	@Override
+	public long countActiveLoans() {
+		return loans.values().stream().filter(l -> !l.isReturned()).count();
+	}
+
+	@Override
+	public long countOverdueLoans() {
+		return loans.values().stream().filter(Loan::isOverdue).count();
+	}
+
+	@Override
+	public long countLoansByItemType(String itemType) {
+		return loans.values().stream().filter(l -> l.getItemType().equalsIgnoreCase(itemType)).count();
+	}
+
+	@Override
+	public boolean isItemOnLoan(UUID itemId) {
+		return loans.values().stream().anyMatch(l -> l.getItemId().equals(itemId) && !l.isReturned());
+	}
+
+	@Override
+	public boolean hasOverdueLoans(UUID userId) {
+		return loans.values().stream().anyMatch(l -> l.getUserId().equals(userId) && l.isOverdue());
+	}
+
+	@Override
+	public List<Loan> findLoansDueSoon(int days) {
+		LocalDate now = LocalDate.now();
+		LocalDate limit = now.plusDays(days);
+
+		return loans.values().stream().filter(l -> !l.isReturned() && !l.getDueDate().isAfter(limit)).toList();
+	}
+
+	@Override
+	public Optional<Loan> findMostRecentLoanByUser(UUID userId) {
+		return loans.values().stream().filter(l -> l.getUserId().equals(userId))
+				.max(Comparator.comparing(Loan::getBorrowDate));
+	}
+
+	@Override
+	public Optional<Loan> findMostRecentLoanByItem(UUID itemId) {
+		return loans.values().stream().filter(l -> l.getItemId().equals(itemId))
+				.max(Comparator.comparing(Loan::getBorrowDate));
+	}
 }
