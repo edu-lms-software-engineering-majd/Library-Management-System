@@ -46,6 +46,7 @@ class AuthorizationServiceTest {
 
 			assertTrue(ex.getMessage().contains("ADMIN") || ex.getMessage().contains("admin"));
 		}
+		
 
 		@Test
 		@DisplayName("Should throw for MEMBER user")
@@ -70,9 +71,9 @@ class AuthorizationServiceTest {
 		@Test
 		@DisplayName("Should pass when user is LIBRARIAN")
 		void shouldAllowLibrarian() throws PermissionDeniedException {
-			assertDoesNotThrow(() -> AuthorizationService.ensureAdmin(adminUser));
-
+		    assertDoesNotThrow(() -> AuthorizationService.ensureLibrarian(librarianUser));
 		}
+
 
 		@Test
 		@DisplayName("Should throw for ADMIN user")

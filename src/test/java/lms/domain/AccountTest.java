@@ -30,6 +30,7 @@ class AccountTest {
 		account = new Account(testUserId);
 	}
 
+	
 	@AfterEach
 	void tearDown() {
 		account = null;
@@ -121,6 +122,7 @@ class AccountTest {
 			account.getFineTransactions().clear();
 		});
 	}
+	
 
 	@Test
 	void givenMultipleFines_whenAdded_thenTotalFinesAccumulates() {

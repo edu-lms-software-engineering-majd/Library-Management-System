@@ -60,4 +60,7 @@ public class Notification {
 	public NotificationType getType() {
 		return type;
 	}
+	
+	
+	
 }

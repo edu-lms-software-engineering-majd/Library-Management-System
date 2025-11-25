@@ -22,6 +22,7 @@ class AccountValidatorTest {
 		validator = null;
 	}
 
+	
 	@Test
 	void givenNegativeFineAmount_whenValidateFineAmount_thenThrowIllegalArgumentException() {
 

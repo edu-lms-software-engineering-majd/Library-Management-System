@@ -204,5 +204,14 @@ public class Account {
 	public String toString() {
 		return String.format("Account[ID: %s, Balance: %.2f, Status: %s]", accountId.toString().substring(0, 8),
 				totalFines, status);
+
 	}
+	
+	public void setStatus(AccountStatus status) {
+	    this.status = status;
+	    this.updatedAt = LocalDate.now();
+	}
+
+	
+	
 }

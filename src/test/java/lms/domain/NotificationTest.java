@@ -139,6 +139,7 @@ public class NotificationTest {
 		assertEquals(newContent, notification.getNotificationContent());
 	}
 
+	
 	@Test
 	void givenNotification_whenCreated_thenTimestampIsRecent() {
 

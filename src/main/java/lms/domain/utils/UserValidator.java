@@ -23,24 +23,43 @@ import lms.domain.Role;
  */
 public class UserValidator {
 
-	private static final UserValidator INSTANCE = new UserValidator();
+	
+	//private static final UserValidator INSTANCE = new UserValidator();
+	
 	private static final int MIN_PASSWORD_LENGTH = 8;
 
 	/**
 	 * Private constructor to prevent instantiation.
 	 */
-	private UserValidator() {
+	
+	
+	
+	/*private UserValidator() 
+	 * 
+	 * {
 	}
+	
+	*/
 
 	/**
 	 * Returns the singleton instance of the validator.
 	 * 
 	 * @return the shared UserValidator instance
 	 */
-	public static UserValidator getInstance() {
+	/*public static UserValidator getInstance() {
 		return INSTANCE;
 	}
+*/
+	
+	
+	
+	public UserValidator() {}  // allow tests to instantiate
 
+	private static final UserValidator INSTANCE = new UserValidator();
+	public static UserValidator getInstance() { return INSTANCE; }
+
+	
+	
 	/**
 	 * Validates a user's first name.
 	 * 

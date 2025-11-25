@@ -21,6 +21,7 @@ public class LoanStatsService {
 		this.loanRepo = loanRepo;
 	}
 
+	
 	// =============================================================
 	// Basic Counts
 	// =============================================================
@@ -48,6 +49,7 @@ public class LoanStatsService {
 		return loanRepo.findByUserId(userId).size();
 	}
 
+	
 	// =============================================================
 	// Aggregations & Grouping
 	// =============================================================

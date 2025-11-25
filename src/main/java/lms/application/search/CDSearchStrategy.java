@@ -21,3 +21,4 @@ public abstract class CDSearchStrategy implements SearchStrategy<CD> {
         return description;
     }
 }
+

@@ -83,6 +83,7 @@ class JournalTest {
 			journal.decrementAvailableCopies();
 		});
 	}
+	
 
 	@Test
 	void givenDecrementedCopies_whenIncrementAvailableCopies_thenCopiesIncreased() {

@@ -43,12 +43,10 @@ class BookServiceTest {
 
 	private BookService bookService;
 
-	// بيانات مستخدمين
-	private UserDTO adminUser;
+ 	private UserDTO adminUser;
 	private UserDTO memberUser;
 
-	// كتاب حقيقي للاختبارات
-	private Book sampleBook;
+ 	private Book sampleBook;
 	private UUID sampleBookId;
 
 	@BeforeEach
@@ -344,14 +342,14 @@ class BookServiceTest {
 		String oldIsbn = sampleBook.getIsbn();
 
 		boolean result = bookService.updateBook(adminUser, sampleBookId, "New Title Only", // title
-				null, // author
-				null, // isbn
-				null, // publisher
-				null, // publicationYear
-				null, // category
-				null, // totalCopies
-				null, // language
-				null // shelfLocation
+				null, 
+				null, 
+				null, 
+				null,
+				null, 
+				null, 
+				null, 
+				null 
 		);
 
 		assertTrue(result);

@@ -152,6 +152,7 @@ class CDTest {
 	}
 
 	@Test
+	
 	void givenCDWithAllCopiesAvailable_whenCheckIsBorrowed_thenReturnFalse() {
 		assertFalse(cd.isBorrowed());
 	}

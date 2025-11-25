@@ -296,5 +296,15 @@ public class Book implements LoanableItem {
 	public void setShelfLocation(String shelfLocation) {
 		BookValidator.getInstance().validateShelfLocation(shelfLocation);
 		this.shelfLocation = shelfLocation;
+
 	}
+	
+	
+	
+	public void setAvailableCopies(int availableCopies) {
+	    if (availableCopies < 0 || availableCopies > this.totalCopies)
+	        throw new IllegalArgumentException("Invalid available copies");
+	    this.availableCopies = availableCopies;
+	}
+
 }
