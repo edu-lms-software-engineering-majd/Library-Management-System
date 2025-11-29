@@ -35,7 +35,6 @@ class NotificationServiceTest {
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
 
-		// NotificationService now REQUIRES EmailService
 		notificationService = new NotificationService(emailService);
 
 		testUser = new User("Ahmad", "salameh", "hmeedsalameh2004@gmail.com", "AhmadSalameh",
@@ -52,7 +51,6 @@ class NotificationServiceTest {
 		assertEquals(1, testUser.getUnreadNotifications().size());
 		assertEquals(notification, testUser.getUnreadNotifications().get(0));
 
-		// Verify email sent
 		verify(emailService).sendEmail(eq("hmeedsalameh2004@gmail.com"), anyString(), eq("Test notification"));
 	}
 

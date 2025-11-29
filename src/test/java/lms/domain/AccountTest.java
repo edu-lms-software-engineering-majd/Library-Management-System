@@ -1,10 +1,12 @@
 package lms.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -30,15 +32,17 @@ class AccountTest {
 		account = new Account(testUserId);
 	}
 
-	
 	@AfterEach
 	void tearDown() {
 		account = null;
 	}
 
+	// -----------------------------------------
+	// CONSTRUCTOR TESTS
+	// -----------------------------------------
+
 	@Test
 	void givenNewAccount_whenCreated_thenFieldsAreInitializedCorrectly() {
-
 		assertNotNull(account.getAccountId());
 		assertEquals(testUserId, account.getUserId());
 		assertEquals(0.0, account.getTotalFines());
@@ -47,11 +51,13 @@ class AccountTest {
 		assertNotNull(account.getUpdatedAt());
 		assertTrue(account.getFineTransactions().isEmpty());
 	}
-	
+
+	// -----------------------------------------
+	// ADD FINE TESTS
+	// -----------------------------------------
 
 	@Test
 	void givenValidAmount_whenAddFine_thenFineIsAssigned() {
-
 		account.addFine(SMALL_FINE, "due date of 10 days");
 
 		assertEquals(SMALL_FINE, account.getTotalFines());
@@ -60,29 +66,7 @@ class AccountTest {
 	}
 
 	@Test
-	void givenValidPayment_whenPayFine_thenFineIsReduced() {
-
-		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
-		account.payFine(30);
-
-		assertEquals(20.0, account.getTotalFines());
-		assertEquals(2, account.getFineTransactions().size());
-		assertEquals(AccountStatus.ACTIVE, account.getStatus());
-	}
-
-	@Test
-	void givenFullPayment_whenPayFine_thenTotalFinesIsZero() {
-
-		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
-		account.payFine(MEDIUM_FINE);
-
-		assertEquals(0.0, account.getTotalFines());
-		assertEquals(2, account.getFineTransactions().size());
-	}
-
-	@Test
 	void givenFineExceedsThreshold_whenAddFine_thenAccountIsSuspended() {
-
 		account.addFine(ABOVE_THRESHOLD, "Multiple late returns");
 
 		assertEquals(ABOVE_THRESHOLD, account.getTotalFines());
@@ -90,89 +74,7 @@ class AccountTest {
 	}
 
 	@Test
-	void givenSuspendedAccount_whenPayAllFines_thenAccountIsActivated() {
-
-		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
-		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-
-		account.payFine(LARGE_FINE);
-
-		assertEquals(0.0, account.getTotalFines());
-		assertEquals(AccountStatus.ACTIVE, account.getStatus());
-	}
-
-	@Test
-	void givenSuspendedAccount_whenPartialPayment_thenAccountRemainsSuspended() {
-
-		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
-		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-
-		account.payFine(MEDIUM_FINE);
-
-		assertEquals(100.0, account.getTotalFines());
-		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-	}
-
-	@Test
-	void givenAccount_whenGetFineTransactions_thenReturnsUnmodifiableList() {
-
-		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
-
-		assertThrows(UnsupportedOperationException.class, () -> {
-			account.getFineTransactions().clear();
-		});
-	}
-	
-
-	@Test
-	void givenMultipleFines_whenAdded_thenTotalFinesAccumulates() {
-
-		account.addFine(10, "Fine 1");
-		account.addFine(20, "Fine 2");
-		account.addFine(30, "Fine 3");
-
-		assertEquals(60.0, account.getTotalFines());
-		assertEquals(3, account.getFineTransactions().size());
-	}
-
-	@Test
-	void givenMultiplePayments_whenMade_thenTotalFinesDecreasesCorrectly() {
-
-		account.addFine(100, "Large fine");
-		account.payFine(20);
-		account.payFine(30);
-		account.payFine(25);
-
-		assertEquals(25.0, account.getTotalFines());
-		assertEquals(4, account.getFineTransactions().size());
-	}
-
-	@Test
-	void givenAccount_whenSetStatus_thenStatusIsUpdated() {
-
-		assertEquals(AccountStatus.ACTIVE, account.getStatus());
-
-		account.setStatus(AccountStatus.BLACKLISTED);
-
-		assertEquals(AccountStatus.BLACKLISTED, account.getStatus());
-	}
-
-	@Test
-	void givenAccount_whenToString_thenReturnsFormattedString() {
-
-		account.addFine(50.50, LATE_RETURN_REASON);
-
-		String result = account.toString();
-
-		assertNotNull(result);
-		assertTrue(result.contains("Account"));
-		assertTrue(result.contains("50.50"));
-		assertTrue(result.contains("ACTIVE"));
-	}
-
-	@Test
 	void givenExactThresholdAmount_whenAddFine_thenAccountRemainsActive() {
-
 		account.addFine(SUSPENSION_THRESHOLD, "Threshold fine");
 
 		assertEquals(SUSPENSION_THRESHOLD, account.getTotalFines());
@@ -181,7 +83,6 @@ class AccountTest {
 
 	@Test
 	void givenJustAboveThreshold_whenAddFine_thenAccountIsSuspended() {
-
 		account.addFine(100.01, "Just above threshold");
 
 		assertEquals(100.01, account.getTotalFines());
@@ -190,7 +91,6 @@ class AccountTest {
 
 	@Test
 	void givenActiveAccountWithFines_whenAddMoreFines_thenStillActive() {
-
 		account.addFine(30.0, "First fine");
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 
@@ -202,7 +102,6 @@ class AccountTest {
 
 	@Test
 	void givenAccountWithFinesBelowThreshold_whenAddFineExceedingThreshold_thenAccountSuspended() {
-
 		account.addFine(80.0, "First fine");
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 
@@ -213,8 +112,62 @@ class AccountTest {
 	}
 
 	@Test
-	void givenSuspendedAccount_whenPayPartialLeavingAboveZero_thenStillSuspended() {
+	void givenMultipleFines_whenAdded_thenTotalFinesAccumulates() {
+		account.addFine(10, "Fine 1");
+		account.addFine(20, "Fine 2");
+		account.addFine(30, "Fine 3");
 
+		assertEquals(60.0, account.getTotalFines());
+		assertEquals(3, account.getFineTransactions().size());
+	}
+
+	// -----------------------------------------
+	// PAYMENT TESTS
+	// -----------------------------------------
+
+	@Test
+	void givenValidPayment_whenPayFine_thenFineIsReduced() {
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
+		account.payFine(30);
+
+		assertEquals(20.0, account.getTotalFines());
+		assertEquals(2, account.getFineTransactions().size());
+		assertEquals(AccountStatus.ACTIVE, account.getStatus());
+	}
+
+	@Test
+	void givenFullPayment_whenPayFine_thenTotalFinesIsZero() {
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
+		account.payFine(MEDIUM_FINE);
+
+		assertEquals(0.0, account.getTotalFines());
+		assertEquals(2, account.getFineTransactions().size());
+	}
+
+	@Test
+	void givenSuspendedAccount_whenPayAllFines_thenAccountIsActivated() {
+		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
+		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
+
+		account.payFine(LARGE_FINE);
+
+		assertEquals(0.0, account.getTotalFines());
+		assertEquals(AccountStatus.ACTIVE, account.getStatus());
+	}
+
+	@Test
+	void givenSuspendedAccount_whenPartialPayment_thenAccountRemainsSuspended() {
+		account.addFine(LARGE_FINE, MULTIPLE_VIOLATIONS_REASON);
+		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
+
+		account.payFine(MEDIUM_FINE);
+
+		assertEquals(100.0, account.getTotalFines());
+		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
+	}
+
+	@Test
+	void givenSuspendedAccount_whenPayPartialLeavingAboveZero_thenStillSuspended() {
 		account.addFine(150.0, "Large fine");
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 
@@ -225,45 +178,102 @@ class AccountTest {
 	}
 
 	@Test
+	void givenMultiplePayments_whenMade_thenTotalFinesDecreasesCorrectly() {
+		account.addFine(100, "Large fine");
+		account.payFine(20);
+		account.payFine(30);
+		account.payFine(25);
+
+		assertEquals(25.0, account.getTotalFines());
+		assertEquals(4, account.getFineTransactions().size());
+	}
+
+	// -----------------------------------------
+	// LIST IMMUTABILITY
+	// -----------------------------------------
+
+	@Test
+	void givenAccount_whenGetFineTransactions_thenReturnsUnmodifiableList() {
+		account.addFine(MEDIUM_FINE, LATE_RETURN_REASON);
+
+		assertThrows(UnsupportedOperationException.class, () -> {
+			account.getFineTransactions().clear();
+		});
+	}
+
+	// -----------------------------------------
+	// STATUS TESTS
+	// -----------------------------------------
+
+	@Test
+	void givenAccount_whenSetStatus_thenStatusIsUpdated() {
+		assertEquals(AccountStatus.ACTIVE, account.getStatus());
+
+		account.setStatus(AccountStatus.BLACKLISTED);
+
+		assertEquals(AccountStatus.BLACKLISTED, account.getStatus());
+	}
+
+	// -----------------------------------------
+	// TOSTRING TEST
+	// -----------------------------------------
+
+	@Test
+	void givenAccount_whenToString_thenReturnsFormattedString() {
+		account.addFine(50.50, LATE_RETURN_REASON);
+
+		String result = account.toString();
+
+		assertNotNull(result);
+		assertTrue(result.contains("Account"));
+		assertTrue(result.contains("50.50"));
+		assertTrue(result.contains(account.getStatus().toString()));
+	}
+
+	// -----------------------------------------
+	// MISC TESTS
+	// -----------------------------------------
+
+	@Test
 	void givenMultipleAccounts_whenCreated_thenEachHasUniqueId() {
+		Account a1 = new Account(UUID.randomUUID());
+		Account a2 = new Account(UUID.randomUUID());
+		Account a3 = new Account(UUID.randomUUID());
 
-		Account account1 = new Account(UUID.randomUUID());
-		Account account2 = new Account(UUID.randomUUID());
-		Account account3 = new Account(UUID.randomUUID());
-
-		assertTrue(!account1.getAccountId().equals(account2.getAccountId()));
-		assertTrue(!account2.getAccountId().equals(account3.getAccountId()));
-		assertTrue(!account1.getAccountId().equals(account3.getAccountId()));
+		assertNotEquals(a1.getAccountId(), a2.getAccountId());
+		assertNotEquals(a2.getAccountId(), a3.getAccountId());
+		assertNotEquals(a1.getAccountId(), a3.getAccountId());
 	}
 
 	@Test
 	void givenAccount_whenAddFine_thenUpdatedAtChanges() {
+		LocalDate before = account.getUpdatedAt();
 
 		account.addFine(10.0, "Fine");
 
-		assertNotNull(account.getUpdatedAt());
+		assertTrue(account.getUpdatedAt().isAfter(before));
 	}
 
 	@Test
 	void givenAccount_whenPayFine_thenUpdatedAtChanges() {
-
 		account.addFine(50.0, "Fine");
+		LocalDate before = account.getUpdatedAt();
+
 		account.payFine(20.0);
 
-		assertNotNull(account.getUpdatedAt());
+		assertTrue(account.getUpdatedAt().isAfter(before));
 	}
 
 	@Test
 	void givenAccount_whenSetStatus_thenUpdatedAtChanges() {
-
+		LocalDate before = account.getUpdatedAt();
 		account.setStatus(AccountStatus.BLACKLISTED);
 
-		assertNotNull(account.getUpdatedAt());
+		assertTrue(account.getUpdatedAt().isAfter(before));
 	}
 
 	@Test
 	void givenAccountWithZeroFines_whenNoActivity_thenRemainsActive() {
-
 		assertEquals(0.0, account.getTotalFines());
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}

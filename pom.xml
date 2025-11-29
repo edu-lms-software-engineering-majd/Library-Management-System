@@ -20,17 +20,12 @@
 
   <dependencies>
 
- 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
-
- 
-
-
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -39,7 +34,7 @@
       <scope>test</scope>
     </dependency>
 
-		<!-- Mockito -->
+    <!-- Mockito -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -47,19 +42,6 @@
       <scope>test</scope>
     </dependency>
 
-
-
-<!-- Jakarta Mail (replaces old javax.mail) -->
-<dependency>
-    <groupId>com.sun.mail</groupId>
-    <artifactId>jakarta.mail</artifactId>
-    <version>2.0.1</version>
-</dependency>
-
-
-
- 
- 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
@@ -67,9 +49,55 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- Jakarta Mail -->
+    <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>2.0.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
+
+  
+    <pluginManagement>
+      <plugins>
+
+				<!-- Surefire Plugin for JUnit5 -->
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.2</version>
+          <configuration></configuration>
+        </plugin>
+
+				<!-- Jacoco Plugin -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+
+            <execution>
+              <id>report</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
+		<!-- END Jacoco -->
+
+ 
     <plugins>
 
 			<!-- Compiler Plugin -->
@@ -82,7 +110,7 @@
         </configuration>
       </plugin>
 
-			<!-- Surefire Plugin -->
+			<!-- Surefire Plugin (runtime plugin) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -93,6 +121,7 @@
       </plugin>
 
     </plugins>
+
   </build>
 
 </project>

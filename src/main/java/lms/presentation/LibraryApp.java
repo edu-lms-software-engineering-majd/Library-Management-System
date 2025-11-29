@@ -1,9 +1,27 @@
 package lms.presentation;
 
-import lms.application.*;
-import lms.application.notifications.email.EmailService;
-import lms.domain.*;
-import lms.persistence.*;
+import lms.application.AccountService;
+import lms.application.AuthService;
+import lms.application.BookService;
+import lms.application.CDService;
+import lms.application.JournalService;
+import lms.application.LoanService;
+import lms.application.NotificationService;
+import lms.application.UserService;
+import lms.application.email.EmailService;
+import lms.domain.BookRepository;
+import lms.domain.CDRepository;
+import lms.domain.JournalsRepository;
+import lms.domain.LoanRepository;
+import lms.domain.Role;
+import lms.domain.User;
+import lms.domain.UserRepository;
+import lms.domain.utils.PasswordUtils;
+import lms.persistence.StaticBookRepository;
+import lms.persistence.StaticCDRepository;
+import lms.persistence.StaticJournalsRepository;
+import lms.persistence.StaticLoanRepository;
+import lms.persistence.StaticUserRepository;
 
 /**
  * Entry point for the Library Management System (LMS).
@@ -22,6 +40,9 @@ public class LibraryApp {
 		// Repositories (Singleton Static)
 		// -------------------------------
 		UserRepository userRepo = StaticUserRepository.getInstance();
+		
+		
+		
 		BookRepository bookRepo = StaticBookRepository.getInstance();
 		CDRepository cdRepo = StaticCDRepository.getInstance();
 		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();
@@ -36,7 +57,11 @@ public class LibraryApp {
 		CDService cdService = new CDService(cdRepo);
 		JournalService journalService = new JournalService(journalsRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
+		String pass1 = PasswordUtils.hashPassword("12345678");
+		String pass2 = PasswordUtils.hashPassword("11111111");
 
+		userRepo.add(new User("Ahmad", "Salameh", "ahmad@example.com", "ahmad", pass1, Role.ADMIN));
+		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.MEMBER));
 		// -------------------------------
 		// REAL Email Service (SMTP Gmail)
 		// -------------------------------
