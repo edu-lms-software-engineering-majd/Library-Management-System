@@ -12,19 +12,23 @@ import lms.domain.UserRepository;
  * Application-level logic for managing user financial accounts. Clean,
  * validated, and aligned with the LMS architecture.
  */
-public class AccountService {
+public class AccountService 
+{
 
 	
 	private final UserRepository userRepo;
 
-	public AccountService(UserRepository userRepo) {
+	public AccountService(UserRepository userRepo)
+	{
 		if (userRepo == null)
 			throw new IllegalArgumentException("UserRepository cannot be null");
 		this.userRepo = userRepo;
 	}
+	
 
 	/** Fetches a user by ID or throws a clean exception */
-	private User getUserOrThrow(UUID userId) {
+	private User getUserOrThrow(UUID userId) 
+	{
 		if (userId == null)
 			throw new IllegalArgumentException("User ID cannot be null");
 
@@ -37,7 +41,8 @@ public class AccountService {
 		return getUserOrThrow(userId).getAccount();
 	}
 
-	public AccountStatus getUserAccountStatus(UUID userId) {
+	public AccountStatus getUserAccountStatus(UUID userId)
+	{
 		return getAccount(userId).getStatus();
 	}
 
@@ -49,7 +54,8 @@ public class AccountService {
 		return getAccount(userId).canBorrowBooks();
 	}
 
-	public void addFineToUser(UUID userId, double amount, String reason) {
+	public void addFineToUser(UUID userId, double amount, String reason) 
+	{
 		if (amount <= 0)
 			throw new IllegalArgumentException("Fine amount must be positive");
 
@@ -58,7 +64,8 @@ public class AccountService {
 		userRepo.update(user);
 	}
 
-	public void payUserFine(UUID userId, double amount) {
+	public void payUserFine(UUID userId, double amount) 
+	{
 		if (amount <= 0)
 			throw new IllegalArgumentException("Payment amount must be positive");
 
@@ -67,7 +74,8 @@ public class AccountService {
 		userRepo.update(user);
 	}
 
-	public void suspendUserAccount(UUID userId, String reason) {
+	public void suspendUserAccount(UUID userId, String reason) 
+	{
 		if (reason == null || reason.isBlank())
 			throw new IllegalArgumentException("Suspension reason cannot be empty");
 
@@ -76,18 +84,21 @@ public class AccountService {
 		userRepo.update(user);
 	}
 
-	public void activateUserAccount(UUID userId) {
+	public void activateUserAccount(UUID userId) 
+	{
 		User user = getUserOrThrow(userId);
 		user.getAccount().activateAccount();
 		userRepo.update(user);
 	}
 
 	/** Aggregation operations */
-	public double calculateTotalFinesForAllUsers() {
+	public double calculateTotalFinesForAllUsers() 
+	{
 		return userRepo.getAllUsers().stream().mapToDouble(u -> u.getAccount().getTotalFines()).sum();
 	}
 
-	public int getUsersWithFinesCount() {
+	public int getUsersWithFinesCount() 
+	{
 		return (int) userRepo.getAllUsers().stream().filter(u -> u.getAccount().getTotalFines() > 0).count();
 	}
 

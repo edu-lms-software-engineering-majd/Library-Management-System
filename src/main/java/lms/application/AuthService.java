@@ -105,6 +105,7 @@ public class AuthService {
 		currentUser = null;
 	}
 
+	
 	/**
 	 * Retrieves the currently authenticated user as a DTO.
 	 *

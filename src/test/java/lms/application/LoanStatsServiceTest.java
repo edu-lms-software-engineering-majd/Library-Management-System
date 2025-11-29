@@ -25,18 +25,17 @@ class LoanStatsServiceTest {
 	UUID item2;
 	UUID item3;
 
-	Loan loan1; // Active
-	Loan loan2; // Returned
-	Loan loan3; // Returned long duration
-	Loan loan4; // Overdue
-	Loan loan5; // Different item type
+	Loan loan1;
+	Loan loan2;
+	Loan loan3;
+	Loan loan4;
+	Loan loan5;
 
 	@BeforeEach
 	void setup() throws Exception {
 
 		loanRepo = StaticLoanRepository.getInstance();
 
-		// Clean old data
 		loanRepo.findAll().forEach(l -> {
 			try {
 				loanRepo.delete(l.getLoanId());
@@ -53,36 +52,23 @@ class LoanStatsServiceTest {
 		item2 = UUID.randomUUID();
 		item3 = UUID.randomUUID();
 
-		// ------------------------------
-		// Loan data
-		// ------------------------------
-
-		// 1) Active loan
 		loan1 = new Loan(userA, item1, "book", LocalDate.now().minusDays(3));
 		loanRepo.save(loan1);
 
-		// 2) Returned (duration 5 days)
 		loan2 = new Loan(userA, item2, "book", LocalDate.now().minusDays(10));
 		loan2.returnItem(LocalDate.now().minusDays(5));
 		loanRepo.save(loan2);
 
-		// 3) Returned (duration 20 days)
 		loan3 = new Loan(userB, item2, "book", LocalDate.now().minusDays(30));
 		loan3.returnItem(LocalDate.now().minusDays(10));
 		loanRepo.save(loan3);
 
-		// 4) Overdue loan
 		loan4 = new Loan(userB, item1, "book", LocalDate.now().minusDays(50));
 		loanRepo.save(loan4);
 
-		// 5) Different item type
 		loan5 = new Loan(userB, item3, "cd", LocalDate.now().minusDays(2));
 		loanRepo.save(loan5);
 	}
-
-	// =============================================================
-	// BASIC COUNTS
-	// =============================================================
 
 	@Test
 	void testCountTotalLoans() {
@@ -116,10 +102,6 @@ class LoanStatsServiceTest {
 		assertEquals(3, statsService.countLoansByUser(userB));
 	}
 
-	// =============================================================
-	// AGGREGATIONS
-	// =============================================================
-
 	@Test
 	void testCountLoansPerItemType() {
 		Map<String, Long> counts = statsService.countLoansPerItemType();
@@ -133,10 +115,6 @@ class LoanStatsServiceTest {
 		assertEquals(2, map.get(userA));
 		assertEquals(3, map.get(userB));
 	}
-
-	// =============================================================
-	// DATE RANGE
-	// =============================================================
 
 	@Test
 	void testCountLoansBorrowedBetween() {
@@ -156,10 +134,6 @@ class LoanStatsServiceTest {
 		assertEquals(2, count);
 	}
 
-	// =============================================================
-	// TOP BORROWED ITEMS
-	// =============================================================
-
 	@Test
 	void testGetTopBorrowedItems() {
 		List<Map.Entry<UUID, Long>> top = statsService.getTopBorrowedItems(2);
@@ -167,10 +141,6 @@ class LoanStatsServiceTest {
 		assertEquals(2, top.size());
 		assertTrue(top.get(0).getValue() >= top.get(1).getValue());
 	}
-
-	// =============================================================
-	// DURATIONS
-	// =============================================================
 
 	@Test
 	void testAverageLoanDuration() {
@@ -181,18 +151,14 @@ class LoanStatsServiceTest {
 	@Test
 	void testMaxLoanDuration() {
 		long max = statsService.getMaxLoanDuration();
-		assertEquals(20, max); // loan3: 20 days
+		assertEquals(20, max);
 	}
 
 	@Test
 	void testMinLoanDuration() {
 		long min = statsService.getMinLoanDuration();
-		assertEquals(5, min); // loan2: 5 days
+		assertEquals(5, min);
 	}
-
-	// =============================================================
-	// DUE SOON
-	// =============================================================
 
 	@Test
 	void testCountLoansDueSoon() {

@@ -76,9 +76,7 @@ class LoanServiceTest {
 		memberUser = new UserDTO(UUID.randomUUID(), "member", "Member", "User", Role.MEMBER);
 	}
 
-	// =====================================================================================
-	// loanItem() tests
-	// =====================================================================================
+	 
 	@Nested
 	@DisplayName("loanItem() Tests")
 	class LoanItemTests {
