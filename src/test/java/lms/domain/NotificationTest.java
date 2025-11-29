@@ -18,40 +18,18 @@ public class NotificationTest {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		// Reserved for future global test setup
 	}
 
-	/**
-	 * Cleans up test environment after all test methods. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if cleanup fails
-	 */
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-		// Reserved for future global test cleanup
 	}
 
-	/**
-	 * Sets up test environment before each test method. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if setup fails
-	 */
 	@BeforeEach
 	void setUp() throws Exception {
-		// Reserved for future per-test setup
 	}
 
-	/**
-	 * Cleans up test environment after each test method. Currently not used but
-	 * available for future expansion.
-	 *
-	 * @throws Exception if cleanup fails
-	 */
 	@AfterEach
 	void tearDown() throws Exception {
-		// Reserved for future per-test cleanup
 	}
 
 	@Test
@@ -124,22 +102,6 @@ public class NotificationTest {
 	}
 
 	@Test
-	void givenNotification_whenSetNotificationContent_thenContentIsUpdated() {
-
-		UUID senderId = UUID.randomUUID();
-		String originalContent = "Original message";
-		NotificationType type = NotificationType.OVERDUE;
-
-		Notification notification = new Notification(originalContent, senderId, type);
-		assertEquals(originalContent, notification.getNotificationContent());
-
-		String newContent = "Updated message";
-		notification.setNotificationContent(newContent);
-
-		assertEquals(newContent, notification.getNotificationContent());
-	}
-
-	@Test
 	void givenNotification_whenCreated_thenTimestampIsRecent() {
 
 		UUID senderId = UUID.randomUUID();
@@ -154,24 +116,25 @@ public class NotificationTest {
 	}
 
 	@Test
-	void givenNullContent_whenCreateNotification_thenContentIsNull() {
+	void givenNullContent_whenCreateNotification_thenThrowsIllegalArgumentException() {
 
 		UUID senderId = UUID.randomUUID();
 		NotificationType type = NotificationType.OVERDUE;
 
-		Notification notification = new Notification(null, senderId, type);
-
-		assertEquals(null, notification.getNotificationContent());
+		assertThrows(IllegalArgumentException.class, () -> {
+			new Notification(null, senderId, type);
+		});
 	}
 
 	@Test
-	void givenEmptyContent_whenCreateNotification_thenContentIsEmpty() {
+	void givenEmptyContent_whenCreateNotification_thenThrowsIllegalArgumentException() {
 
 		UUID senderId = UUID.randomUUID();
 		NotificationType type = NotificationType.OVERDUE;
 
-		Notification notification = new Notification("", senderId, type);
-
-		assertEquals("", notification.getNotificationContent());
+		assertThrows(IllegalArgumentException.class, () -> {
+			new Notification("", senderId, type);
+		});
 	}
 }
+

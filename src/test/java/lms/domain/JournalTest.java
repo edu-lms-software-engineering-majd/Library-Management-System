@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.UUID;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +16,6 @@ class JournalTest {
 	@BeforeEach
 	void setUp() {
 		journal = new Journal("Nature", "Springer Nature", 5);
-	}
-
-	@AfterEach
-	void tearDown() {
-		journal = null;
 	}
 
 	@Test
@@ -52,7 +44,9 @@ class JournalTest {
 
 	@Test
 	void givenJournalWithNoAvailableCopies_whenCheckIsAvailable_thenReturnFalse() {
-		journal.setAvailableCopies(0);
+		for (int i = 0; i < 5; i++) {
+			journal.decrementAvailableCopies();
+		}
 		
 		assertFalse(journal.isAvailable());
 	}
@@ -77,7 +71,9 @@ class JournalTest {
 
 	@Test
 	void givenNoCopiesAvailable_whenDecrementAvailableCopies_thenThrowIllegalStateException() {
-		journal.setAvailableCopies(0);
+		for (int i = 0; i < 5; i++) {
+			journal.decrementAvailableCopies();
+		}
 		
 		assertThrows(IllegalStateException.class, () -> {
 			journal.decrementAvailableCopies();
@@ -103,9 +99,7 @@ class JournalTest {
 
 	@Test
 	void givenJournal_whenGetId_thenReturnNonNullUUID() {
-		UUID id = journal.getId();
-		
-		assertNotNull(id);
+		assertNotNull(journal.getId());
 	}
 
 	@Test
@@ -121,34 +115,35 @@ class JournalTest {
 
 	@Test
 	void givenNewTitle_whenSetTitle_thenTitleIsUpdated() {
-		String newTitle = "Hello Title";
-		journal.setTitle(newTitle);
-		
-		assertEquals(newTitle, journal.getTitle());
+		journal.setTitle("Science Today");
+		assertEquals("Science Today", journal.getTitle());
+	}
+
+	@Test
+	void givenNullTitle_whenSetTitle_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> journal.setTitle(null));
 	}
 
 	@Test
 	void givenNewAuthor_whenSetAuthor_thenAuthorIsUpdated() {
-		String newAuthor = "Majd Awwad";
-		journal.setAuthor(newAuthor);
-		
-		assertEquals(newAuthor, journal.getAuthor());
+		journal.setAuthor("IEEE");
+		assertEquals("IEEE", journal.getAuthor());
+	}
+
+	@Test
+	void givenNullAuthor_whenSetAuthor_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> journal.setAuthor(null));
 	}
 
 	@Test
 	void givenNewTotalCopies_whenSetTotalCopies_thenTotalCopiesIsUpdated() {
-		int newTotal = 10;
-		journal.setTotalCopies(newTotal);
-		
-		assertEquals(newTotal, journal.getTotalCopies());
+		journal.setTotalCopies(10);
+		assertEquals(10, journal.getTotalCopies());
 	}
 
 	@Test
-	void givenNewAvailableCopies_whenSetAvailableCopies_thenAvailableCopiesIsUpdated() {
-		int newAvailable = 3;
-		journal.setAvailableCopies(newAvailable);
-		
-		assertEquals(newAvailable, journal.getAvailableCopies());
+	void givenInvalidTotalCopies_whenSetTotalCopies_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> journal.setTotalCopies(0));
 	}
 
 	@Test
@@ -159,14 +154,14 @@ class JournalTest {
 	@Test
 	void givenJournalWithSomeCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
 		journal.decrementAvailableCopies();
-		
 		assertTrue(journal.isBorrowed());
 	}
 
 	@Test
 	void givenJournalWithAllCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		journal.setAvailableCopies(0);
-		
+		for (int i = 0; i < 5; i++) {
+			journal.decrementAvailableCopies();
+		}
 		assertTrue(journal.isBorrowed());
 	}
 
@@ -189,3 +184,4 @@ class JournalTest {
 		assertTrue(result.contains("3/5"));
 	}
 }
+

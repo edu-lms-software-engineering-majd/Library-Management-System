@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.UUID;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,12 +16,6 @@ class CDTest {
 	@BeforeEach
 	void setUp() {
 		cd = new CD("Thriller", "Michael Jackson", 3);
-	}
-	
-
-	@AfterEach
-	void tearDown() {
-		cd = null;
 	}
 
 	@Test
@@ -53,7 +44,9 @@ class CDTest {
 
 	@Test
 	void givenCDWithNoAvailableCopies_whenCheckIsAvailable_thenReturnFalse() {
-		cd.setAvailableCopies(0);
+		for (int i = 0; i < 3; i++) {
+			cd.decrementAvailableCopies();
+		}
 		
 		assertFalse(cd.isAvailable());
 	}
@@ -77,7 +70,9 @@ class CDTest {
 
 	@Test
 	void givenNoCopiesAvailable_whenDecrementAvailableCopies_thenThrowIllegalStateException() {
-		cd.setAvailableCopies(0);
+		for (int i = 0; i < 3; i++) {
+			cd.decrementAvailableCopies();
+		}
 		
 		assertThrows(IllegalStateException.class, () -> {
 			cd.decrementAvailableCopies();
@@ -103,9 +98,7 @@ class CDTest {
 
 	@Test
 	void givenCD_whenGetId_thenReturnNonNullUUID() {
-		UUID id = cd.getId();
-		
-		assertNotNull(id);
+		assertNotNull(cd.getId());
 	}
 
 	@Test
@@ -121,34 +114,35 @@ class CDTest {
 
 	@Test
 	void givenNewTitle_whenSetTitle_thenTitleIsUpdated() {
-		String newTitle = "Hello";
-		cd.setTitle(newTitle);
-		
-		assertEquals(newTitle, cd.getTitle());
+		cd.setTitle("Hello");
+		assertEquals("Hello", cd.getTitle());
+	}
+
+	@Test
+	void givenNullTitle_whenSetTitle_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> cd.setTitle(null));
 	}
 
 	@Test
 	void givenNewArtist_whenSetArtist_thenArtistIsUpdated() {
-		String newArtist = "Majd";
-		cd.setArtist(newArtist);
-		
-		assertEquals(newArtist, cd.getArtist());
+		cd.setArtist("The Beatles");
+		assertEquals("The Beatles", cd.getArtist());
+	}
+
+	@Test
+	void givenNullArtist_whenSetArtist_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> cd.setArtist(null));
 	}
 
 	@Test
 	void givenNewTotalCopies_whenSetTotalCopies_thenTotalCopiesIsUpdated() {
-		int newTotal = 5;
-		cd.setTotalCopies(newTotal);
-		
-		assertEquals(newTotal, cd.getTotalCopies());
+		cd.setTotalCopies(5);
+		assertEquals(5, cd.getTotalCopies());
 	}
 
 	@Test
-	void givenNewAvailableCopies_whenSetAvailableCopies_thenAvailableCopiesIsUpdated() {
-		int newAvailable = 2;
-		cd.setAvailableCopies(newAvailable);
-		
-		assertEquals(newAvailable, cd.getAvailableCopies());
+	void givenInvalidTotalCopies_whenSetTotalCopies_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> cd.setTotalCopies(0));
 	}
 
 	@Test
@@ -159,14 +153,14 @@ class CDTest {
 	@Test
 	void givenCDWithSomeCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
 		cd.decrementAvailableCopies();
-		
 		assertTrue(cd.isBorrowed());
 	}
 
 	@Test
 	void givenCDWithAllCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		cd.setAvailableCopies(0);
-		
+		for (int i = 0; i < 3; i++) {
+			cd.decrementAvailableCopies();
+		}
 		assertTrue(cd.isBorrowed());
 	}
 
@@ -187,4 +181,15 @@ class CDTest {
 		
 		assertTrue(result.contains("2/3"));
 	}
+
+	@Test
+	void givenNullTitle_whenCreateCD_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> new CD(null, "Artist"));
+	}
+
+	@Test
+	void givenNullArtist_whenCreateCD_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> new CD("Title", null));
+	}
 }
+

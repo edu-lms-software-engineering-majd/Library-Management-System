@@ -11,7 +11,7 @@ public class FineStrategyFactory {
 		case "book" -> new BookFineStrategy();
 		case "cd" -> new CDFineStrategy();
 		case "journal" -> new JournalFineStrategy();
-		default -> days -> days * 5.0;
+		default -> days -> days * 0.25;
 		};
 	}
 }

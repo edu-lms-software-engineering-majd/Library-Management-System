@@ -5,10 +5,13 @@ package lms.domain.strategy;
  */
 public class BookFineStrategy implements FineStrategy {
 
-	private static final double BOOK_FINE_RATE = 10.0;
+	private static final double BOOK_FINE_RATE = 0.50;
 
 	@Override
 	public double calculateFine(long daysOverdue) {
+		if (daysOverdue < 0) {
+			throw new IllegalArgumentException("Days overdue cannot be negative");
+		}
 		return daysOverdue * BOOK_FINE_RATE;
 	}
 }
