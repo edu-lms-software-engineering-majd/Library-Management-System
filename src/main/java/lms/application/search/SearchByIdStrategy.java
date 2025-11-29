@@ -11,13 +11,17 @@ import lms.domain.Book;
  * @version 1.0
  */
 public class SearchByIdStrategy extends BookSearchStrategy {
-    
-    public SearchByIdStrategy() {
-        super("Search by ID");
-    }
-    
-    @Override
-    public List<Book> execute(List<Book> books, String searchTerm) {
-        return SearchUtils.searchById(books, searchTerm, Book::getId);
-    }
+
+	public SearchByIdStrategy() {
+		super("Search by ID");
+	}
+
+	@Override
+	public List<Book> execute(List<Book> books, String searchTerm) {
+
+		String lower = searchTerm.toLowerCase().trim();
+
+		return books.stream().filter(b -> b.getId().toString().toLowerCase().startsWith(lower)).toList();
+	}
+
 }

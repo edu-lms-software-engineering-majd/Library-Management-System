@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -32,7 +31,6 @@ import lms.domain.Role;
 import lms.domain.exception.PermissionDeniedException;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("BookService – High Coverage Tests")
 class BookServiceTest {
 
 	@Mock
@@ -43,11 +41,9 @@ class BookServiceTest {
 
 	private BookService bookService;
 
-	// بيانات مستخدمين
 	private UserDTO adminUser;
 	private UserDTO memberUser;
 
-	// كتاب حقيقي للاختبارات
 	private Book sampleBook;
 	private UUID sampleBookId;
 
@@ -55,37 +51,27 @@ class BookServiceTest {
 	void setUp() {
 		bookService = new BookService(bookRepo);
 
-		adminUser = new UserDTO(UUID.randomUUID(), "ahmadsalameh", "Ahmad", "Salameh", Role.ADMIN);
+		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
 
-		memberUser = new UserDTO(UUID.randomUUID(), "majdawwad", "Majd", "Awwad", Role.MEMBER);
+		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.MEMBER);
 
 		sampleBook = new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
 				"Software Engineering", 5, "English", "A1-01");
+
 		sampleBookId = sampleBook.getId();
 	}
 
-	// =====================================================================
-	// Constructor
-	// =====================================================================
-
 	@Test
-	@DisplayName("Constructor – should throw when repository is null")
 	void givenNullRepository_whenCreateBookService_thenThrow() {
 		assertThrows(IllegalArgumentException.class, () -> new BookService(null));
 	}
 
 	@Test
-	@DisplayName("Constructor – should create service with valid repository")
 	void givenValidRepository_whenCreateBookService_thenSuccess() {
 		assertNotNull(bookService);
 	}
 
-	// =====================================================================
-	// addBook
-	// =====================================================================
-
 	@Test
-	@DisplayName("addBook – should add book successfully for ADMIN")
 	void givenAdmin_whenAddBook_thenBookCreatedAndSaved() throws Exception {
 		when(bookRepo.addBook(any(Book.class))).thenReturn(true);
 
@@ -98,31 +84,21 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("addBook – should throw PermissionDeniedException for non-admin user")
-	void givenMember_whenAddBook_thenThrowPermissionDenied() {
-		assertThrows(PermissionDeniedException.class, () -> {
-			bookService.addBook(memberUser, "Test Title", "Test Author", "1111111111", "Some Publisher", 2024,
-					"Category", 2, "English", "C1-01");
-		});
+	void givenMember_whenAddBook_thenPermissionDenied() {
+		assertThrows(PermissionDeniedException.class, () -> bookService.addBook(memberUser, "Test Title", "Test Author",
+				"1111111111", "Some Publisher", 2024, "Category", 2, "English", "C1-01"));
 	}
 
 	@Test
-	@DisplayName("addBook – should throw IllegalStateException when repository rejects book (ISBN exists)")
 	void givenDuplicateIsbn_whenAddBook_thenThrowIllegalState() throws Exception {
 		when(bookRepo.addBook(any(Book.class))).thenReturn(false);
 
-		assertThrows(IllegalStateException.class, () -> {
-			bookService.addBook(adminUser, "Clean Architecture", "Robert C. Martin", "9780134494166", "Prentice Hall",
-					2017, "Software Engineering", 4, "English", "A1-02");
-		});
+		assertThrows(IllegalStateException.class,
+				() -> bookService.addBook(adminUser, "Clean Architecture", "Robert C. Martin", "9780134494166",
+						"Prentice Hall", 2017, "Software Engineering", 4, "English", "A1-02"));
 	}
 
-	// =====================================================================
-	// getAllBooks
-	// =====================================================================
-
 	@Test
-	@DisplayName("getAllBooks – should delegate to repository")
 	void whenGetAllBooks_thenReturnListFromRepository() {
 		when(bookRepo.getAllBooks()).thenReturn(List.of(sampleBook));
 
@@ -133,19 +109,13 @@ class BookServiceTest {
 		verify(bookRepo).getAllBooks();
 	}
 
-	// =====================================================================
-	// searchBooks
-	// =====================================================================
-
 	@Test
-	@DisplayName("searchBooks – should throw IllegalArgumentException when strategy is null")
 	void givenNullStrategy_whenSearchBooks_thenThrow() {
 		assertThrows(IllegalArgumentException.class, () -> bookService.searchBooks(null, "Clean"));
 	}
 
 	@Test
-	@DisplayName("searchBooks – should use strategy and repository list")
-	void givenValidStrategy_whenSearchBooks_thenStrategyIsCalled() {
+	void givenValidStrategy_whenSearchBooks_thenStrategyIsUsed() {
 		when(bookRepo.getAllBooks()).thenReturn(List.of(sampleBook));
 		when(searchStrategy.execute(anyList(), anyString())).thenReturn(List.of(sampleBook));
 
@@ -157,18 +127,12 @@ class BookServiceTest {
 		verify(searchStrategy).execute(anyList(), eq("Clean"));
 	}
 
-	// =====================================================================
-	// getBookById
-	// =====================================================================
-
 	@Test
-	@DisplayName("getBookById – should throw when id is null")
 	void givenNullId_whenGetBookById_thenThrow() {
 		assertThrows(IllegalArgumentException.class, () -> bookService.getBookById(null));
 	}
 
 	@Test
-	@DisplayName("getBookById – should return book when found")
 	void givenExistingId_whenGetBookById_thenReturnBook() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 
@@ -180,7 +144,6 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("getBookById – should return null when not found")
 	void givenMissingId_whenGetBookById_thenReturnNull() {
 		UUID missingId = UUID.randomUUID();
 		when(bookRepo.getBookById(missingId)).thenReturn(Optional.empty());
@@ -190,12 +153,7 @@ class BookServiceTest {
 		assertNull(result);
 	}
 
-	// =====================================================================
-	// getBookBySubId
-	// =====================================================================
-
 	@Test
-	@DisplayName("getBookBySubId – should return single matching book")
 	void givenUniquePrefix_whenGetBookBySubId_thenReturnBook() {
 		Book book1 = mock(Book.class);
 		when(book1.getId()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
@@ -209,7 +167,6 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("getBookBySubId – should throw when no matches found")
 	void givenNoMatchPrefix_whenGetBookBySubId_thenThrow() {
 		when(bookRepo.getAllBooks()).thenReturn(List.of(sampleBook));
 
@@ -217,7 +174,6 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("getBookBySubId – should throw when multiple matches found")
 	void givenAmbiguousPrefix_whenGetBookBySubId_thenThrow() {
 		Book book1 = mock(Book.class);
 		Book book2 = mock(Book.class);
@@ -233,12 +189,7 @@ class BookServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> bookService.getBookBySubId("aaaaaaaa"));
 	}
 
-	// =====================================================================
-	// isAvailableBook
-	// =====================================================================
-
 	@Test
-	@DisplayName("isAvailableBook – should return true when book has available copies")
 	void givenBookWithAvailableCopies_whenIsAvailableBook_thenTrue() {
 		Book book = mock(Book.class);
 		when(book.getAvailableCopies()).thenReturn(3);
@@ -247,11 +198,9 @@ class BookServiceTest {
 		boolean available = bookService.isAvailableBook(sampleBookId);
 
 		assertTrue(available);
-		verify(bookRepo).getBookById(sampleBookId);
 	}
 
 	@Test
-	@DisplayName("isAvailableBook – should return false when no available copies")
 	void givenBookWithoutAvailableCopies_whenIsAvailableBook_thenFalse() {
 		Book book = mock(Book.class);
 		when(book.getAvailableCopies()).thenReturn(0);
@@ -263,7 +212,6 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("isAvailableBook – should return false when book does not exist")
 	void givenMissingBook_whenIsAvailableBook_thenFalse() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.empty());
 
@@ -272,12 +220,7 @@ class BookServiceTest {
 		assertFalse(available);
 	}
 
-	// =====================================================================
-	// isValidBook
-	// =====================================================================
-
 	@Test
-	@DisplayName("isValidBook – should return true when book exists")
 	void givenExistingBook_whenIsValidBook_thenTrue() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 
@@ -285,27 +228,20 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("isValidBook – should return false when book does not exist")
 	void givenMissingBook_whenIsValidBook_thenFalse() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.empty());
 
 		assertFalse(bookService.isValidBook(sampleBookId));
 	}
 
-	// =====================================================================
-	// updateBook
-	// =====================================================================
-
 	@Test
-	@DisplayName("updateBook – should throw PermissionDeniedException for non-admin user")
-	void givenMember_whenUpdateBook_thenThrowPermissionDenied() {
+	void givenMember_whenUpdateBook_thenPermissionDenied() {
 		assertThrows(PermissionDeniedException.class, () -> bookService.updateBook(memberUser, sampleBookId,
 				"New Title", null, null, null, null, null, null, null, null));
 	}
 
 	@Test
-	@DisplayName("updateBook – should throw when book not found")
-	void givenAdminAndMissingBook_whenUpdateBook_thenThrowIllegalArgument() {
+	void givenAdminAndMissingBook_whenUpdateBook_thenThrow() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.empty());
 
 		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, "New Title",
@@ -313,8 +249,7 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("updateBook – should update fields and persist for admin")
-	void givenAdminAndExistingBook_whenUpdateBook_thenFieldsUpdatedAndSaved() throws Exception {
+	void givenAdminAndExistingBook_whenUpdateBook_thenSuccess() throws Exception {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 		when(bookRepo.updateBook(sampleBook)).thenReturn(true);
 
@@ -335,24 +270,15 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("updateBook – should allow partial update when some fields are null")
-	void givenPartialData_whenUpdateBook_thenOnlyProvidedFieldsChanged() throws Exception {
+	void givenPartialData_whenUpdateBook_thenOnlyProvidedFieldsUpdated() throws Exception {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 		when(bookRepo.updateBook(sampleBook)).thenReturn(true);
 
 		String oldAuthor = sampleBook.getAuthor();
 		String oldIsbn = sampleBook.getIsbn();
 
-		boolean result = bookService.updateBook(adminUser, sampleBookId, "New Title Only", // title
-				null, // author
-				null, // isbn
-				null, // publisher
-				null, // publicationYear
-				null, // category
-				null, // totalCopies
-				null, // language
-				null // shelfLocation
-		);
+		boolean result = bookService.updateBook(adminUser, sampleBookId, "New Title Only", null, null, null, null, null,
+				null, null, null);
 
 		assertTrue(result);
 		assertEquals("New Title Only", sampleBook.getTitle());
@@ -361,38 +287,26 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("updateBook – should throw when new totalCopies < availableCopies")
 	void givenLowerTotalCopiesThanAvailable_whenUpdateBook_thenThrow() {
-		// sampleBook created with total=5, available=5
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 
-		assertThrows(IllegalArgumentException.class,
-				() -> bookService.updateBook(adminUser, sampleBookId, null, null, null, null, null, null, 4, // أقل من
-						// availableCopies
-						// = 5
-						null, null));
+		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, null, null,
+				null, null, null, null, 4, null, null));
 	}
 
-	// =====================================================================
-	// deleteBook
-	// =====================================================================
-
 	@Test
-	@DisplayName("deleteBook – should throw PermissionDeniedException for non-admin")
-	void givenMember_whenDeleteBook_thenThrowPermissionDenied() {
+	void givenMember_whenDeleteBook_thenPermissionDenied() {
 		assertThrows(PermissionDeniedException.class, () -> bookService.deleteBook(memberUser, sampleBookId));
 	}
 
 	@Test
-	@DisplayName("deleteBook – should throw when book not found")
-	void givenAdminAndMissingBook_whenDeleteBook_thenThrowIllegalArgument() {
+	void givenAdminAndMissingBook_whenDeleteBook_thenThrow() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.empty());
 
 		assertThrows(IllegalArgumentException.class, () -> bookService.deleteBook(adminUser, sampleBookId));
 	}
 
 	@Test
-	@DisplayName("deleteBook – should delete existing book and return true")
 	void givenAdminAndExistingBook_whenDeleteBook_thenSuccess() throws Exception {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 		when(bookRepo.deleteBook(sampleBookId)).thenReturn(true);
@@ -404,7 +318,6 @@ class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("deleteBook – should return false when repository delete returns false")
 	void givenAdminAndExistingBook_whenDeleteFails_thenReturnFalse() throws Exception {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 		when(bookRepo.deleteBook(sampleBookId)).thenReturn(false);

@@ -23,6 +23,7 @@ public class Notification {
 	private final String notificationContent;
 	private final UUID senderID;
 	private final NotificationType type;
+	private String content;
 
 	/**
 	 * Constructs a new notification with the specified content and sender. The
@@ -60,4 +61,9 @@ public class Notification {
 	public NotificationType getType() {
 		return type;
 	}
+
+	public void setNotificationContent(String content) {
+		this.content = content;
+	}
+
 }

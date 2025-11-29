@@ -26,8 +26,14 @@ public class AccountValidator {
 	/**
 	 * Private constructor to prevent instantiation.
 	 */
-	private AccountValidator() {
+	
+	/*private AccountValidator() {
 	}
+	
+	*/
+	
+	public AccountValidator() {} 
+	
 
 	/**
 	 * Returns the singleton instance of the validator.

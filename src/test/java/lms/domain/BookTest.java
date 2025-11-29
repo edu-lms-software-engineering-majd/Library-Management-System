@@ -23,6 +23,7 @@ class BookTest {
 	@Test
 	void givenValidParameters_whenCreateBook_thenBookIsInitializedCorrectly() {
 		assertNotNull(book);
+		
 		assertNotNull(book.getId());
 		assertEquals("Java Programming", book.getTitle());
 		assertEquals("John Doe", book.getAuthor());

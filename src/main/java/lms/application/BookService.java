@@ -47,6 +47,7 @@ public class BookService {
 		this.bookRepo = bookRepo;
 	}
 
+	
 	/**
 	 * Creates and persists a new book if the user has admin privileges.
 	 *

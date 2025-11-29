@@ -24,6 +24,7 @@ class ConsoleSchedulerLoggerTest {
 	@AfterEach
 	void restoreStreams() {
 		System.setOut(originalOut);
+		outContent.reset();
 	}
 
 	@Test

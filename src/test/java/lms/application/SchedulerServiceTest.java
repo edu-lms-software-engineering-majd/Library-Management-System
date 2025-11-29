@@ -46,7 +46,6 @@ class SchedulerServiceTest {
 		schedulerService.startOverdueCheckScheduler();
 		assertTrue(schedulerService.isRunning());
 
-		// تشغيل مهمة OverdueCheck يدوياً
 		TimerTask task = Arrays.stream(schedulerService.getClass().getDeclaredMethods())
 				.filter(m -> m.getName().contains("createOverdueCheckTask")).findFirst().map(m -> {
 					try {
@@ -79,7 +78,6 @@ class SchedulerServiceTest {
 	void whenStartWithCustomValidDelay_thenSchedulerStarts() {
 		schedulerService.startOverdueCheckScheduler(1000L, 2000L);
 		assertTrue(schedulerService.isRunning());
-		// التحقق من logger بدون الاعتماد على صيغة الأرقام
 		verify(logger).logSchedulerStart(contains("Overdue loan checker scheduled"));
 		schedulerService.stop();
 	}
@@ -98,6 +96,7 @@ class SchedulerServiceTest {
 	void givenTooShortPeriod_whenStartScheduler_thenThrowIllegalArgumentException() {
 		assertThrows(IllegalArgumentException.class, () -> schedulerService.startOverdueCheckScheduler(1000, 500));
 	}
+	
 
 	@Test
 	void whenStopWithoutRunning_thenDoesNothing() {

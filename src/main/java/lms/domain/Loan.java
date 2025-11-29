@@ -34,9 +34,9 @@ public class Loan {
 	/**
 	 * Creates a new loan with validation.
 	 * 
-	 * @param userId the borrower's user ID
-	 * @param itemId the borrowed item's ID
-	 * @param itemType the type of item (book, cd, journal)
+	 * @param userId     the borrower's user ID
+	 * @param itemId     the borrowed item's ID
+	 * @param itemType   the type of item (book, cd, journal)
 	 * @param borrowDate the date the item was borrowed
 	 * @throws IllegalArgumentException if any parameter is null or invalid
 	 */
@@ -58,8 +58,8 @@ public class Loan {
 	 * Calculates the fine amount for this loan using the Strategy pattern.
 	 * 
 	 * <p>
-	 * Fine calculation depends on the item type and number of days overdue.
-	 * Returns 0.0 if the loan is not overdue or has been returned on time.
+	 * Fine calculation depends on the item type and number of days overdue. Returns
+	 * 0.0 if the loan is not overdue or has been returned on time.
 	 * </p>
 	 * 
 	 * @return the calculated fine amount
@@ -76,7 +76,9 @@ public class Loan {
 	/**
 	 * Calculates the due date based on item type and borrow date.
 	 * 
-	 * <p>Business rules:</p>
+	 * <p>
+	 * Business rules:
+	 * </p>
 	 * <ul>
 	 * <li>Books: 28 days</li>
 	 * <li>CDs: 21 days</li>
@@ -164,8 +166,8 @@ public class Loan {
 	}
 
 	/**
-	 * Marks that a fine has been applied for this loan.
-	 * This prevents duplicate fine applications.
+	 * Marks that a fine has been applied for this loan. This prevents duplicate
+	 * fine applications.
 	 */
 	public void markFineApplied() {
 		this.fineApplied = true;
@@ -193,7 +195,7 @@ public class Loan {
 	 * Extends the loan period by the specified number of days.
 	 * 
 	 * @param days the number of days to extend (must be positive)
-	 * @throws IllegalStateException if loan cannot be extended
+	 * @throws IllegalStateException    if loan cannot be extended
 	 * @throws IllegalArgumentException if days is not positive
 	 */
 	public void extendLoan(int days) {
@@ -201,9 +203,16 @@ public class Loan {
 		LoanValidator.getInstance().validateExtensionDays(days);
 		this.dueDate = this.dueDate.plusDays(days);
 	}
-	
+
 	public boolean isReturned() {
-	    return returnDate != null;
+		return returnDate != null;
+	}
+
+	public void returnItem(LocalDate returnDate) {
+		if (returnDate == null) {
+			throw new IllegalArgumentException("Return date cannot be null.");
+		}
+		this.returnDate = returnDate;
 	}
 
 }

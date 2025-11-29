@@ -102,6 +102,23 @@ public class NotificationTest {
 	}
 
 	@Test
+	void givenNotification_whenSetNotificationContent_thenContentIsUpdated() {
+
+		UUID senderId = UUID.randomUUID();
+		String originalContent = "Original message";
+		NotificationType type = NotificationType.OVERDUE;
+
+		Notification notification = new Notification(originalContent, senderId, type);
+		assertEquals(originalContent, notification.getNotificationContent());
+
+		String newContent = "Updated message";
+		notification.setNotificationContent(newContent);
+
+		assertEquals(newContent, notification.getNotificationContent());
+	}
+
+	
+	@Test
 	void givenNotification_whenCreated_thenTimestampIsRecent() {
 
 		UUID senderId = UUID.randomUUID();

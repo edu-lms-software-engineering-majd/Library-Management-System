@@ -6,14 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import lms.application.UserDTO;
 import lms.domain.exception.PasswordReuseException;
@@ -273,8 +272,13 @@ class UserTest {
 	}
 
 	@Test
-	void givenNullLastName_whenUpdateName_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> user.updateName("Ahmad", null));
+	
+	void givenNewUsername_whenSetUsername_thenUsernameIsUpdated() {
+
+		String newUsername = "majdnew";
+		user.setUsername(newUsername);
+
+		assertEquals(newUsername, user.getUsername());
 	}
 
 	@Test

@@ -6,56 +6,58 @@ import java.util.function.Function;
 
 /**
  * Utility class providing common search operations for different entity types.
- * 
- * <p>
- * This class centralizes reusable search logic to reduce code duplication
- * across various search strategy implementations.
- * </p>
- * 
- * @author Majd Awwad
- * @version 1.0
+ *
+ * This updated version fully supports: - Exact UUID match - Prefix match -
+ * Partial match - Handling empty search term - Throwing exception if multiple
+ * matches found
  */
 public class SearchUtils {
-    
-    /**
-     * Private constructor to prevent instantiation of utility class.
-     */
-    private SearchUtils() {
-        throw new UnsupportedOperationException("Utility class cannot be instantiated");
-    }
-    
-    /**
-     * Performs UUID-based search with fallback to partial matching.
-     * 
-     * <p>
-     * This method first attempts to parse the search term as a complete UUID
-     * and performs an exact match. If the search term is not a valid UUID,
-     * it falls back to partial matching (case-insensitive contains).
-     * </p>
-     * 
-     * @param <T> the type of entity being searched
-     * @param items the list of items to search through
-     * @param searchTerm the search term (full or partial UUID)
-     * @param idExtractor function to extract UUID from an item
-     * @return list of matching items
-     */
-    public static <T> List<T> searchById(List<T> items, String searchTerm, 
-                                          Function<T, UUID> idExtractor) {
-        String lowerSearchTerm = searchTerm.toLowerCase().trim();
-        
-        try {
-            UUID searchId = UUID.fromString(searchTerm);
-            List<T> exactMatch = items.stream()
-                    .filter(item -> idExtractor.apply(item).equals(searchId))
-                    .toList();
-            if (!exactMatch.isEmpty()) {
-                return exactMatch;
-            }
-        } catch (IllegalArgumentException e) {}
-        
-        return items.stream()
-                .filter(item -> idExtractor.apply(item).toString()
-                        .toLowerCase().contains(lowerSearchTerm))
-                .toList();
-    }
+
+	private SearchUtils() {
+		throw new UnsupportedOperationException("Utility class cannot be instantiated");
+	}
+
+	/**
+	 * Unified ID search with strict rules:
+	 *
+	 * Rules: 1) searchTerm = null or blank → return all items 2) Exact UUID match →
+	 * return exactly 1 result 3) Prefix match (startsWith) 4) If: - 0 matches →
+	 * return empty list - 1 match → return it - > 1 match → throw
+	 * IllegalArgumentException
+	 */
+	public static <T> List<T> searchById(List<T> items, String searchTerm, Function<T, UUID> idExtractor) {
+
+		if (searchTerm == null || searchTerm.isBlank()) {
+			return items;
+		}
+
+		String lower = searchTerm.toLowerCase().trim();
+
+		// Try exact UUID match
+		try {
+			UUID exactId = UUID.fromString(searchTerm);
+			List<T> exactMatch = items.stream().filter(item -> idExtractor.apply(item).equals(exactId)).toList();
+
+			if (!exactMatch.isEmpty()) {
+				return exactMatch;
+			}
+
+		} catch (IllegalArgumentException ignored) {
+			// Not a full UUID → continue to partial matching
+		}
+
+		// Partial / Prefix match
+		List<T> matches = items.stream()
+				.filter(item -> idExtractor.apply(item).toString().toLowerCase().startsWith(lower)).toList();
+
+		if (matches.isEmpty()) {
+			return List.of();
+		}
+
+		if (matches.size() > 1) {
+			throw new IllegalArgumentException("Multiple matches found for ID prefix: " + searchTerm);
+		}
+
+		return matches;
+	}
 }
