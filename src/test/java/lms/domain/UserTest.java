@@ -288,6 +288,7 @@ class UserTest {
 	}
 
 	@Test
+	
 	void givenNewUsername_whenSetUsername_thenUsernameIsUpdated() {
 
 		String newUsername = "majdnew";

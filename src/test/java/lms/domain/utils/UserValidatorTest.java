@@ -17,6 +17,7 @@ class UserValidatorTest {
 
 	private UserValidator validator;
 
+	
 	@BeforeEach
 	void setUp() {
 		validator = new UserValidator();

@@ -165,6 +165,15 @@ public class Journal implements LoanableItem {
 
 	@Override
 	public String toString() {
-		return String.format("Journal: %s by %s (Available: %d/%d)", title, author, availableCopies, totalCopies);
+		return String.format(" %s by %s (%d/%d)", title, author, availableCopies, totalCopies);
 	}
+	
+	
+	
+	public void setAvailableCopies(int availableCopies) {
+	    if (availableCopies < 0 || availableCopies > this.totalCopies)
+	        throw new IllegalArgumentException("Invalid available copies");
+	    this.availableCopies = availableCopies;
+	}
+
 }

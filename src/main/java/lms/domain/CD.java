@@ -167,6 +167,17 @@ public class CD implements LoanableItem {
 
 	@Override
 	public String toString() {
-		return String.format("CD: %s by %s (Available: %d/%d)", title, artist, availableCopies, totalCopies);
+		return String.format("%s by %s (%d/%d)", title, artist, availableCopies, totalCopies);
 	}
+	
+	
+	
+	public void setAvailableCopies(int availableCopies) {
+	    if (availableCopies < 0 || availableCopies > this.totalCopies)
+	        throw new IllegalArgumentException("Invalid available copies");
+	    this.availableCopies = availableCopies;
+	}
+	
+	
+
 }
