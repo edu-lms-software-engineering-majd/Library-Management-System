@@ -398,26 +398,18 @@ public class User {
 		return !unreadNotifications.isEmpty();
 	}
 
-	// These setters exist ONLY to satisfy legacy unit tests.
-	// They delegate to existing domain logic or do minimal updates.
 
 	public void setEmail(String email) {
 		changeEmail(email); // Uses your validation
 	}
 
-	public void setFirstName(String fn) {
-		this.firstName = fn; // Tests expect direct update
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
-	public void setLastName(String ln) {
-		this.lastName = ln; // Tests expect direct update
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public void setUsername(String u) {
-		// Username is immutable in real system.
-		// But tests require setter → allow it only for test compatibility.
-		// NO validation, because username is final and cannot be reassigned.
-		// So we leave this method empty intentionally.
-	}
 
 }
