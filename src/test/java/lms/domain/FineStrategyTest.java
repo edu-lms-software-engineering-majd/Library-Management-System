@@ -46,21 +46,21 @@ class FineStrategyTest {
 	}
 
 	@Test
-	void givenBookOverdue_whenCalculateFine_thenReturn10PerDay() {
+	void givenBookOverdue_whenCalculateFine_thenReturn50CentsPerDay() {
 		double fine = bookStrategy.calculateFine(3);
-		assertEquals(30.0, fine);
+		assertEquals(1.50, fine);
 	}
 
 	@Test
-	void givenCDOverdue_whenCalculateFine_thenReturn20PerDay() {
+	void givenCDOverdue_whenCalculateFine_thenReturn75CentsPerDay() {
 		double fine = cdStrategy.calculateFine(2);
-		assertEquals(40.0, fine);
+		assertEquals(1.50, fine);
 	}
 
 	@Test
-	void givenJournalOverdue_whenCalculateFine_thenReturn15PerDay() {
+	void givenJournalOverdue_whenCalculateFine_thenReturn1DollarPerDay() {
 		double fine = journalStrategy.calculateFine(4);
-		assertEquals(60.0, fine);
+		assertEquals(4.0, fine);
 	}
 
 	@Test
@@ -82,3 +82,4 @@ class FineStrategyTest {
 	}
 
 }
+

@@ -20,7 +20,7 @@ class UserValidatorTest {
 	
 	@BeforeEach
 	void setUp() {
-		validator = new UserValidator();
+		validator = UserValidator.getInstance();
 	}
 
 	@AfterEach

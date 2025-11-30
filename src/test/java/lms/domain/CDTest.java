@@ -22,6 +22,8 @@ class CDTest {
 		cd = new CD("Thriller", "Michael Jackson", 3);
 	}
 
+
+	
 	@AfterEach
 	void tearDown() {
 		cd = null;
@@ -53,6 +55,7 @@ class CDTest {
 
 	@Test
 	void givenCDWithNoAvailableCopies_whenCheckIsAvailable_thenReturnFalse() {
+		
 		cd.setAvailableCopies(0);
 		assertFalse(cd.isAvailable());
 	}
@@ -78,6 +81,7 @@ class CDTest {
 	void givenNoCopiesAvailable_whenDecrementAvailableCopies_thenThrowIllegalStateException() {
 		cd.setAvailableCopies(0);
 
+
 		assertThrows(IllegalStateException.class, () -> cd.decrementAvailableCopies());
 	}
 
@@ -98,6 +102,7 @@ class CDTest {
 
 	@Test
 	void givenCD_whenGetId_thenReturnNonNullUUID() {
+
 		UUID id = cd.getId();
 		assertNotNull(id);
 	}
@@ -115,6 +120,7 @@ class CDTest {
 
 	@Test
 	void givenNewTitle_whenSetTitle_thenTitleIsUpdated() {
+
 		String newTitle = "Hello";
 		cd.setTitle(newTitle);
 
@@ -123,6 +129,7 @@ class CDTest {
 
 	@Test
 	void givenNewArtist_whenSetArtist_thenArtistIsUpdated() {
+
 		String newArtist = "Majd";
 		cd.setArtist(newArtist);
 
@@ -175,4 +182,15 @@ class CDTest {
 
 		assertTrue(result.contains("2/3"));
 	}
+
+	@Test
+	void givenNullTitle_whenCreateCD_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> new CD(null, "Artist"));
+	}
+
+	@Test
+	void givenNullArtist_whenCreateCD_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> new CD("Title", null));
+	}
 }
+

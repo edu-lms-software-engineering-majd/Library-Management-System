@@ -14,7 +14,7 @@ class AccountValidatorTest {
 
 	@BeforeEach
 	void setUp() {
-		validator = new AccountValidator();
+		validator = AccountValidator.getInstance();
 	}
 
 	@AfterEach

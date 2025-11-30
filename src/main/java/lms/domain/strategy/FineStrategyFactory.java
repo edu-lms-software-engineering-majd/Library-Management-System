@@ -27,6 +27,7 @@ package lms.domain.strategy;
  */
 public class FineStrategyFactory {
 
+
     public static FineStrategy getStrategy(String itemType) {
         return switch (itemType.toLowerCase()) {
             case "book" -> new BookFineStrategy();

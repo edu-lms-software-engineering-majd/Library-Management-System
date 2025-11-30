@@ -1,6 +1,5 @@
 package lms.domain;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,23 +28,14 @@ class UserTest {
 				Role.ADMIN);
 	}
 
-	@AfterEach
-	void tearDown() {
-		user = null;
-	}
-
 	@Test
-
 	void givenValidPassword_whenVerifyPassword_thenReturnTrue() {
-
 		String validPassword = "StrongPass1!";
 		assertTrue(user.verifyPassword(validPassword));
 	}
 
 	@Test
-
 	void givenInvalidPassword_whenVerifyPassword_thenReturnFalse() {
-
 		String invalidPassword = "invalidPassword!";
 		assertFalse(user.verifyPassword(invalidPassword));
 	}
@@ -270,21 +259,16 @@ class UserTest {
 	}
 
 	@Test
-	void givenNewFirstName_whenSetFirstName_thenFirstNameIsUpdated() {
+	void givenNewName_whenUpdateName_thenNameIsUpdated() {
+		user.updateName("Ahmad", "Ali");
 
-		String newFirstName = "Ahmad";
-		user.setFirstName(newFirstName);
-
-		assertEquals(newFirstName, user.getFirstName());
+		assertEquals("Ahmad", user.getFirstName());
+		assertEquals("Ali", user.getLastName());
 	}
 
 	@Test
-	void givenNewLastName_whenSetLastName_thenLastNameIsUpdated() {
-
-		String newLastName = "Ali";
-		user.setLastName(newLastName);
-
-		assertEquals(newLastName, user.getLastName());
+	void givenNullFirstName_whenUpdateName_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> user.updateName(null, "Ali"));
 	}
 
 	@Test
@@ -298,12 +282,19 @@ class UserTest {
 	}
 
 	@Test
-	void givenNewEmail_whenSetEmail_thenEmailIsUpdated() {
+	void givenUser_whenGetUsername_thenReturnOriginalUsername() {
+		assertEquals("majdawwad", user.getUsername());
+	}
 
-		String newEmail = "newemail@gmail.com";
-		user.setEmail(newEmail);
+	@Test
+	void givenNewEmail_whenChangeEmail_thenEmailIsUpdated() {
+		user.changeEmail("newemail@gmail.com");
+		assertEquals("newemail@gmail.com", user.getEmail());
+	}
 
-		assertEquals(newEmail, user.getEmail());
+	@Test
+	void givenInvalidEmail_whenChangeEmail_thenThrowException() {
+		assertThrows(IllegalArgumentException.class, () -> user.changeEmail("invalid-email"));
 	}
 
 	@Test
@@ -355,3 +346,4 @@ class UserTest {
 		});
 	}
 }
+
