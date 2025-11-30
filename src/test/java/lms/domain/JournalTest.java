@@ -1,186 +1,285 @@
 package lms.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class JournalTest {
 
-	private Journal journal;
+    private Journal journal;
 
-	@BeforeEach
-	void setUp() {
-		journal = new Journal("Nature", "Springer Nature", 5);
-	}
+    @BeforeEach
+    void setUp() {
+        journal = new Journal("Nature", "Multiple Authors", 4);
+    }
 
-	@Test
-	void givenValidParameters_whenCreateJournal_thenJournalIsInitializedCorrectly() {
-		assertNotNull(journal);
-		assertNotNull(journal.getId());
-		assertEquals("Nature", journal.getTitle());
-		assertEquals("Springer Nature", journal.getAuthor());
-		assertEquals(5, journal.getTotalCopies());
-		assertEquals(5, journal.getAvailableCopies());
-	}
+    @Test
+    void shouldCreateJournalWithValidData() {
+        assertNotNull(journal);
+        assertEquals("Nature", journal.getTitle());
+        assertEquals("Multiple Authors", journal.getAuthor());
+        assertEquals(4, journal.getTotalCopies());
+        assertEquals(4, journal.getAvailableCopies());
+        assertNotNull(journal.getId());
+    }
 
-	@Test
-	void givenDefaultConstructor_whenCreateJournal_thenJournalHasOneCopy() {
-		Journal singleJournal = new Journal("Science", "AAAS");
+    @Test
+    void shouldCreateJournalWithDefaultCopies() {
+        Journal journalDefault = new Journal("Science", "Editorial Board");
+        
+        assertNotNull(journalDefault);
+        assertEquals("Science", journalDefault.getTitle());
+        assertEquals("Editorial Board", journalDefault.getAuthor());
+        assertEquals(1, journalDefault.getTotalCopies());
+        assertEquals(1, journalDefault.getAvailableCopies());
+    }
 
-		assertNotNull(singleJournal);
-		assertEquals(1, singleJournal.getTotalCopies());
-		assertEquals(1, singleJournal.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenTitleIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal(null, "Author")
+        );
+    }
 
-	@Test
-	void givenJournalWithAvailableCopies_whenCheckIsAvailable_thenReturnTrue() {
-		assertTrue(journal.isAvailable());
-	}
+    @Test
+    void shouldThrowExceptionWhenTitleIsEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("", "Author")
+        );
+    }
 
-	@Test
-	void givenJournalWithNoAvailableCopies_whenCheckIsAvailable_thenReturnFalse() {
-		for (int i = 0; i < 5; i++) {
-			journal.decrementAvailableCopies();
-		}
-		
-		assertFalse(journal.isAvailable());
-	}
+    @Test
+    void shouldThrowExceptionWhenTitleIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("   ", "Author")
+        );
+    }
 
-	@Test
-	void givenAvailableCopies_whenDecrementAvailableCopies_thenCopiesDecreased() {
-		int initialCopies = journal.getAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenAuthorIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("Title", null)
+        );
+    }
 
-		journal.decrementAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenAuthorIsEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("Title", "")
+        );
+    }
 
-		assertEquals(initialCopies - 1, journal.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenAuthorIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("Title", "   ")
+        );
+    }
 
-	@Test
-	void givenMultipleCopies_whenDecrementMultipleTimes_thenCopiesDecreasedCorrectly() {
-		journal.decrementAvailableCopies();
-		journal.decrementAvailableCopies();
-		journal.decrementAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenTotalCopiesIsZero() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("Title", "Author", 0)
+        );
+    }
 
-		assertEquals(2, journal.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenTotalCopiesIsNegative() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new Journal("Title", "Author", -1)
+        );
+    }
 
-	@Test
-	void givenNoCopiesAvailable_whenDecrementAvailableCopies_thenThrowIllegalStateException() {
-		for (int i = 0; i < 5; i++) {
-			journal.decrementAvailableCopies();
-		}
-		
-		assertThrows(IllegalStateException.class, () -> {
-			journal.decrementAvailableCopies();
-		});
-	}
+    @Test
+    void shouldReturnTrueForIsAvailableWhenCopiesAvailable() {
+        assertTrue(journal.isAvailable());
+    }
 
-	@Test
-	void givenDecrementedCopies_whenIncrementAvailableCopies_thenCopiesIncreased() {
-		journal.decrementAvailableCopies();
-		int current = journal.getAvailableCopies();
+    @Test
+    void shouldReturnFalseForIsAvailableWhenNoCopiesAvailable() {
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        
+        assertFalse(journal.isAvailable());
+    }
 
-		journal.incrementAvailableCopies();
+    @Test
+    void shouldReturnFalseForIsBorrowedWhenAllCopiesAvailable() {
+        assertFalse(journal.isBorrowed());
+    }
 
-		assertEquals(current + 1, journal.getAvailableCopies());
-	}
+    @Test
+    void shouldReturnTrueForIsBorrowedWhenAtLeastOneCopyBorrowed() {
+        journal.decrementAvailableCopies();
+        
+        assertTrue(journal.isBorrowed());
+    }
 
-	@Test
-	void givenAllCopiesAvailable_whenIncrementAvailableCopies_thenThrowIllegalStateException() {
-		assertThrows(IllegalStateException.class, () -> journal.incrementAvailableCopies());
-	}
+    @Test
+    void shouldDecrementAvailableCopiesSuccessfully() {
+        journal.decrementAvailableCopies();
+        
+        assertEquals(3, journal.getAvailableCopies());
+    }
 
-	@Test
-	void givenJournal_whenGetId_thenReturnNonNullUUID() {
-		assertNotNull(journal.getId());
-	}
+    @Test
+    void shouldThrowExceptionWhenDecrementingWithNoCopiesAvailable() {
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        
+        assertThrows(IllegalStateException.class, () -> 
+            journal.decrementAvailableCopies()
+        );
+    }
 
-	@Test
-	void givenMultipleJournals_whenCreate_thenEachHasUniqueId() {
-		Journal j1 = new Journal("Journal 1", "Publisher 1", 1);
-		Journal j2 = new Journal("Journal 2", "Publisher 2", 2);
-		Journal j3 = new Journal("Journal 3", "Publisher 3", 3);
+    @Test
+    void shouldIncrementAvailableCopiesSuccessfully() {
+        journal.decrementAvailableCopies();
+        journal.incrementAvailableCopies();
+        
+        assertEquals(4, journal.getAvailableCopies());
+    }
 
-		assertNotEquals(j1.getId(), j2.getId());
-		assertNotEquals(j2.getId(), j3.getId());
-		assertNotEquals(j1.getId(), j3.getId());
-	}
+    @Test
+    void shouldThrowExceptionWhenIncrementingBeyondTotalCopies() {
+        assertThrows(IllegalStateException.class, () -> 
+            journal.incrementAvailableCopies()
+        );
+    }
 
-	@Test
-	void givenNewTitle_whenSetTitle_thenTitleIsUpdated() {
-		journal.setTitle("Science Today");
-		assertEquals("Science Today", journal.getTitle());
-	}
+    @Test
+    void shouldSetTitleSuccessfully() {
+        journal.setTitle("The Lancet");
+        
+        assertEquals("The Lancet", journal.getTitle());
+    }
 
-	@Test
-	void givenNullTitle_whenSetTitle_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> journal.setTitle(null));
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNullTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setTitle(null)
+        );
+    }
 
-	@Test
-	void givenNewAuthor_whenSetAuthor_thenAuthorIsUpdated() {
-		journal.setAuthor("IEEE");
-		assertEquals("IEEE", journal.getAuthor());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingEmptyTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setTitle("")
+        );
+    }
 
-	@Test
-	void givenNullAuthor_whenSetAuthor_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> journal.setAuthor(null));
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingBlankTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setTitle("   ")
+        );
+    }
 
-	@Test
-	void givenNewTotalCopies_whenSetTotalCopies_thenTotalCopiesIsUpdated() {
-		journal.setTotalCopies(10);
-		assertEquals(10, journal.getTotalCopies());
-	}
+    @Test
+    void shouldSetAuthorSuccessfully() {
+        journal.setAuthor("Research Team");
+        
+        assertEquals("Research Team", journal.getAuthor());
+    }
 
-	@Test
-	void givenInvalidTotalCopies_whenSetTotalCopies_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> journal.setTotalCopies(0));
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNullAuthor() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setAuthor(null)
+        );
+    }
 
-	@Test
-	void givenJournalWithAllCopiesAvailable_whenCheckIsBorrowed_thenReturnFalse() {
-		assertFalse(journal.isBorrowed());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingEmptyAuthor() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setAuthor("")
+        );
+    }
 
-	@Test
-	void givenJournalWithSomeCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		journal.decrementAvailableCopies();
-		assertTrue(journal.isBorrowed());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingBlankAuthor() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setAuthor("   ")
+        );
+    }
 
-	@Test
-	void givenJournalWithAllCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		for (int i = 0; i < 5; i++) {
-			journal.decrementAvailableCopies();
-		}
-		assertTrue(journal.isBorrowed());
-	}
+    @Test
+    void shouldSetTotalCopiesSuccessfully() {
+        journal.setTotalCopies(6);
+        
+        assertEquals(6, journal.getTotalCopies());
+    }
 
-	@Test
-	void givenJournal_whenToString_thenReturnsFormattedString() {
-		String result = journal.toString();
+    @Test
+    void shouldThrowExceptionWhenSettingZeroTotalCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setTotalCopies(0)
+        );
+    }
 
-		assertNotNull(result);
-		assertTrue(result.contains("Nature"));
-		assertTrue(result.contains("Springer Nature"));
-		assertTrue(result.contains("5/5"));
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNegativeTotalCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setTotalCopies(-1)
+        );
+    }
 
-	@Test
-	void givenBorrowedJournal_whenToString_thenShowsCorrectCopiesStatus() {
-		journal.decrementAvailableCopies();
-		journal.decrementAvailableCopies();
+    @Test
+    void shouldSetAvailableCopiesSuccessfully() {
+        journal.setAvailableCopies(2);
+        
+        assertEquals(2, journal.getAvailableCopies());
+    }
 
-		String result = journal.toString();
-		assertTrue(result.contains("3/5"));
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNegativeAvailableCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setAvailableCopies(-1)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSettingAvailableCopiesBeyondTotal() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            journal.setAvailableCopies(6)
+        );
+    }
+
+    @Test
+    void shouldReturnCorrectToStringFormat() {
+        String result = journal.toString();
+        
+        assertTrue(result.contains("Nature"));
+        assertTrue(result.contains("Multiple Authors"));
+        assertTrue(result.contains("4/4"));
+    }
+
+    @Test
+    void shouldGenerateUniqueId() {
+        Journal journal1 = new Journal("Title1", "Author1");
+        Journal journal2 = new Journal("Title2", "Author2");
+        
+        assertNotEquals(journal1.getId(), journal2.getId());
+    }
+
+    @Test
+    void shouldMaintainConsistentStateAfterMultipleOperations() {
+        journal.setTitle("Updated Journal");
+        journal.setAuthor("Updated Author");
+        journal.decrementAvailableCopies();
+        journal.decrementAvailableCopies();
+        journal.incrementAvailableCopies();
+        
+        assertEquals("Updated Journal", journal.getTitle());
+        assertEquals("Updated Author", journal.getAuthor());
+        assertEquals(3, journal.getAvailableCopies());
+        assertEquals(4, journal.getTotalCopies());
+        assertTrue(journal.isAvailable());
+        assertTrue(journal.isBorrowed());
+    }
 }
-

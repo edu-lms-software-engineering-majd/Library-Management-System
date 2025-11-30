@@ -35,7 +35,7 @@ public class Notification {
 	 * @throws IllegalArgumentException if any parameter is null or content is blank
 	 */
 	public Notification(String content, UUID senderID, NotificationType type) {
-		// Validate all inputs using NotificationValidator (DRY principle)
+
 		NotificationValidator.getInstance().validate(content, senderID, type);
 
 		this.timestamp = Instant.now();
@@ -48,7 +48,6 @@ public class Notification {
 		return notificationContent;
 	}
 
-	// NOTE: Notification content is immutable - no setter provided
 
 	public Instant getTimestamp() {
 		return timestamp;
@@ -62,8 +61,5 @@ public class Notification {
 		return type;
 	}
 
-	public void setNotificationContent(String content) {
-		this.content = content;
-	}
 
 }

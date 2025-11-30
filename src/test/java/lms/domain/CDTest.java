@@ -1,196 +1,283 @@
 package lms.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.UUID;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CDTest {
 
-	private CD cd;
+    private CD cd;
 
-	@BeforeEach
-	void setUp() {
-		cd = new CD("Thriller", "Michael Jackson", 3);
-	}
+    @BeforeEach
+    void setUp() {
+        cd = new CD("Dark Side of the Moon", "Pink Floyd", 3);
+    }
 
+    @Test
+    void shouldCreateCDWithValidData() {
+        assertNotNull(cd);
+        assertEquals("Dark Side of the Moon", cd.getTitle());
+        assertEquals("Pink Floyd", cd.getArtist());
+        assertEquals(3, cd.getTotalCopies());
+        assertEquals(3, cd.getAvailableCopies());
+        assertNotNull(cd.getId());
+    }
 
-	
-	@AfterEach
-	void tearDown() {
-		cd = null;
-	}
+    @Test
+    void shouldCreateCDWithDefaultCopies() {
+        CD cdDefault = new CD("Abbey Road", "The Beatles");
+        
+        assertNotNull(cdDefault);
+        assertEquals("Abbey Road", cdDefault.getTitle());
+        assertEquals("The Beatles", cdDefault.getArtist());
+        assertEquals(1, cdDefault.getTotalCopies());
+        assertEquals(1, cdDefault.getAvailableCopies());
+    }
 
-	@Test
-	void givenValidParameters_whenCreateCD_thenCDIsInitializedCorrectly() {
-		assertNotNull(cd);
-		assertNotNull(cd.getId());
-		assertEquals("Thriller", cd.getTitle());
-		assertEquals("Michael Jackson", cd.getArtist());
-		assertEquals(3, cd.getTotalCopies());
-		assertEquals(3, cd.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenTitleIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD(null, "Artist")
+        );
+    }
 
-	@Test
-	void givenDefaultConstructor_whenCreateCD_thenCDHasOneCopy() {
-		CD singleCD = new CD("Greatest Hits", "The Beatles");
+    @Test
+    void shouldThrowExceptionWhenTitleIsEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("", "Artist")
+        );
+    }
 
-		assertNotNull(singleCD);
-		assertEquals(1, singleCD.getTotalCopies());
-		assertEquals(1, singleCD.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenTitleIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("   ", "Artist")
+        );
+    }
 
-	@Test
-	void givenCDWithAvailableCopies_whenCheckIsAvailable_thenReturnTrue() {
-		assertTrue(cd.isAvailable());
-	}
+    @Test
+    void shouldThrowExceptionWhenArtistIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("Title", null)
+        );
+    }
 
-	@Test
-	void givenCDWithNoAvailableCopies_whenCheckIsAvailable_thenReturnFalse() {
-		
-		cd.setAvailableCopies(0);
-		assertFalse(cd.isAvailable());
-	}
+    @Test
+    void shouldThrowExceptionWhenArtistIsEmpty() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("Title", "")
+        );
+    }
 
-	@Test
-	void givenAvailableCopies_whenDecrementAvailableCopies_thenCopiesDecreased() {
-		int initialCopies = cd.getAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenArtistIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("Title", "   ")
+        );
+    }
 
-		cd.decrementAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenTotalCopiesIsZero() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("Title", "Artist", 0)
+        );
+    }
 
-		assertEquals(initialCopies - 1, cd.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenTotalCopiesIsNegative() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            new CD("Title", "Artist", -1)
+        );
+    }
 
-	@Test
-	void givenMultipleCopies_whenDecrementMultipleTimes_thenCopiesDecreasedCorrectly() {
-		cd.decrementAvailableCopies();
-		cd.decrementAvailableCopies();
+    @Test
+    void shouldReturnTrueForIsAvailableWhenCopiesAvailable() {
+        assertTrue(cd.isAvailable());
+    }
 
-		assertEquals(1, cd.getAvailableCopies());
-	}
+    @Test
+    void shouldReturnFalseForIsAvailableWhenNoCopiesAvailable() {
+        cd.decrementAvailableCopies();
+        cd.decrementAvailableCopies();
+        cd.decrementAvailableCopies();
+        
+        assertFalse(cd.isAvailable());
+    }
 
-	@Test
-	void givenNoCopiesAvailable_whenDecrementAvailableCopies_thenThrowIllegalStateException() {
-		cd.setAvailableCopies(0);
+    @Test
+    void shouldReturnFalseForIsBorrowedWhenAllCopiesAvailable() {
+        assertFalse(cd.isBorrowed());
+    }
 
+    @Test
+    void shouldReturnTrueForIsBorrowedWhenAtLeastOneCopyBorrowed() {
+        cd.decrementAvailableCopies();
+        
+        assertTrue(cd.isBorrowed());
+    }
 
-		assertThrows(IllegalStateException.class, () -> cd.decrementAvailableCopies());
-	}
+    @Test
+    void shouldDecrementAvailableCopiesSuccessfully() {
+        cd.decrementAvailableCopies();
+        
+        assertEquals(2, cd.getAvailableCopies());
+    }
 
-	@Test
-	void givenDecrementedCopies_whenIncrementAvailableCopies_thenCopiesIncreased() {
-		cd.decrementAvailableCopies();
-		int current = cd.getAvailableCopies();
+    @Test
+    void shouldThrowExceptionWhenDecrementingWithNoCopiesAvailable() {
+        cd.decrementAvailableCopies();
+        cd.decrementAvailableCopies();
+        cd.decrementAvailableCopies();
+        
+        assertThrows(IllegalStateException.class, () -> 
+            cd.decrementAvailableCopies()
+        );
+    }
 
-		cd.incrementAvailableCopies();
+    @Test
+    void shouldIncrementAvailableCopiesSuccessfully() {
+        cd.decrementAvailableCopies();
+        cd.incrementAvailableCopies();
+        
+        assertEquals(3, cd.getAvailableCopies());
+    }
 
-		assertEquals(current + 1, cd.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenIncrementingBeyondTotalCopies() {
+        assertThrows(IllegalStateException.class, () -> 
+            cd.incrementAvailableCopies()
+        );
+    }
 
-	@Test
-	void givenAllCopiesAvailable_whenIncrementAvailableCopies_thenThrowIllegalStateException() {
-		assertThrows(IllegalStateException.class, () -> cd.incrementAvailableCopies());
-	}
+    @Test
+    void shouldSetTitleSuccessfully() {
+        cd.setTitle("The Wall");
+        
+        assertEquals("The Wall", cd.getTitle());
+    }
 
-	@Test
-	void givenCD_whenGetId_thenReturnNonNullUUID() {
+    @Test
+    void shouldThrowExceptionWhenSettingNullTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setTitle(null)
+        );
+    }
 
-		UUID id = cd.getId();
-		assertNotNull(id);
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingEmptyTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setTitle("")
+        );
+    }
 
-	@Test
-	void givenMultipleCDs_whenCreate_thenEachHasUniqueId() {
-		CD cd1 = new CD("Album 1", "Artist 1", 1);
-		CD cd2 = new CD("Album 2", "Artist 2", 2);
-		CD cd3 = new CD("Album 3", "Artist 3", 3);
+    @Test
+    void shouldThrowExceptionWhenSettingBlankTitle() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setTitle("   ")
+        );
+    }
 
-		assertNotEquals(cd1.getId(), cd2.getId());
-		assertNotEquals(cd2.getId(), cd3.getId());
-		assertNotEquals(cd1.getId(), cd3.getId());
-	}
+    @Test
+    void shouldSetArtistSuccessfully() {
+        cd.setArtist("Led Zeppelin");
+        
+        assertEquals("Led Zeppelin", cd.getArtist());
+    }
 
-	@Test
-	void givenNewTitle_whenSetTitle_thenTitleIsUpdated() {
+    @Test
+    void shouldThrowExceptionWhenSettingNullArtist() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setArtist(null)
+        );
+    }
 
-		String newTitle = "Hello";
-		cd.setTitle(newTitle);
+    @Test
+    void shouldThrowExceptionWhenSettingEmptyArtist() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setArtist("")
+        );
+    }
 
-		assertEquals(newTitle, cd.getTitle());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingBlankArtist() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setArtist("   ")
+        );
+    }
 
-	@Test
-	void givenNewArtist_whenSetArtist_thenArtistIsUpdated() {
+    @Test
+    void shouldSetTotalCopiesSuccessfully() {
+        cd.setTotalCopies(5);
+        
+        assertEquals(5, cd.getTotalCopies());
+    }
 
-		String newArtist = "Majd";
-		cd.setArtist(newArtist);
+    @Test
+    void shouldThrowExceptionWhenSettingZeroTotalCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setTotalCopies(0)
+        );
+    }
 
-		assertEquals(newArtist, cd.getArtist());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNegativeTotalCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setTotalCopies(-1)
+        );
+    }
 
-	@Test
-	void givenNewTotalCopies_whenSetTotalCopies_thenTotalCopiesIsUpdated() {
-		cd.setTotalCopies(5);
-		assertEquals(5, cd.getTotalCopies());
-	}
+    @Test
+    void shouldSetAvailableCopiesSuccessfully() {
+        cd.setAvailableCopies(2);
+        
+        assertEquals(2, cd.getAvailableCopies());
+    }
 
-	@Test
-	void givenNewAvailableCopies_whenSetAvailableCopies_thenAvailableCopiesIsUpdated() {
-		cd.setAvailableCopies(2);
-		assertEquals(2, cd.getAvailableCopies());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingNegativeAvailableCopies() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setAvailableCopies(-1)
+        );
+    }
 
-	@Test
-	void givenCDWithAllCopiesAvailable_whenCheckIsBorrowed_thenReturnFalse() {
-		assertFalse(cd.isBorrowed());
-	}
+    @Test
+    void shouldThrowExceptionWhenSettingAvailableCopiesBeyondTotal() {
+        assertThrows(IllegalArgumentException.class, () -> 
+            cd.setAvailableCopies(5)
+        );
+    }
 
-	@Test
-	void givenCDWithSomeCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		cd.decrementAvailableCopies();
-		assertTrue(cd.isBorrowed());
-	}
+    @Test
+    void shouldReturnCorrectToStringFormat() {
+        String result = cd.toString();
+        
+        assertTrue(result.contains("Dark Side of the Moon"));
+        assertTrue(result.contains("Pink Floyd"));
+        assertTrue(result.contains("3/3"));
+    }
 
-	@Test
-	void givenCDWithAllCopiesBorrowed_whenCheckIsBorrowed_thenReturnTrue() {
-		cd.setAvailableCopies(0);
-		assertTrue(cd.isBorrowed());
-	}
+    @Test
+    void shouldGenerateUniqueId() {
+        CD cd1 = new CD("Title1", "Artist1");
+        CD cd2 = new CD("Title2", "Artist2");
+        
+        assertNotEquals(cd1.getId(), cd2.getId());
+    }
 
-	@Test
-	void givenCD_whenToString_thenReturnsFormattedString() {
-		String result = cd.toString();
-
-		assertNotNull(result);
-		assertTrue(result.contains("Thriller"));
-		assertTrue(result.contains("Michael Jackson"));
-		assertTrue(result.contains("3/3"));
-	}
-
-	@Test
-	void givenBorrowedCD_whenToString_thenShowsCorrectCopiesStatus() {
-		cd.decrementAvailableCopies();
-		String result = cd.toString();
-
-		assertTrue(result.contains("2/3"));
-	}
-
-	@Test
-	void givenNullTitle_whenCreateCD_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> new CD(null, "Artist"));
-	}
-
-	@Test
-	void givenNullArtist_whenCreateCD_thenThrowException() {
-		assertThrows(IllegalArgumentException.class, () -> new CD("Title", null));
-	}
+    @Test
+    void shouldMaintainConsistentStateAfterMultipleOperations() {
+        cd.setTitle("Updated Album");
+        cd.setArtist("Updated Artist");
+        cd.decrementAvailableCopies();
+        cd.decrementAvailableCopies();
+        cd.incrementAvailableCopies();
+        
+        assertEquals("Updated Album", cd.getTitle());
+        assertEquals("Updated Artist", cd.getArtist());
+        assertEquals(2, cd.getAvailableCopies());
+        assertEquals(3, cd.getTotalCopies());
+        assertTrue(cd.isAvailable());
+        assertTrue(cd.isBorrowed());
+    }
 }
-

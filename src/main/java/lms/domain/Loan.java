@@ -41,7 +41,7 @@ public class Loan {
 	 * @throws IllegalArgumentException if any parameter is null or invalid
 	 */
 	public Loan(UUID userId, UUID itemId, String itemType, LocalDate borrowDate) {
-		// Validate all inputs using LoanValidator (DRY principle)
+
 		LoanValidator.getInstance().validate(userId, itemId, itemType, borrowDate);
 
 		this.loanId = UUID.randomUUID();

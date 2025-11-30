@@ -3,54 +3,26 @@ package lms.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class NotificationTest {
+class NotificationTest {
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-	}
+	private static final String VALID_CONTENT = "Test notification";
+	private static final UUID VALID_SENDER_ID = UUID.randomUUID();
 
 	@Test
-	void givenNullNotification_whenAccessMethods_throwsNullPointerException() {
-
-		assertThrows(NullPointerException.class, () -> {
-			Notification notification = null;
-			notification.getNotificationContent();
-		});
-	}
-
-	@Test
-	void givenValidParameters_whenCreateNotification_thenAllFieldsAreSet() {
-
-		UUID senderId = UUID.randomUUID();
+	void createsNotificationSuccessfully() {
 		String content = "Your book is overdue";
+		UUID senderId = UUID.randomUUID();
 		NotificationType type = NotificationType.OVERDUE;
 
 		Notification notification = new Notification(content, senderId, type);
 
-		assertNotNull(notification);
 		assertEquals(content, notification.getNotificationContent());
 		assertEquals(senderId, notification.getSenderID());
 		assertEquals(type, notification.getType());
@@ -58,100 +30,65 @@ public class NotificationTest {
 	}
 
 	@Test
-	void givenOverdueType_whenCreateNotification_thenTypeIsOverdue() {
+	void setsTimestampWithinReasonableTimeframe() {
+		Instant before = Instant.now();
 
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.OVERDUE;
+		Notification notification = new Notification(VALID_CONTENT, VALID_SENDER_ID, NotificationType.OVERDUE);
 
-		Notification notification = new Notification("Your book is overdue", senderId, type);
+		Instant after = Instant.now();
+		assertFalse(notification.getTimestamp().isBefore(before));
+		assertFalse(notification.getTimestamp().isAfter(after));
+	}
+
+	@Test
+	void createsNotificationWithOverdueType() {
+		Notification notification = new Notification(VALID_CONTENT, VALID_SENDER_ID, NotificationType.OVERDUE);
 
 		assertEquals(NotificationType.OVERDUE, notification.getType());
 	}
 
 	@Test
-	void givenDueSoonType_whenCreateNotification_thenTypeIsDueSoon() {
-
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.DUE_SOON;
-
-		Notification notification = new Notification("Your book is due soon", senderId, type);
+	void createsNotificationWithDueSoonType() {
+		Notification notification = new Notification(VALID_CONTENT, VALID_SENDER_ID, NotificationType.DUE_SOON);
 
 		assertEquals(NotificationType.DUE_SOON, notification.getType());
 	}
 
 	@Test
-	void givenLoanApprovedType_whenCreateNotification_thenTypeIsLoanApproved() {
-
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.LOAN_APPROVED;
-
-		Notification notification = new Notification("Your loan request has been approved", senderId, type);
+	void createsNotificationWithLoanApprovedType() {
+		Notification notification = new Notification(VALID_CONTENT, VALID_SENDER_ID, NotificationType.LOAN_APPROVED);
 
 		assertEquals(NotificationType.LOAN_APPROVED, notification.getType());
 	}
 
 	@Test
-	void givenLoanRejectedType_whenCreateNotification_thenTypeIsLoanRejected() {
-
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.LOAN_REJECTED;
-
-		Notification notification = new Notification("Your loan request has been rejected", senderId, type);
+	void createsNotificationWithLoanRejectedType() {
+		Notification notification = new Notification(VALID_CONTENT, VALID_SENDER_ID, NotificationType.LOAN_REJECTED);
 
 		assertEquals(NotificationType.LOAN_REJECTED, notification.getType());
 	}
 
 	@Test
-	void givenNotification_whenSetNotificationContent_thenContentIsUpdated() {
-
-		UUID senderId = UUID.randomUUID();
-		String originalContent = "Original message";
-		NotificationType type = NotificationType.OVERDUE;
-
-		Notification notification = new Notification(originalContent, senderId, type);
-		assertEquals(originalContent, notification.getNotificationContent());
-
-		String newContent = "Updated message";
-		notification.setNotificationContent(newContent);
-
-		assertEquals(newContent, notification.getNotificationContent());
-	}
-
-	
-	@Test
-	void givenNotification_whenCreated_thenTimestampIsRecent() {
-
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.OVERDUE;
-
-		Instant before = Instant.now();
-		Notification notification = new Notification("Test notification", senderId, type);
-		Instant after = Instant.now();
-
-		assertTrue(notification.getTimestamp().isAfter(before) || notification.getTimestamp().equals(before));
-		assertTrue(notification.getTimestamp().isBefore(after) || notification.getTimestamp().equals(after));
+	void throwsExceptionWhenContentIsNull() {
+		assertThrows(IllegalArgumentException.class, 
+			() -> new Notification(null, VALID_SENDER_ID, NotificationType.OVERDUE));
 	}
 
 	@Test
-	void givenNullContent_whenCreateNotification_thenThrowsIllegalArgumentException() {
-
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.OVERDUE;
-
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Notification(null, senderId, type);
-		});
+	void throwsExceptionWhenContentIsEmpty() {
+		assertThrows(IllegalArgumentException.class, 
+			() -> new Notification("", VALID_SENDER_ID, NotificationType.OVERDUE));
 	}
 
 	@Test
-	void givenEmptyContent_whenCreateNotification_thenThrowsIllegalArgumentException() {
+	void throwsExceptionWhenSenderIdIsNull() {
+		assertThrows(IllegalArgumentException.class, 
+			() -> new Notification(VALID_CONTENT, null, NotificationType.OVERDUE));
+	}
 
-		UUID senderId = UUID.randomUUID();
-		NotificationType type = NotificationType.OVERDUE;
-
-		assertThrows(IllegalArgumentException.class, () -> {
-			new Notification("", senderId, type);
-		});
+	@Test
+	void throwsExceptionWhenTypeIsNull() {
+		assertThrows(IllegalArgumentException.class, 
+			() -> new Notification(VALID_CONTENT, VALID_SENDER_ID, null));
 	}
 }
-

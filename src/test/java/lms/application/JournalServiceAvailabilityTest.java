@@ -2,6 +2,7 @@ package lms.application;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -34,51 +35,57 @@ class JournalServiceAvailabilityTest {
 	}
 
 	@Test
-	void shouldReturnTrueWhenAvailable() {
-		UUID id = UUID.randomUUID();
-		Journal journal = org.mockito.Mockito.mock(Journal.class);
+	void returnsTrueWhenJournalIsAvailable() {
+		UUID journalId = UUID.randomUUID();
+		Journal journal = mock(Journal.class);
+		when(journal.isBorrowed()).thenReturn(false);
+		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 
-		when(journal.isAvailable()).thenReturn(true);
-		when(journalRepo.getJournalById(id)).thenReturn(Optional.of(journal));
+		boolean result = journalService.isAvailableJournal(journalId);
 
-		assertTrue(journalService.isAvailableJournal(id));
+		assertTrue(result);
 	}
 
 	@Test
-	void shouldReturnFalseWhenBorrowed() {
-		UUID id = UUID.randomUUID();
-		Journal journal = org.mockito.Mockito.mock(Journal.class);
+	void returnsFalseWhenJournalIsBorrowed() {
+		UUID journalId = UUID.randomUUID();
+		Journal journal = mock(Journal.class);
+		when(journal.isBorrowed()).thenReturn(true);
+		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 
-		when(journal.isAvailable()).thenReturn(false);
-		when(journalRepo.getJournalById(id)).thenReturn(Optional.of(journal));
+		boolean result = journalService.isAvailableJournal(journalId);
 
-		assertFalse(journalService.isAvailableJournal(id));
+		assertFalse(result);
 	}
 
 	@Test
-	void shouldReturnFalseWhenMissing() {
-		UUID id = UUID.randomUUID();
+	void returnsFalseWhenJournalDoesNotExist() {
+		UUID journalId = UUID.randomUUID();
+		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.empty());
 
-		when(journalRepo.getJournalById(id)).thenReturn(Optional.empty());
+		boolean result = journalService.isAvailableJournal(journalId);
 
-		assertFalse(journalService.isAvailableJournal(id));
+		assertFalse(result);
 	}
 
 	@Test
-	void shouldValidateExistingJournal() {
-		UUID id = UUID.randomUUID();
+	void returnsTrueWhenJournalExists() {
+		UUID journalId = UUID.randomUUID();
+		Journal journal = mock(Journal.class);
+		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.of(journal));
 
-		when(journalRepo.getJournalById(id)).thenReturn(Optional.of(org.mockito.Mockito.mock(Journal.class)));
+		boolean result = journalService.isValidJournal(journalId);
 
-		assertTrue(journalService.isValidJournal(id));
+		assertTrue(result);
 	}
 
 	@Test
-	void shouldInvalidateMissingJournal() {
-		UUID id = UUID.randomUUID();
+	void returnsFalseWhenJournalDoesNotExistForValidation() {
+		UUID journalId = UUID.randomUUID();
+		when(journalRepo.getJournalById(journalId)).thenReturn(Optional.empty());
 
-		when(journalRepo.getJournalById(id)).thenReturn(Optional.empty());
+		boolean result = journalService.isValidJournal(journalId);
 
-		assertFalse(journalService.isValidJournal(id));
+		assertFalse(result);
 	}
 }

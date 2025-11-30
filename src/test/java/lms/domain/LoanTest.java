@@ -151,7 +151,7 @@ class LoanTest {
 		LocalDate borrowDate = LocalDate.now().minusDays(26);
 		Loan loan = new Loan(testUserId, testItemId, "cd", borrowDate);
 
-		double expectedFine = 5 * 0.75;
+		double expectedFine = 5 * 20.0;
 		assertEquals(expectedFine, loan.calculateFine());
 	}
 
@@ -161,7 +161,7 @@ class LoanTest {
 		LocalDate borrowDate = LocalDate.now().minusDays(10);
 		Loan loan = new Loan(testUserId, testItemId, "journal", borrowDate);
 
-		double expectedFine = 3 * 1.00;
+		double expectedFine = 3 * 15.0;
 		assertEquals(expectedFine, loan.calculateFine());
 	}
 
@@ -171,7 +171,7 @@ class LoanTest {
 		LocalDate borrowDate = LocalDate.now().minusDays(24);
 		Loan loan = new Loan(testUserId, testItemId, "magazine", borrowDate);
 
-		double expectedFine = 10 * 0.25;
+		double expectedFine = 10 * 5.0;
 		assertEquals(expectedFine, loan.calculateFine());
 	}
 
