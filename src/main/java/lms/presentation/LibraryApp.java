@@ -70,7 +70,7 @@ public class LibraryApp {
 		String pass2 = PasswordUtils.hashPassword("1");
 
 		userRepo.add(new User("Ahmad", "Salameh", "ahmad@example.com", "ahmad", pass1, Role.ADMIN));
-		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.ADMIN));
+		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.MEMBER));
 		// -------------------------------
 		// REAL Email Service (SMTP Gmail)
 		// -------------------------------
@@ -90,7 +90,7 @@ public class LibraryApp {
 		// -------------------------------
 		// CLI Layer
 		// -------------------------------
-		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService);
+		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService, notificationService, accountService);
 
 		cli.start();
 	}

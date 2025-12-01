@@ -2,11 +2,13 @@ package lms.presentation;
 
 import java.util.Scanner;
 
+import lms.application.AccountService;
 import lms.application.AuthService;
 import lms.application.BookService;
 import lms.application.CDService;
 import lms.application.JournalService;
 import lms.application.LoanService;
+import lms.application.NotificationService;
 import lms.application.UserDTO;
 import lms.application.UserService;
 import lms.domain.Role;
@@ -81,6 +83,8 @@ public class LibraryCLI implements CLI {
 	private final LoanService loanService;
 	private final CDService cdService;
 	private final JournalService journalService;
+	private final NotificationService notificationService;
+	private final AccountService accountService;
 
 	/**
 	 * Constructs a {@code LibraryCLI} with required services.
@@ -90,14 +94,15 @@ public class LibraryCLI implements CLI {
 	 * @param bookService the service for book-related operations
 	 * @param loanService 
 	 */
-	public LibraryCLI(AuthService authService, UserService userService, BookService bookService, LoanService loanService, CDService cdService, JournalService journalService) {
+	public LibraryCLI(AuthService authService, UserService userService, BookService bookService, LoanService loanService, CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService) {
 		this.authService = authService;
 		this.bookService = bookService;
 		this.userService = userService;
 		this.loanService = loanService;
 		this.cdService = cdService;
 		this.journalService = journalService;
-		 
+		this.notificationService = notificationService;
+		this.accountService = accountService;
 	}
 
 	/**
@@ -158,7 +163,7 @@ public class LibraryCLI implements CLI {
 			if (authService.login(username, password)) {
 				UserDTO current = AuthService.getCurrentUser();
 				System.out.println("Login successful! Welcome, " + current.username());
-				CLIFactory.getCLI(this.authService, this.userService, this.bookService, this.loanService, this.cdService, this.journalService).start();
+				CLIFactory.getCLI(this.authService, this.userService, this.bookService, this.loanService, this.cdService, this.journalService, this.notificationService, this.accountService).start();
 			}
 		} catch (UserNotFoundException | InvalidPasswordException | IllegalAccessException e) {
 			System.out.println("Login failed: " + e.getMessage());

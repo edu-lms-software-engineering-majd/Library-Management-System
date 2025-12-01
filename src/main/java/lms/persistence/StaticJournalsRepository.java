@@ -24,6 +24,20 @@ public class StaticJournalsRepository implements JournalsRepository {
 	public static StaticJournalsRepository getInstance() {
 		return INSTANCE;
 	}
+	
+	static {
+		Journal journal1 = new Journal("Nature", "Springer Nature", 5);
+		Journal journal2 = new Journal("Science", "American Association for the Advancement of Science", 4);
+		Journal journal3 = new Journal("The Lancet", "Elsevier", 3);
+		Journal journal4 = new Journal("Cell", "Cell Press", 2);
+		Journal journal5 = new Journal("The New England Journal of Medicine", "Massachusetts Medical Society", 2);
+		
+		journals.put(journal1.getId(), journal1);
+		journals.put(journal2.getId(), journal2);
+		journals.put(journal3.getId(), journal3);
+		journals.put(journal4.getId(), journal4);
+		journals.put(journal5.getId(), journal5);
+	}
 
 	// ============================================
 	// Validation

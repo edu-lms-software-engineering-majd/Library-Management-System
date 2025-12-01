@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lms.domain.Role;
 import lms.domain.User;
 import lms.domain.UserRepository;
+import lms.domain.utils.PasswordUtils;
 
 public class StaticUserRepository implements UserRepository {
 
@@ -21,6 +23,16 @@ public class StaticUserRepository implements UserRepository {
 
 	public static StaticUserRepository getInstance() {
 		return INSTANCE;
+	}
+	
+	static {
+		users.add(new User("Admin", "System", "admin@test.com", "admin", PasswordUtils.hashPassword("admi123"),
+				Role.ADMIN));
+
+		users.add(new User("John", "Doe", "user@test.com", "user", PasswordUtils.hashPassword("user123"),
+				Role.LIBRARIAN));
+		users.add(new User("Majd", "Awwad", "majdawwad@gmail.com", "majd04", PasswordUtils.hashPassword("majd123"),
+				Role.ADMIN));
 	}
 
 	// ======================================

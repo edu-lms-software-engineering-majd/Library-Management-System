@@ -5,7 +5,8 @@ public enum NotificationType {
 	OVERDUE,
 	DUE_SOON,
 	LOAN_APPROVED,
-	LOAN_REJECTED
+	LOAN_REJECTED,
+	GENERAL
 }
 
 

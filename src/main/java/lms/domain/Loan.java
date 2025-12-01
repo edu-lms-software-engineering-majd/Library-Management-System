@@ -128,7 +128,7 @@ public class Loan {
 	}
 
 	/** @return the unique loan identifier */
-	public UUID getLoanId() {
+	public UUID getId() {
 		return loanId;
 	}
 

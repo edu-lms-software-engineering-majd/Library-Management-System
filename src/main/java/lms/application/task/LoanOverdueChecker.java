@@ -37,7 +37,7 @@ public class LoanOverdueChecker implements Runnable {
             try {
                 User user = userRepository.getByID(loan.getUserId()).orElse(null);
                 if (user == null) {
-                    System.err.println("User not found for loan ID: " + loan.getLoanId());
+                    System.err.println("User not found for loan ID: " + loan.getId());
                     continue;
                 }
 
@@ -53,10 +53,10 @@ public class LoanOverdueChecker implements Runnable {
                 loan.setNotified(true);
                 loanRepository.save(loan);
 
-                System.out.println("Sent overdue notification for loan ID: " + loan.getLoanId());
+                System.out.println("Sent overdue notification for loan ID: " + loan.getId());
 
             } catch (Exception e) {
-                System.err.println("Failed to send notification for loan ID: " + loan.getLoanId());
+                System.err.println("Failed to send notification for loan ID: " + loan.getId());
                 e.printStackTrace();
             }
         }

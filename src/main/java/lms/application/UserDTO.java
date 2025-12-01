@@ -34,5 +34,5 @@ import lms.domain.Role;
  * @author Majd Awwad
  * @version 1.0
  */
-public record UserDTO(UUID userID, String username, String firstName, String lastName, Role role) {
+public record UserDTO(UUID userID, String username, String firstName, String lastName, String email, Role role) {
 }

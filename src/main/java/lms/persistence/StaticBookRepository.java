@@ -47,6 +47,16 @@ public final class StaticBookRepository implements BookRepository {
     public static StaticBookRepository getInstance() {
         return INSTANCE;
     }
+    
+    static {
+		books.add(new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
+				"Software Engineering", 5, "English", "Shelf A1"));
+		books.add(new Book("Effective Java", "Joshua Bloch", "9780134685991", "Addison-Wesley", 2018, "Programming", 3,
+				"English", "Shelf B2"));
+		books.add(new Book("Design Patterns: Elements of Reusable Object-Oriented Software",
+				"Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides", "9780201633610", "Addison-Wesley", 1994,
+				"Software Design", 2, "English", "Shelf C3"));
+	}
 
     // ============================================================
     // Validation

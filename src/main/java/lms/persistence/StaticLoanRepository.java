@@ -59,17 +59,17 @@ public class StaticLoanRepository implements LoanRepository {
 
 	@Override
 	public boolean save(Loan loan) throws LoanAlreadyExistsException {
-		if (loans.containsKey(loan.getLoanId()))
+		if (loans.containsKey(loan.getId()))
 			throw new LoanAlreadyExistsException();
 
-		loans.put(loan.getLoanId(), loan);
+		loans.put(loan.getId(), loan);
 		return true;
 	}
 
 	@Override
 	public boolean update(Loan loan) throws LoanNotFoundException {
-		validateLoanExists(loan.getLoanId());
-		loans.put(loan.getLoanId(), loan);
+		validateLoanExists(loan.getId());
+		loans.put(loan.getId(), loan);
 		return true;
 	}
 
