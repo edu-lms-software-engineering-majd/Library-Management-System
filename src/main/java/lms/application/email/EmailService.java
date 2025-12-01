@@ -2,6 +2,7 @@ package lms.application.email;
 
 import java.util.Properties;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -20,12 +21,21 @@ import jakarta.mail.internet.MimeMessage;
  */
 public class EmailService {
 
+    private static EmailService instance;
     private final String username;
     private final String appPassword;
 
-    public EmailService(String username, String appPassword) {
-        this.username = username;
-        this.appPassword = appPassword;
+    private EmailService() {
+        Dotenv dotenv = Dotenv.load();
+        this.username = dotenv.get("GMAIL_USERNAME");
+        this.appPassword = dotenv.get("GMAIL_APP_PASSWORD");
+    }
+
+    public static synchronized EmailService getInstance() {
+        if (instance == null) {
+            instance = new EmailService();
+        }
+        return instance;
     }
 
     public void sendEmail(String to, String subject, String body) {

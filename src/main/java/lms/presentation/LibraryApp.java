@@ -1,5 +1,9 @@
 package lms.presentation;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import lms.application.AccountService;
 import lms.application.AuthService;
 import lms.application.BookService;
@@ -9,6 +13,7 @@ import lms.application.LoanService;
 import lms.application.NotificationService;
 import lms.application.UserService;
 import lms.application.email.EmailService;
+import lms.application.task.LoanOverdueChecker;
 import lms.domain.BookRepository;
 import lms.domain.CDRepository;
 import lms.domain.JournalsRepository;
@@ -34,7 +39,11 @@ import lms.persistence.StaticUserRepository;
  */
 public class LibraryApp {
 
+	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
 	public static void main(String[] args) {
+		// Schedule the overdue loan checker to run every 24 hours
+		scheduler.scheduleAtFixedRate(new LoanOverdueChecker(), 1, 24 * 60, TimeUnit.MINUTES);
 
 		// -------------------------------
 		// Repositories (Singleton Static)
@@ -58,14 +67,14 @@ public class LibraryApp {
 		JournalService journalService = new JournalService(journalsRepo, userRepo);
 		AccountService accountService = new AccountService(userRepo);
 		String pass1 = PasswordUtils.hashPassword("12345678");
-		String pass2 = PasswordUtils.hashPassword("11111111");
+		String pass2 = PasswordUtils.hashPassword("1");
 
 		userRepo.add(new User("Ahmad", "Salameh", "ahmad@example.com", "ahmad", pass1, Role.ADMIN));
-		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.MEMBER));
+		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.ADMIN));
 		// -------------------------------
 		// REAL Email Service (SMTP Gmail)
 		// -------------------------------
-		EmailService emailService = new EmailService("hmeedsalameh2004@gmail.com", "YOUR_16_CHAR_APP_PASSWORD");
+		EmailService emailService = EmailService.getInstance();
 
 		// -------------------------------
 		// Notification Service (Now REAL)

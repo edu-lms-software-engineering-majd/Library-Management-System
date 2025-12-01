@@ -30,6 +30,7 @@ public class Loan {
 	private LocalDate dueDate;
 	private LocalDate returnDate;
 	private boolean fineApplied;
+	private boolean notified;
 
 	/**
 	 * Creates a new loan with validation.
@@ -52,6 +53,7 @@ public class Loan {
 		this.dueDate = calculateDueDate(itemType, borrowDate);
 		this.returnDate = null;
 		this.fineApplied = false;
+		this.notified = false;
 	}
 
 	/**
@@ -215,4 +217,11 @@ public class Loan {
 		this.returnDate = returnDate;
 	}
 
+	public boolean isNotified() {
+		return notified;
+	}
+
+	public void setNotified(boolean notified) {
+		this.notified = notified;
+	}
 }

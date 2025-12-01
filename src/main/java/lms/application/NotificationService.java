@@ -38,6 +38,13 @@ public class NotificationService {
 	private final EmailService emailService;
 
 	/**
+	 * Constructs a NotificationService using the singleton EmailService instance.
+	 */
+	public NotificationService() {
+		this.emailService = EmailService.getInstance();
+	}
+
+	/**
 	 * Constructs a NotificationService.
 	 *
 	 * @param emailService the email sending service (mandatory)
@@ -128,6 +135,17 @@ public class NotificationService {
 
 		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.LOAN_APPROVED);
 
+		notify(user, notification);
+	}
+
+	/**
+	 * Creates and sends a generic notification.
+	 *
+	 * @param user    the user to notify
+	 * @param message the message content
+	 */
+	public void createNotification(User user, String message) {
+		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.GENERAL);
 		notify(user, notification);
 	}
 }
