@@ -16,3 +16,6 @@ Thumbs.db
 
 #doc
 doc/
+
+#.env files
+.env

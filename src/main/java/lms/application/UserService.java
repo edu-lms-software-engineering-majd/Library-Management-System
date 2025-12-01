@@ -71,6 +71,11 @@ public class UserService {
 		return userOptional.get().toDTO();
 	}
 
+	public User getDomainUserByUsername(String username) throws UserNotFoundException {
+		return userRepo.getByUserName(username)
+				.orElseThrow(() -> new UserNotFoundException("No such user with this username"));
+	}
+
 	public boolean updateUser(UserDTO currentUser, UUID userID, String newUsername, String newEmail, String newPassword,
 			Role newRole) throws IllegalAccessException, UserNotFoundException {
 

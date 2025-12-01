@@ -126,7 +126,7 @@ public class User {
 	 * @return a UserDTO containing essential user information
 	 */
 	public UserDTO toDTO() {
-		return new UserDTO(this.userID, this.username, this.firstName, this.lastName, this.role);
+		return new UserDTO(this.userID, this.username, this.firstName, this.lastName, this.email, this.role);
 	}
 
 	/**
@@ -396,6 +396,10 @@ public class User {
 	 */
 	public boolean hasUnreadNotifications() {
 		return !unreadNotifications.isEmpty();
+	}
+
+	public List<Notification> getNotifications() {
+		return Collections.unmodifiableList(unreadNotifications);
 	}
 
 

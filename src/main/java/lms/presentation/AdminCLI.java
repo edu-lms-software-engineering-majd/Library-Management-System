@@ -1127,7 +1127,7 @@ private void handleViewLoanStats() {
 	    
 	    for (var loan : overdueLoans) {
 	        System.out.printf("%-10s %-15s %-15s %-12s %-8d %-10.2f\n",
-	            loan.getLoanId().toString().substring(0, 8),
+	            loan.getId().toString().substring(0, 8),
 	            loan.getUserId().toString().substring(0, 8),
 	            loan.getItemId().toString().substring(0, 8),
 	            loan.getDueDate(),

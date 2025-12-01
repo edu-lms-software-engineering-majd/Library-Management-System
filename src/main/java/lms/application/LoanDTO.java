@@ -29,7 +29,7 @@ public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDat
 	 * @return a new LoanDTO containing the mapped loan data
 	 */
 	public static LoanDTO fromLoan(Loan loan) {
-		return new LoanDTO(loan.getLoanId(), loan.getUserId(), loan.getItemId(), loan.getBorrowDate(),
+		return new LoanDTO(loan.getId(), loan.getUserId(), loan.getItemId(), loan.getBorrowDate(),
 				loan.getDueDate(), loan.getReturnDate(), loan.getReturnDate() != null, loan.isFineApplied(),
 				loan.isOverdue(), loan.getDaysOverdue(), loan.calculateFine());
 	}
