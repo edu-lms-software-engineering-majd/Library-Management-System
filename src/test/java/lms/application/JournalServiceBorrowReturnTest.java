@@ -32,7 +32,9 @@ class JournalServiceBorrowReturnTest {
 	@BeforeEach
 	void setUp() {
 		journalService = new JournalService(journalRepo, userRepo);
-		adminUser = new UserDTO(UUID.randomUUID(), "admin", "Admin", "User", lms.domain.Role.ADMIN);
+
+		adminUser = new UserDTO(UUID.randomUUID(), "admin", "Admin", "User", "admin@example.com",
+				lms.domain.Role.ADMIN);
 	}
 
 	@Test

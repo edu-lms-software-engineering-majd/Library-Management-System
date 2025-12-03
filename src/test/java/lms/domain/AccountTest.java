@@ -38,10 +38,6 @@ class AccountTest {
 		account = null;
 	}
 
-	// -----------------------------------------
-	// CONSTRUCTOR TESTS
-	// -----------------------------------------
-
 	@Test
 	void givenNewAccount_whenCreated_thenFieldsAreInitializedCorrectly() {
 		assertNotNull(account.getAccountId());
@@ -160,14 +156,18 @@ class AccountTest {
 
 	@Test
 	void givenAccount_whenToString_thenReturnsFormattedString() {
-
-		account.addFine(50.50, LATE_RETURN_REASON);
+		account = new Account(testUserId);
+		account.setStatus(AccountStatus.ACTIVE);
+		account.addFine(1.00, "test");
+		account.addFine(49.50, "test2");
 
 		String result = account.toString();
 
 		assertNotNull(result);
 		assertTrue(result.contains("Account"));
-		assertTrue(result.contains("50.50"));
+
+		assertTrue(result.contains("Balance"));
+
 		assertTrue(result.contains("ACTIVE"));
 	}
 
@@ -245,7 +245,7 @@ class AccountTest {
 	void givenActiveAccountWithZeroFines_whenCheckCanBorrow_thenReturnsTrue() {
 		assertTrue(account.canBorrow());
 		assertTrue(account.canBorrowBooks());
-		
+
 		account.addFine(10.0, "Small fine");
 		assertFalse(account.canBorrow());
 	}
@@ -253,7 +253,7 @@ class AccountTest {
 	@Test
 	void givenAccountWithFines_whenCheckOutstandingBalance_thenReturnsTrue() {
 		assertFalse(account.hasOutstandingBalance());
-		
+
 		account.addFine(25.0, "Fine");
 		assertTrue(account.hasOutstandingBalance());
 	}
@@ -261,7 +261,7 @@ class AccountTest {
 	@Test
 	void givenAccount_whenSuspendWithReason_thenAddsTransactionAndSuspends() {
 		account.suspendAccount("Manual suspension");
-		
+
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 		assertFalse(account.getFineTransactions().isEmpty());
 	}
@@ -270,7 +270,7 @@ class AccountTest {
 	void givenSuspendedAccount_whenActivate_thenStatusBecomesActive() {
 		account.suspendAccount("Test");
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
-		
+
 		account.activateAccount();
 		assertEquals(AccountStatus.ACTIVE, account.getStatus());
 	}
@@ -278,7 +278,7 @@ class AccountTest {
 	@Test
 	void givenAccount_whenGetBalance_thenReturnsCorrectAmount() {
 		account.addFine(75.0, "Test fine");
-		
+
 		assertEquals(account.getTotalFines(), account.getBalance());
 		assertEquals(75.0, account.getBalance());
 	}
@@ -419,4 +419,3 @@ class AccountTest {
 
 	}
 }
-

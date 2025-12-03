@@ -20,7 +20,7 @@ package lms.domain.strategy;
  */
 public class JournalFineStrategy implements FineStrategy {
 
-    private static final double JOURNAL_FINE_RATE = 15.0;
+    private static final double JOURNAL_FINE_RATE = 1.0;
 
     @Override
     public double calculateFine(long daysOverdue) {

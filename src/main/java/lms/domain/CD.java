@@ -41,14 +41,15 @@ public class CD implements LoanableItem {
 	}
 
 	/**
-	 * Creates a new {@code CD} with the required fields and specified number of copies.
-	 * The {@code id} is automatically generated and {@code availableCopies} is 
-	 * initialized to {@code totalCopies}.
+	 * Creates a new {@code CD} with the required fields and specified number of
+	 * copies. The {@code id} is automatically generated and {@code availableCopies}
+	 * is initialized to {@code totalCopies}.
 	 *
-	 * @param title  the title of the CD
-	 * @param artist the artist of the CD
+	 * @param title       the title of the CD
+	 * @param artist      the artist of the CD
 	 * @param totalCopies the total number of copies owned by the library
-	 * @throws IllegalArgumentException if title or artist is null or blank, or if totalCopies is less than 1
+	 * @throws IllegalArgumentException if title or artist is null or blank, or if
+	 *                                  totalCopies is less than 1
 	 */
 	public CD(String title, String artist, int totalCopies) {
 		// Fail Fast: Validate all fields before object creation
@@ -117,7 +118,8 @@ public class CD implements LoanableItem {
 		return availableCopies;
 	}
 
-	// NOTE: Available copies managed through domain methods (decrementAvailableCopies/incrementAvailableCopies)
+	// NOTE: Available copies managed through domain methods
+	// (decrementAvailableCopies/incrementAvailableCopies)
 
 	/**
 	 * Checks if any copy is currently borrowed.
@@ -151,7 +153,6 @@ public class CD implements LoanableItem {
 		availableCopies--;
 	}
 
-	
 	/**
 	 * Marks the CD as returned by incrementing available copies.
 	 * 
@@ -167,17 +168,13 @@ public class CD implements LoanableItem {
 
 	@Override
 	public String toString() {
-		return String.format("%s by %s (%d/%d)", title, artist, availableCopies, totalCopies);
+		return String.format(java.util.Locale.US, "%s by %s (%d/%d)", title, artist, availableCopies, totalCopies);
 	}
-	
-	
-	
+
 	public void setAvailableCopies(int availableCopies) {
-	    if (availableCopies < 0 || availableCopies > this.totalCopies)
-	        throw new IllegalArgumentException("Invalid available copies");
-	    this.availableCopies = availableCopies;
+		if (availableCopies < 0 || availableCopies > this.totalCopies)
+			throw new IllegalArgumentException("Invalid available copies");
+		this.availableCopies = availableCopies;
 	}
-	
-	
 
 }
