@@ -47,7 +47,7 @@ class SearchByIdStrategyTest {
 
 	@Test
 	void shouldReturnMultipleMatchesWhenIdsStartWithSamePrefix() {
-		// Create a fake book with the same prefix
+	 
 		String prefix = book1.getId().toString().substring(0, 3);
 
 		Book fakeBook = new Book("Fake", "X", "999", "Y", 2000, "Test", 1, "EN", "Z") {
@@ -68,7 +68,7 @@ class SearchByIdStrategyTest {
 	void shouldHandleEmptySearchTerm() {
 		List<Book> result = strategy.execute(books, "");
 
-		// Empty string matches ALL IDs
+		 
 		assertEquals(books.size(), result.size());
 	}
 

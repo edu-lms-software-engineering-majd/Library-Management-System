@@ -28,9 +28,7 @@ public class StaticLoanRepository implements LoanRepository {
 
 	private static final Map<UUID, Loan> loans = new HashMap<>();
 
-	// ===============================
-	// Helpers
-	// ===============================
+	 
 	private void validateLoanExists(UUID loanId) throws LoanNotFoundException {
 		if (!loans.containsKey(loanId))
 			throw new LoanNotFoundException("Loan not found: " + loanId);
@@ -48,9 +46,7 @@ public class StaticLoanRepository implements LoanRepository {
 			throw new ItemNotFoundException("Item has no loans: " + itemId);
 	}
 
-	// ===============================
-	// CRUD
-	// ===============================
+	 
 
 	@Override
 	public Optional<Loan> findById(UUID loanId) {
@@ -85,9 +81,7 @@ public class StaticLoanRepository implements LoanRepository {
 		return new ArrayList<>(loans.values());
 	}
 
-	// ===============================
-	// User-based queries
-	// ===============================
+	 
 
 	@Override
 	public List<Loan> findByUserId(UUID userId) throws UserNotFoundException {
@@ -121,9 +115,7 @@ public class StaticLoanRepository implements LoanRepository {
 		return findActiveLoansByUser(userId).size();
 	}
 
-	// ===============================
-	// Item-based queries
-	// ===============================
+	 
 
 	@Override
 	public List<Loan> findByItemId(UUID itemId) throws ItemNotFoundException {
@@ -148,9 +140,7 @@ public class StaticLoanRepository implements LoanRepository {
 		return found;
 	}
 
-	// ===============================
-	// General filters
-	// ===============================
+	 
 
 	@Override
 	public List<Loan> findOverdueLoans() {
@@ -199,9 +189,7 @@ public class StaticLoanRepository implements LoanRepository {
 				.toList();
 	}
 
-	// ===============================
-	// Stats
-	// ===============================
+	 
 
 	@Override
 	public long countTotalLoans() {

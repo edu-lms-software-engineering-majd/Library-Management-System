@@ -8,7 +8,7 @@ class BookFineStrategyTest {
 	@Test
 	void givenPositiveDays_whenCalculateFine_thenCorrectResult() {
 		BookFineStrategy strategy = new BookFineStrategy();
-		assertEquals(1.5, strategy.calculateFine(3)); // 3 * 0.50
+		assertEquals(1.5, strategy.calculateFine(3)); 
 	}
 
 	@Test

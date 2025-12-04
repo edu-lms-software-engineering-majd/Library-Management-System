@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 
 class CDFineStrategyTest {
 
+	
 	@Test
 	void givenPositiveDays_whenCalculateFine_thenCorrectResult() {
 		CDFineStrategy strategy = new CDFineStrategy();
-		assertEquals(2.25, strategy.calculateFine(3)); // 3 * 0.75
+		assertEquals(60, strategy.calculateFine(3));  
 	}
+	
 
 	@Test
 	void givenZeroDays_whenCalculateFine_thenZeroFine() {

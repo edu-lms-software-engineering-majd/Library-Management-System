@@ -19,7 +19,7 @@ package lms.domain.strategy;
  * <h3>Example:</h3>
  * <pre>{@code
  * FineStrategy strategy = FineStrategyFactory.getStrategy("book");
- * double fine = strategy.calculateFine(3); // returns 30.0
+ * double fine = strategy.calculateFine(3); 
  * }</pre>
  *
  * @author Ahmad Salameh

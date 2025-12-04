@@ -78,7 +78,7 @@ public class UserCLI implements CLI {
         System.out.println("╚═══════════════════════════════════════════════════╝");
         System.out.println("    Welcome, " + currentUser.firstName() + " " + currentUser.lastName() + "!");
         
-        // Show unread notifications count
+        
         try {
             User user = userService.getDomainUserByUsername(currentUser.username());
             int unreadCount = user.getUnreadNotificationCount();
@@ -86,7 +86,7 @@ public class UserCLI implements CLI {
                 System.out.println("    📬 You have " + unreadCount + " unread notification(s)!");
             }
         } catch (Exception e) {
-            // Silently ignore
+           
         }
 
         boolean running = true;
@@ -96,9 +96,9 @@ public class UserCLI implements CLI {
             
             boolean isLibrarian = currentUser.role() == lms.domain.Role.LIBRARIAN;
 
-            // Handle menu options based on role
+            
             if (isLibrarian) {
-                // Librarian menu: 1-9
+              
                 switch (choice) {
                     case "1":
                         handleBrowseAndSearchItems();
@@ -133,7 +133,7 @@ public class UserCLI implements CLI {
                         System.out.println("❌ Invalid choice, try again.");
                 }
             } else {
-                // Regular member menu: 1-8 (no return option)
+           
                 switch (choice) {
                     case "1":
                         handleBrowseAndSearchItems();
@@ -554,7 +554,7 @@ public class UserCLI implements CLI {
     private Book findBookBySearchTerm(List<Book> books, String searchTerm) {
         String lowerSearch = searchTerm.toLowerCase();
         
-        // Try exact match first
+      
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(searchTerm) || 
                 book.getAuthor().equalsIgnoreCase(searchTerm) ||
@@ -563,7 +563,7 @@ public class UserCLI implements CLI {
             }
         }
         
-        // Try partial match
+       
         List<Book> matches = books.stream()
                 .filter(b -> b.getTitle().toLowerCase().contains(lowerSearch) ||
                            b.getAuthor().toLowerCase().contains(lowerSearch) ||
@@ -578,7 +578,7 @@ public class UserCLI implements CLI {
             return matches.get(0);
         }
         
-        // Multiple matches - let user choose
+         
         System.out.println("\n🔍 Multiple matches found:");
         displayBookResultsWithNumbers(matches);
         System.out.print("Enter the number of the book you want (1-" + matches.size() + "): ");
@@ -598,7 +598,7 @@ public class UserCLI implements CLI {
     private CD findCDBySearchTerm(List<CD> cds, String searchTerm) {
         String lowerSearch = searchTerm.toLowerCase();
         
-        // Try exact match first
+        
         for (CD cd : cds) {
             if (cd.getTitle().equalsIgnoreCase(searchTerm) || 
                 cd.getArtist().equalsIgnoreCase(searchTerm) ||
@@ -607,7 +607,7 @@ public class UserCLI implements CLI {
             }
         }
         
-        // Try partial match
+   
         List<CD> matches = cds.stream()
                 .filter(c -> c.getTitle().toLowerCase().contains(lowerSearch) ||
                            c.getArtist().toLowerCase().contains(lowerSearch) ||
@@ -622,7 +622,7 @@ public class UserCLI implements CLI {
             return matches.get(0);
         }
         
-        // Multiple matches - let user choose
+         
         System.out.println("\n🔍 Multiple matches found:");
         displayCDResultsWithNumbers(matches);
         System.out.print("Enter the number of the CD you want (1-" + matches.size() + "): ");
@@ -642,7 +642,7 @@ public class UserCLI implements CLI {
     private Journal findJournalBySearchTerm(List<Journal> journals, String searchTerm) {
         String lowerSearch = searchTerm.toLowerCase();
         
-        // Try exact match first
+        
         for (Journal journal : journals) {
             if (journal.getTitle().equalsIgnoreCase(searchTerm) || 
                 journal.getAuthor().equalsIgnoreCase(searchTerm) ||
@@ -651,7 +651,7 @@ public class UserCLI implements CLI {
             }
         }
         
-        // Try partial match
+        
         List<Journal> matches = journals.stream()
                 .filter(j -> j.getTitle().toLowerCase().contains(lowerSearch) ||
                            j.getAuthor().toLowerCase().contains(lowerSearch) ||
@@ -666,7 +666,7 @@ public class UserCLI implements CLI {
             return matches.get(0);
         }
         
-        // Multiple matches - let user choose
+        
         System.out.println("\n🔍 Multiple matches found:");
         displayJournalResultsWithNumbers(matches);
         System.out.print("Enter the number of the journal you want (1-" + matches.size() + "): ");
@@ -721,7 +721,7 @@ public class UserCLI implements CLI {
         }
         
         try {
-            // Search for users matching the search term
+          
             List<lms.application.UserDTO> allUsers = userService.getAllUsers();
             List<lms.application.UserDTO> matchingUsers = allUsers.stream()
                     .filter(u -> u.username().toLowerCase().contains(searchTerm.toLowerCase()) ||
@@ -739,7 +739,7 @@ public class UserCLI implements CLI {
             if (matchingUsers.size() == 1) {
                 selectedUser = matchingUsers.get(0);
             } else {
-                // Multiple matches - let user choose
+              
                 System.out.println("\n🔍 Multiple users found:");
                 System.out.println("═".repeat(80));
                 System.out.printf("%-4s %-20s %-25s %-20s%n", "#", "Username", "Name", "Role");
@@ -769,7 +769,7 @@ public class UserCLI implements CLI {
                 }
             }
             
-            // Process return for selected user
+         
             processReturnForUser(selectedUser);
             
         } catch (Exception e) {
@@ -779,7 +779,7 @@ public class UserCLI implements CLI {
 
     private void processReturnViewAllUsers() {
         try {
-            // Get all users with active loans
+         
             List<lms.application.UserDTO> allUsers = userService.getAllUsers();
             List<lms.application.UserDTO> usersWithLoans = new ArrayList<>();
             
@@ -878,7 +878,7 @@ public class UserCLI implements CLI {
                 
                 Loan selectedLoan = activeLoans.get(choice - 1);
                 
-                // Get item details for confirmation
+               
                 String itemDetails = getItemDetails(selectedLoan.getItemId(), selectedLoan.getItemType());
                 System.out.println("\n📤 Processing return of: " + itemDetails);
                 System.out.println("👤 For user: " + user.firstName() + " " + user.lastName());
@@ -901,7 +901,7 @@ public class UserCLI implements CLI {
                 loanService.returnItem(user.userID(), selectedLoan.getId());
                 System.out.println("\n✅ Item returned successfully!");
                 
-                // Show updated account info if there were fines
+               
                 if (selectedLoan.isOverdue()) {
                     User domainUser = userService.getDomainUserByUsername(user.username());
                     double currentBalance = domainUser.getAccount().getTotalFines();
@@ -957,8 +957,7 @@ public class UserCLI implements CLI {
             }
             
             System.out.println("📋 Total active loans: " + activeLoans.size());
-            
-            // Check for overdue items
+        
             long overdueCount = activeLoans.stream().filter(Loan::isOverdue).count();
             if (overdueCount > 0) {
                 System.out.println("⚠️  You have " + overdueCount + " overdue item(s)!");
@@ -1020,11 +1019,11 @@ public class UserCLI implements CLI {
             System.out.println("📅 Created: " + account.getCreatedAt());
             System.out.println("🔄 Last Updated: " + account.getUpdatedAt());
             
-            // Status with color indicator
+          
             String statusIcon = account.getStatus() == lms.domain.AccountStatus.ACTIVE ? "✅" : "❌";
             System.out.println(statusIcon + " Status: " + account.getStatus());
             
-            // Financial summary
+           
             System.out.println("\n💰 Financial Summary:");
             System.out.println("═".repeat(55));
             double totalFines = account.getTotalFines();
@@ -1040,7 +1039,7 @@ public class UserCLI implements CLI {
                 System.out.println("✅ No outstanding balance - Your account is clear!");
             }
             
-            // Borrowing status
+            
             System.out.println("\n📚 Borrowing Status:");
             System.out.println("═".repeat(55));
             if (user.canBorrow()) {
@@ -1081,7 +1080,7 @@ public class UserCLI implements CLI {
             System.out.println("📊 Total Transactions: " + transactions.size());
             System.out.println();
             
-            // Display transactions in a table
+            
             System.out.println("═".repeat(110));
             System.out.printf("%-4s %-12s %-15s %-15s %-50s%n", 
                 "#", "Date", "Type", "Amount", "Description");
@@ -1182,9 +1181,7 @@ public class UserCLI implements CLI {
                     System.out.println("❌ Invalid choice!");
                     return;
             }
-            
-            // Confirm payment
-            System.out.println("\n💳 Payment Summary:");
+               System.out.println("\n💳 Payment Summary:");
             System.out.println("   Amount to Pay: " + String.format("%.2f NIS", paymentAmount));
             System.out.println("   Remaining Balance: " + String.format("%.2f NIS", totalFines - paymentAmount));
             System.out.print("\nConfirm payment? (yes/no): ");
@@ -1196,7 +1193,7 @@ public class UserCLI implements CLI {
                 return;
             }
             
-            // Process payment
+           
             account.payFine(paymentAmount);
             userService.getDomainUserByUsername(currentUser.username()); // Refresh to persist
             
@@ -1229,8 +1226,7 @@ public class UserCLI implements CLI {
             User user = userService.getDomainUserByUsername(currentUser.username());
             lms.domain.Account account = user.getAccount();
             List<lms.domain.FineTransaction> transactions = account.getFineTransactions();
-            
-            // Calculate statistics
+             
             double totalFinesPaid = 0.0;
             double totalFinesIncurred = 0.0;
             int fineCount = 0;
@@ -1246,13 +1242,13 @@ public class UserCLI implements CLI {
                 }
             }
             
-            // Get loan statistics
+          
             List<Loan> allLoans = loanService.getUserAllLoans(currentUser.userID());
             List<Loan> activeLoans = loanService.getUserActiveLoans(currentUser.userID());
             long overdueLoans = activeLoans.stream().filter(Loan::isOverdue).count();
             int completedLoans = allLoans.size() - activeLoans.size();
             
-            // Display statistics
+            
             System.out.println("📊 Financial Statistics:");
             System.out.println("═".repeat(55));
             System.out.println("💸 Total Fines Incurred: " + String.format("%.2f NIS", totalFinesIncurred));
@@ -1279,7 +1275,7 @@ public class UserCLI implements CLI {
                 account.getCreatedAt(), java.time.LocalDate.now());
             System.out.println("📅 Member Since: " + account.getCreatedAt() + " (" + daysSinceCreation + " days)");
             
-            // Performance rating
+          
             System.out.println("\n⭐ Account Performance:");
             System.out.println("═".repeat(55));
             if (account.getTotalFines() == 0 && overdueLoans == 0) {
@@ -1422,7 +1418,7 @@ public class UserCLI implements CLI {
         }
     }
 
-    // Display methods with numbered lists for easy selection
+   
     
     private void displayBookResultsWithNumbers(List<Book> books) {
         System.out.println("═".repeat(100));
@@ -1501,7 +1497,7 @@ public class UserCLI implements CLI {
         System.out.println("═".repeat(110));
     }
 
-    // Helper methods
+    
     
     private String truncate(String text, int maxLength) {
         if (text == null) return "";

@@ -22,7 +22,7 @@ class SearchCDByArtistStrategyTest {
 
 		cd1 = new CD("Hits 2024", "Majd Awwad");
 		cd2 = new CD("Best of 90s", "Ahmad Salameh");
-		cd3 = new CD("Chill Mix", "Majd Awwad"); // نفس الفنان – لازم تطلعه
+		cd3 = new CD("Chill Mix", "Majd Awwad");    
 	}
 
 	@Test
@@ -31,7 +31,7 @@ class SearchCDByArtistStrategyTest {
 
 		List<CD> result = strategy.execute(cds, "majd");
 
-		// المفروض CD1 و CD3
+		 
 		assertEquals(2, result.size());
 		assertTrue(result.contains(cd1));
 		assertTrue(result.contains(cd3));

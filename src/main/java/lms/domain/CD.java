@@ -1,5 +1,6 @@
 package lms.domain;
 
+import java.util.Locale;
 import java.util.UUID;
 
 import lms.domain.utils.CDValidator;
@@ -52,7 +53,7 @@ public class CD implements LoanableItem {
 	 *                                  totalCopies is less than 1
 	 */
 	public CD(String title, String artist, int totalCopies) {
-		// Fail Fast: Validate all fields before object creation
+
 		CDValidator.getInstance().validate(title, artist, totalCopies);
 
 		this.id = UUID.randomUUID();
@@ -168,7 +169,7 @@ public class CD implements LoanableItem {
 
 	@Override
 	public String toString() {
-		return String.format(java.util.Locale.US, "%s by %s (%d/%d)", title, artist, availableCopies, totalCopies);
+		return String.format(Locale.US, "%s by %s (%d/%d)", title, artist, availableCopies, totalCopies);
 	}
 
 	public void setAvailableCopies(int availableCopies) {

@@ -36,7 +36,7 @@ class LoanQueryServiceTest {
 
 		loanRepo.findAll().forEach(l -> {
 			try {
-				loanRepo.delete(l.getId()); // FIXED HERE
+				loanRepo.delete(l.getId()); 
 			} catch (Exception ignored) {
 			}
 		});

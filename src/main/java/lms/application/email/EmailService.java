@@ -40,14 +40,14 @@ public class EmailService {
 
     public void sendEmail(String to, String subject, String body) {
 
-        // Gmail SMTP settings
+       
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
 
-        // Authentication using App Password
+        
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

@@ -14,6 +14,7 @@ class CDTest {
 		cd = new CD("Dark Side of the Moon", "Pink Floyd", 3);
 	}
 
+	
 	@Test
 	void shouldCreateCDWithValidData() {
 		assertNotNull(cd);

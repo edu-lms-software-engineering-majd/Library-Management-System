@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class FineStrategyFactoryTest {
 
+	
 	@Test
 	void givenBookType_whenGetStrategy_thenReturnsBookFineStrategy() {
 		FineStrategy strategy = FineStrategyFactory.getStrategy("book");
@@ -31,6 +32,6 @@ class FineStrategyFactoryTest {
 	void givenUnknownType_whenGetStrategy_thenUsesDefaultFine() {
 		FineStrategy strategy = FineStrategyFactory.getStrategy("unknownTypeXYZ");
 		double fine = strategy.calculateFine(4);
-		assertEquals(4 * 5.0, fine); // default = 5 NIS per day
+		assertEquals(4 * 5.0, fine);  
 	}
 }

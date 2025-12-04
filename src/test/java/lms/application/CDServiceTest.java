@@ -301,6 +301,7 @@ class CDServiceTest {
 	}
 
 	@Test
+
 	void shouldUseStrategySearch() {
 		var strategy = mock(lms.application.search.SearchStrategy.class);
 		CD cd = mock(CD.class);

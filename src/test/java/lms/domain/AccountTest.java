@@ -220,10 +220,7 @@ class AccountTest {
 		assertEquals(AccountStatus.SUSPENDED, account.getStatus());
 	}
 
-	// -----------------------------------------
-	// MISC TESTS
-	// -----------------------------------------
-
+	 
 	@Test
 	void givenMultipleAccounts_whenCreated_thenEachHasUniqueId() {
 		Account a1 = new Account(UUID.randomUUID());

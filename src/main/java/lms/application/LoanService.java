@@ -373,8 +373,7 @@ public class LoanService {
 			throw new IllegalStateException("Cannot extend a completed loan");
 		}
 
-		// In a real implementation, the dueDate would be updated.
-		// This is just a simulation for now.
+	 
 		System.out.println("✅ Loan extended for " + additionalDays + " additional days");
 		return true;
 	}
