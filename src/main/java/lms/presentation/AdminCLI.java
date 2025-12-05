@@ -11,6 +11,7 @@ import lms.application.JournalService;
 import lms.application.LoanQueryService;
 import lms.application.LoanService;
 import lms.application.LoanStatsService;
+import lms.application.ServiceContext;
 import lms.application.UserDTO;
 import lms.application.UserService;
 import lms.application.search.SearchCriteria;
@@ -24,11 +25,18 @@ import lms.domain.exception.PermissionDeniedException;
 import lms.domain.exception.UserNotFoundException;
 
 /**
- * Administrator CLI for Library Management System.
- * Provides clean interface for administrators to manage users, items, and system operations.
+ * Administrator command-line interface for the Library Management System.
+ * 
+ * This interface provides administrators with all the tools they need to manage
+ * the library, including adding/updating/deleting books, CDs, and journals,
+ * managing user accounts, handling loans, and viewing system reports.
+ * 
+ * The class has been refactored to use a ServiceContext object instead of
+ * receiving 8 individual service parameters. This makes the code cleaner
+ * and meets SonarQube's recommendation of keeping constructor parameters at 7 or fewer.
  * 
  * @author Majd Awwad
- * @version 3.0
+ * @version 3.1
  */
 public class AdminCLI implements CLI {
 
@@ -46,6 +54,35 @@ public class AdminCLI implements CLI {
     private final LoanStatsService loanStatsService;
     private final LoanQueryService loanQueryService;
 
+    /**
+     * Creates a new AdminCLI with access to all necessary services.
+     * 
+     * By using a ServiceContext object, we keep the constructor simple
+     * with just one parameter instead of passing 8 separate services.
+     * 
+     * @param context contains all the services needed for admin operations
+     */
+    public AdminCLI(ServiceContext context) {
+        this.userService = context.getUserService();
+        this.bookService = context.getBookService();
+        this.authService = context.getAuthService();
+        this.loanService = context.getLoanService();
+        this.cdService = context.getCdService();
+        this.journalService = context.getJournalService();
+        this.loanStatsService = context.getLoanStatsService();
+        this.loanQueryService = context.getLoanQueryService();
+    }
+
+    /**
+     * Old constructor kept for backward compatibility.
+     * 
+     * This constructor is deprecated because it violates SonarQube's guideline
+     * of having no more than 7 parameters. Please use the new ServiceContext-based
+     * constructor instead.
+     * 
+     * @deprecated Use {@link #AdminCLI(ServiceContext)} instead
+     */
+    @Deprecated
     public AdminCLI(UserService userService, BookService bookService, AuthService authService,
                     LoanService loanService, CDService cdService, JournalService journalService,
                     LoanStatsService loanStatsService, LoanQueryService loanQueryService) {

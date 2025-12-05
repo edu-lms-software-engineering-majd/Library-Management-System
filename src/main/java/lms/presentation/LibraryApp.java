@@ -60,7 +60,7 @@ public class LibraryApp {
 		UserService userService = new UserService(userRepo);
 		BookService bookService = new BookService(bookRepo);
 		CDService cdService = new CDService(cdRepo);
-		JournalService journalService = new JournalService(journalsRepo, userRepo);
+		JournalService journalService = new JournalService(journalsRepo);
 		AccountService accountService = new AccountService(userRepo);
 		String pass1 = PasswordUtils.hashPassword("12345678");
 		String pass2 = PasswordUtils.hashPassword("1");

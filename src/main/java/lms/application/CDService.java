@@ -34,6 +34,8 @@ import lms.domain.exception.PermissionDeniedException;
  */
 public class CDService {
 
+	private static final String CD_NOT_FOUND_MSG = "CD not found with ID: ";
+	
 	private final CDRepository cdRepo;
 
 	/**
@@ -91,7 +93,7 @@ public class CDService {
 
 	/** Retrieves a CD by ID or throws an error. */
 	public CD getCDById(UUID cdId) {
-		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class CDService {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
-		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 
 		if (newTitle != null)
 			cd.setTitle(newTitle);
@@ -149,7 +151,7 @@ public class CDService {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
-		cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 
 		return cdRepo.deleteCD(cdId);
 	}
@@ -185,7 +187,7 @@ public class CDService {
 	 */
 	public void borrowCD(UserDTO userDTO, UUID cdId) {
 
-		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 
 		if (!cd.isAvailable())
 			throw new IllegalStateException("No available copies to borrow: " + cd.getTitle());
@@ -201,7 +203,7 @@ public class CDService {
 	 */
 	public void returnCD(UserDTO userDTO, UUID cdId) {
 
-		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException("CD not found with ID: " + cdId));
+		CD cd = cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 
 		if (cd.getAvailableCopies() >= cd.getTotalCopies())
 			throw new IllegalStateException("All copies already returned: " + cd.getTitle());

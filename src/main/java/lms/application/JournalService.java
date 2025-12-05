@@ -49,7 +49,7 @@ public class JournalService {
 		journalRepo = null;
 	}
 
-	public JournalService(JournalsRepository journalRepo, UserRepository userRepo) {
+	public JournalService(JournalsRepository journalRepo) {
 		this.journalRepo = journalRepo;
 	}
 
