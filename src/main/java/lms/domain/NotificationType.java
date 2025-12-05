@@ -6,6 +6,7 @@ public enum NotificationType {
 	DUE_SOON,
 	LOAN_APPROVED,
 	LOAN_REJECTED,
+	ITEM_RETURNED,
 	GENERAL
 }
 

@@ -68,7 +68,9 @@ class LoanServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		loanService = new LoanService(userRepo, bookRepo, cdRepo, journalRepo, loanRepo, notificationService);
+		RepositoryContext repositoryContext = new RepositoryContext(userRepo, bookRepo, cdRepo, journalRepo, loanRepo);
+		LoanServiceContext context = new LoanServiceContext(repositoryContext, notificationService);
+		loanService = new LoanService(context);
 
 		librarianUser = new UserDTO(UUID.randomUUID(), "libuser", "Lib", "User", "libuser@mail.com", Role.LIBRARIAN);
 
@@ -472,12 +474,24 @@ class LoanServiceTest {
 	}
 
 	@Test
-	void shouldExtendLoanWhenAdminAndActive() throws PermissionDeniedException {
+	void shouldExtendLoanWhenAdminAndActive() throws PermissionDeniedException, ItemNotFoundException, UserNotFoundException {
 		UUID loanId = UUID.randomUUID();
+		UUID userId = UUID.randomUUID();
+		UUID itemId = UUID.randomUUID();
 		Loan loan = mock(Loan.class);
+		User user = mock(User.class);
+		Book book = mock(Book.class);
 
 		when(loanRepo.findById(loanId)).thenReturn(Optional.of(loan));
 		when(loan.isActive()).thenReturn(true);
+		when(loan.getUserId()).thenReturn(userId);
+		when(loan.getItemId()).thenReturn(itemId);
+		when(loan.getItemType()).thenReturn("book");
+		when(loan.getDueDate()).thenReturn(java.time.LocalDate.now().plusDays(7));
+		when(userRepo.getByID(userId)).thenReturn(Optional.of(user));
+		when(user.getUsername()).thenReturn("testuser");
+		when(bookRepo.getBookById(itemId)).thenReturn(Optional.of(book));
+		when(book.getTitle()).thenReturn("Test Book");
 
 		UserDTO adminUser = new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", "admin@mail.com", Role.ADMIN);
 

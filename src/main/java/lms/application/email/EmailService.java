@@ -1,6 +1,7 @@
 package lms.application.email;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.mail.Authenticator;
@@ -12,15 +13,9 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
-/**
- * Real Gmail SMTP Email Service.
- *
- * Uses App Password (not the normal Gmail password).
- *
- * Author: Ahmad Salameh
- */
 public class EmailService {
 
+    private static final Logger logger = Logger.getLogger(EmailService.class.getName());
     private static EmailService instance;
     private final String username;
     private final String appPassword;
@@ -66,10 +61,10 @@ public class EmailService {
 
             Transport.send(message);
 
-            System.out.println("Email sent successfully to " + to);
+            logger.info("Email sent successfully to " + to);
 
         } catch (MessagingException e) {
-            e.printStackTrace();
+            logger.severe("Failed to send email to " + to + ": " + e.getMessage());
             throw new RuntimeException("Failed to send email", e);
         }
     }

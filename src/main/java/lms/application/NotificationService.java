@@ -34,21 +34,12 @@ public class NotificationService {
 	/** Represents the system user who generates auto-notifications. */
 	private static final UUID SYSTEM_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-	/** Email sender service (Gmail SMTP). */
 	private final EmailService emailService;
 
-	/**
-	 * Constructs a NotificationService using the singleton EmailService instance.
-	 */
 	public NotificationService() {
 		this.emailService = EmailService.getInstance();
 	}
 
-	/**
-	 * Constructs a NotificationService.
-	 *
-	 * @param emailService the email sending service (mandatory)
-	 */
 	public NotificationService(EmailService emailService) {
 		if (emailService == null)
 			throw new IllegalArgumentException("EmailService cannot be null");
@@ -61,91 +52,82 @@ public class NotificationService {
 	 * @param user         the target user
 	 * @param notification the notification domain object
 	 */
-	public void notify(User user, Notification notification)
-
-	{
-
+	public void notify(User user, Notification notification) {
 		if (user == null)
 			throw new NullPointerException("User cannot be null");
 		if (notification == null)
 			throw new NullPointerException("Notification cannot be null");
 
-		 
 		user.addNotification(notification);
 
-		 
 		String email = user.getEmail();
 
 		if (email != null && !email.isBlank()) {
-
 			String subject = switch (notification.getType()) {
 			case OVERDUE -> "Overdue Item Notice";
 			case DUE_SOON -> "Due Soon Reminder";
 			case LOAN_APPROVED -> "Loan Approved";
 			case LOAN_REJECTED -> "Loan Rejected";
+			case ITEM_RETURNED -> "Item Returned Successfully";
 			default -> "Library Notification";
 			};
 
 			emailService.sendEmail(email, subject, notification.getNotificationContent());
 		}
-
 	}
 
-	/**
-	 * Sends overdue notification + email.
-	 *
-	 * @param user      the user who borrowed the item
-	 * @param itemTitle the item title
-	 */
 	public void notifyOverdueItem(User user, String itemTitle) {
+		StringBuilder message = new StringBuilder();
+		message.append("Your borrowed item '")
+				.append(itemTitle)
+				.append("' is overdue. Please return it as soon as possible.");
 
-		String message = "Your borrowed item '" + itemTitle + "' is overdue. "
-				+ "Please return it as soon as possible.";
-
-		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.OVERDUE);
-
-		notify(user, notification);
+		createNotification(user, message.toString(), NotificationType.OVERDUE);
 	}
 
-	/**
-	 * Sends a "due soon" reminder.
-	 *
-	 * @param user      the borrower
-	 * @param itemTitle the item title
-	 * @param daysLeft  days left until due date
-	 */
 	public void notifyDueSoon(User user, String itemTitle, int daysLeft) {
+		StringBuilder message = new StringBuilder();
+		message.append("Reminder: Your borrowed item '")
+				.append(itemTitle)
+				.append("' is due in ")
+				.append(daysLeft)
+				.append(" day(s).");
 
-		String message = "Reminder: Your borrowed item '" + itemTitle + "' is due in " + daysLeft + " day(s).";
-
-		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.DUE_SOON);
-
-		notify(user, notification);
+		createNotification(user, message.toString(), NotificationType.DUE_SOON);
 	}
 
-	/**
-	 * Sends a notification that a loan was approved.
-	 *
-	 * @param user      the borrower
-	 * @param itemTitle the borrowed item
-	 */
 	public void notifyLoanApproved(User user, String itemTitle) {
+		StringBuilder message = new StringBuilder();
+		message.append("Loan Approved: You have successfully borrowed '")
+				.append(itemTitle)
+				.append("'.");
 
-		String message = "Loan Approved: You have successfully borrowed '" + itemTitle + "'.";
+		createNotification(user, message.toString(), NotificationType.LOAN_APPROVED);
+	}
 
-		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.LOAN_APPROVED);
+	public void notifyItemReturned(User user, String itemTitle, String itemType, double fineAmount) {
+		StringBuilder message = new StringBuilder();
+		message.append("Your ")
+				.append(itemType)
+				.append(" '")
+				.append(itemTitle)
+				.append("' has been returned successfully.");
 
+		if (fineAmount > 0) {
+			message.append(" A late return fine of ")
+					.append(fineAmount)
+					.append(" NIS has been applied to your account.");
+		}
+
+		createNotification(user, message.toString(), NotificationType.ITEM_RETURNED);
+	}
+
+	public void createNotification(User user, String message, NotificationType type) {
+		Notification notification = new Notification(message, SYSTEM_ID, type);
 		notify(user, notification);
 	}
 
-	/**
-	 * Creates and sends a generic notification.
-	 *
-	 * @param user    the user to notify
-	 * @param message the message content
-	 */
 	public void createNotification(User user, String message) {
-		Notification notification = new Notification(message, SYSTEM_ID, NotificationType.GENERAL);
-		notify(user, notification);
+		createNotification(user, message, NotificationType.GENERAL);
 	}
 }

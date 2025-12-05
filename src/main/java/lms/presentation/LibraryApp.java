@@ -11,8 +11,10 @@ import lms.application.CDService;
 import lms.application.JournalService;
 import lms.application.LoanQueryService;
 import lms.application.LoanService;
+import lms.application.LoanServiceContext;
 import lms.application.LoanStatsService;
 import lms.application.NotificationService;
+import lms.application.RepositoryContext;
 import lms.application.UserService;
 import lms.application.email.EmailService;
 import lms.application.task.LoanOverdueChecker;
@@ -70,12 +72,11 @@ public class LibraryApp {
 		 
 		EmailService emailService = EmailService.getInstance();
 
-	 
 		NotificationService notificationService = new NotificationService(emailService);
 
-		 
-		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo,
-				notificationService);
+		RepositoryContext repositoryContext = new RepositoryContext(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo);
+		LoanServiceContext loanServiceContext = new LoanServiceContext(repositoryContext, notificationService);
+		LoanService loanService = new LoanService(loanServiceContext);
 
 		LoanStatsService loanStatsService = new LoanStatsService(loanRepo);
 		LoanQueryService loanQueryService = new LoanQueryService(loanRepo);

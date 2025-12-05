@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import lms.domain.Book;
 import lms.domain.BookRepository;
@@ -24,63 +25,28 @@ import lms.domain.exception.LoanNotFoundException;
 import lms.domain.exception.PermissionDeniedException;
 import lms.domain.exception.UserNotFoundException;
 
-/**
- * Application service responsible for managing borrowing and returning
- * operations in the Library Management System.
- *
- * <p>
- * This service coordinates loan and return processes between domain entities
- * and applies business rules related to library operations.
- * </p>
- *
- * <h2>Responsibilities:</h2>
- * <ul>
- * <li>Manage book borrowing operations</li>
- * <li>Handle returning of borrowed books</li>
- * <li>Calculate and apply overdue fines</li>
- * <li>Provide information about active and overdue loans</li>
- * </ul>
- *
- * @author Majd Awwad
- * @version 1.0
- */
 public class LoanService {
 
-	/** Repository for managing user data. */
+	private static final Logger logger = Logger.getLogger(LoanService.class.getName());
+
 	private final UserRepository userRepo;
-
-	/** Repository for managing book data. */
 	private final BookRepository bookRepo;
-
-	/** Repository for managing CD data. */
 	private final CDRepository cdRepo;
-
-	/** Repository for managing journal data. */
 	private final JournalsRepository journalRepo;
-
-	/** Repository for managing loan data. */
 	private final LoanRepository loanRepo;
+	private final NotificationService notificationService;
 
-	private NotificationService notificationService;
-
-	/**
-	 * Constructs a new LoanService with the required repositories.
-	 *
-	 * @param userRepo    the repository for user operations
-	 * @param bookRepo    the repository for book operations
-	 * @param cdRepo      the repository for CD operations
-	 * @param journalRepo the repository for journal operations
-	 * @param loanRepo    the repository for loan operations
-	 */
-	public LoanService(UserRepository userRepo, BookRepository bookRepo, CDRepository cdRepo,
-			JournalsRepository journalRepo, LoanRepository loanRepo, NotificationService accountService) {
-
-		this.userRepo = userRepo;
-		this.bookRepo = bookRepo;
-		this.cdRepo = cdRepo;
-		this.journalRepo = journalRepo;
-		this.loanRepo = loanRepo;
-		this.notificationService = accountService;
+	public LoanService(LoanServiceContext context) {
+		if (context == null) {
+			throw new IllegalArgumentException("LoanServiceContext cannot be null");
+		}
+		RepositoryContext repos = context.getRepositories();
+		this.userRepo = repos.getUserRepo();
+		this.bookRepo = repos.getBookRepo();
+		this.cdRepo = repos.getCdRepo();
+		this.journalRepo = repos.getJournalRepo();
+		this.loanRepo = repos.getLoanRepo();
+		this.notificationService = context.getNotificationService();
 	}
 
 	/**
@@ -237,26 +203,20 @@ public class LoanService {
 
 		double fineAmount = 0.0;
 		if (loan.isOverdue()) {
-
 			fineAmount = loan.calculateFine();
-
 			user.getAccount().addFine(fineAmount,
 					"Late return of " + loan.getItemType() + " - " + loan.getDaysOverdue() + " day(s) overdue");
-
 			loan.markFineApplied();
-
-			System.out.println("⚠️  Late fine applied: " + fineAmount + " NIS");
-			System.out.println("   Overdue days: " + loan.getDaysOverdue());
+			logger.warning("Late fine applied: " + fineAmount + " NIS to user '" + user.getUsername() + "' for " + loan.getItemType() + " '" + item.getTitle() + "'. Overdue by " + loan.getDaysOverdue() + " days");
 		}
 
 		loanRepo.update(loan);
 		updateItemRepository(item, loan.getItemType());
 		userRepo.update(user);
 
-		System.out.println("✅ " + loan.getItemType() + " returned successfully");
-		if (fineAmount > 0) {
-			System.out.println("   Fine applied: " + fineAmount + " NIS");
-		}
+		notificationService.notifyItemReturned(user, item.getTitle(), loan.getItemType(), fineAmount);
+
+		logger.info(loan.getItemType().toUpperCase() + " returned: '" + item.getTitle() + "' by user '" + user.getUsername() + "'" + (fineAmount > 0 ? " with fine " + fineAmount + " NIS" : ""));
 
 		return true;
 	}
@@ -361,7 +321,7 @@ public class LoanService {
 	 *                                   days is not positive
 	 * @throws IllegalStateException     if the loan has already been completed
 	 */
-	public boolean extendLoan(UserDTO userDTO, UUID loanId, int additionalDays) throws PermissionDeniedException {
+	public boolean extendLoan(UserDTO userDTO, UUID loanId, int additionalDays) throws PermissionDeniedException, ItemNotFoundException, UserNotFoundException {
 		AuthorizationService.ensureAdmin(userDTO);
 
 		if (additionalDays <= 0) {
@@ -373,8 +333,11 @@ public class LoanService {
 			throw new IllegalStateException("Cannot extend a completed loan");
 		}
 
-	 
-		System.out.println("✅ Loan extended for " + additionalDays + " additional days");
+		User user = userRepo.getByID(loan.getUserId())
+				.orElseThrow(() -> new UserNotFoundException("User not found for loan"));
+		LoanableItem item = getItemByIdAndType(loan.getItemId(), loan.getItemType());
+		
+		logger.info("Loan extended by " + additionalDays + " days for user '" + user.getUsername() + "', " + loan.getItemType() + " '" + item.getTitle() + "'. New due date: " + loan.getDueDate().plusDays(additionalDays));
 		return true;
 	}
 
