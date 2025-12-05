@@ -31,7 +31,7 @@ class JournalServiceAvailabilityTest {
 
 	@BeforeEach
 	void setUp() {
-		journalService = new JournalService(journalRepo, userRepo);
+		journalService = new JournalService(journalRepo);
 	}
 
 	@Test

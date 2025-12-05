@@ -36,7 +36,7 @@ class JournalServiceUpdateTest {
 
 	@BeforeEach
 	void setUp() {
-		journalService = new JournalService(journalRepo, userRepo);
+		journalService = new JournalService(journalRepo);
 
 		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
 

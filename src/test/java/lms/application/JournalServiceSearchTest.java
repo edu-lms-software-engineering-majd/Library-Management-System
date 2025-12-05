@@ -35,7 +35,7 @@ class JournalServiceSearchTest {
 
     @BeforeEach
     void setUp() {
-        journalService = new JournalService(journalRepo, userRepo);
+        journalService = new JournalService(journalRepo);
     }
 
     @Test
