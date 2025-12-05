@@ -43,7 +43,7 @@ public class LibraryApp {
 
 	public static void main(String[] args) {
 	 
-		scheduler.scheduleAtFixedRate(new LoanOverdueChecker(), 1, 24 * 60, TimeUnit.MINUTES);
+		scheduler.scheduleAtFixedRate(new LoanOverdueChecker(), 1, (long )24 * 60, TimeUnit.MINUTES);
 
 		 
 		UserRepository userRepo = StaticUserRepository.getInstance();
