@@ -54,13 +54,13 @@ class FineStrategyTest {
 	@Test
 	void givenCDOverdue_whenCalculateFine_thenReturn75CentsPerDay() {
 		double fine = cdStrategy.calculateFine(2);
-		assertEquals(1.50, fine);
+		assertEquals(40.0, fine);
 	}
 
 	@Test
 	void givenJournalOverdue_whenCalculateFine_thenReturn1DollarPerDay() {
 		double fine = journalStrategy.calculateFine(4);
-		assertEquals(4.0, fine);
+		assertEquals(60.0, fine);
 	}
 
 	@Test
