@@ -10,6 +10,7 @@ import lms.domain.Role;
 import lms.domain.User;
 import lms.domain.UserRepository;
 import lms.domain.exception.UserNotFoundException;
+import lms.domain.utils.PasswordUtils;
 
 /**
  * Application service for managing users in the Library Management System.
@@ -107,6 +108,24 @@ public class UserService {
 		User user = userRepo.getByID(userID)
 				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
 		return user.canBorrow();
+	}
+
+	public UserDTO registerUser(String username, String rawPassword, String firstName, String lastName, String email, Role role) {
+		
+		if (userRepo.isExist(username)) {
+			throw new IllegalArgumentException("Username already exists");
+		}
+
+		String hashedPassword = PasswordUtils.hashPassword(rawPassword);
+		User newUser = new User(firstName, lastName, email, username, hashedPassword, role);
+		
+		boolean success = userRepo.add(newUser);
+		
+		if (!success) {
+			throw new IllegalStateException("Failed to register user");
+		}
+		
+		return newUser.toDTO();
 	}
 
 }

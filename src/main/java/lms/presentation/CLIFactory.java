@@ -5,7 +5,9 @@ import lms.application.BookService;
 import lms.application.CDService;
 import lms.application.AccountService;
 import lms.application.JournalService;
+import lms.application.LoanQueryService;
 import lms.application.LoanService;
+import lms.application.LoanStatsService;
 import lms.application.NotificationService;
 import lms.application.UserService;
 
@@ -37,7 +39,7 @@ import lms.application.UserService;
  * </p>
  * 
  * @author Majd
- * @version 1.0
+ * @version 2.0
  */
 public class CLIFactory {
 
@@ -50,10 +52,10 @@ public class CLIFactory {
 	 * @return a {@link CLI} instance for the current user
 	 * @throws IllegalStateException if the user's role is unsupported
 	 */
-	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService,CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService) {
+	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService,CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService, LoanStatsService loanStatsService, LoanQueryService loanQueryService) {
 		switch (AuthService.getInstance().getCurrentUser().role()) {
 		case ADMIN:
-			return new AdminCLI(userService, bookService, authService,loanService, cdService, journalService);
+			return new AdminCLI(userService, bookService, authService,loanService, cdService, journalService, loanStatsService, loanQueryService);
 		case MEMBER:
 		case LIBRARIAN:
 			return new UserCLI(userService, bookService, cdService, journalService, loanService, notificationService, authService, accountService);

@@ -76,7 +76,7 @@ class BookServiceTest {
 		when(bookRepo.addBook(any(Book.class))).thenReturn(true);
 
 		Book result = bookService.addBook(adminUser, "Domain-Driven Design", "Eric Evans", "9780321125217",
-				"Addison-Wesley", 2003, "Software Engineering", 3, "English", "B2-05");
+				"Addison-Wesley", 2003, "Software Engineering", 3, "English", "A book about strategic design in complex systems", "B2-05");
 
 		assertNotNull(result);
 		assertEquals("Domain-Driven Design", result.getTitle());
@@ -86,7 +86,7 @@ class BookServiceTest {
 	@Test
 	void givenMember_whenAddBook_thenPermissionDenied() {
 		assertThrows(PermissionDeniedException.class, () -> bookService.addBook(memberUser, "Test Title", "Test Author",
-				"1111111111", "Some Publisher", 2024, "Category", 2, "English", "C1-01"));
+				"1111111111", "Some Publisher", 2024, "Category", 2, "English", "Test description", "C1-01"));
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class BookServiceTest {
 
 		assertThrows(IllegalStateException.class,
 				() -> bookService.addBook(adminUser, "Clean Architecture", "Robert C. Martin", "9780134494166",
-						"Prentice Hall", 2017, "Software Engineering", 4, "English", "A1-02"));
+						"Prentice Hall", 2017, "Software Engineering", 4, "English", "A guide to software architecture", "A1-02"));
 	}
 
 	@Test

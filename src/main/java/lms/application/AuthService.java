@@ -91,7 +91,7 @@ public class AuthService {
 	 * @see #getInstance(UserRepository)
 	 * @see #getInstance()
 	 */
-	private static AuthService INSTANCE;
+	private static AuthService instance;
 
 	/** Repository used to access domain-level user data */
 	private final UserRepository userRepo;
@@ -131,10 +131,10 @@ public class AuthService {
 	 * @return the singleton {@code AuthService} instance
 	 */
 	public static AuthService getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new AuthService(StaticUserRepository.getInstance());
+		if (instance == null) {
+			instance = new AuthService(StaticUserRepository.getInstance());
 		}
-		return INSTANCE;
+		return instance;
 	}	
 	
 

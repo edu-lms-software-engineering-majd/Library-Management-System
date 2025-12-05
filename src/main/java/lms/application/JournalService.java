@@ -43,17 +43,14 @@ import lms.domain.exception.PermissionDeniedException;
 public class JournalService {
 
 	private final JournalsRepository journalRepo;
-	private final UserRepository userRepo;
 
 	@SuppressWarnings("unused")
 	private JournalService() {
 		journalRepo = null;
-		userRepo = null;
 	}
 
 	public JournalService(JournalsRepository journalRepo, UserRepository userRepo) {
 		this.journalRepo = journalRepo;
-		this.userRepo = userRepo;
 	}
 
 	 

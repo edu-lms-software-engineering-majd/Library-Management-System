@@ -28,7 +28,6 @@ import lms.domain.exception.ItemNotFoundException;
 public class SchedulerService {
 
 	private static final long ONE_MINUTE_MS = 60000L;
-	private static final long ONE_HOUR_MS = 3600000L;
 	private static final long TWENTY_FOUR_HOURS_MS = 86400000L;
 
 	private final LoanService loanService;

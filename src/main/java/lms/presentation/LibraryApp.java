@@ -9,7 +9,9 @@ import lms.application.AuthService;
 import lms.application.BookService;
 import lms.application.CDService;
 import lms.application.JournalService;
+import lms.application.LoanQueryService;
 import lms.application.LoanService;
+import lms.application.LoanStatsService;
 import lms.application.NotificationService;
 import lms.application.UserService;
 import lms.application.email.EmailService;
@@ -75,8 +77,11 @@ public class LibraryApp {
 		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo,
 				notificationService);
 
+		LoanStatsService loanStatsService = new LoanStatsService(loanRepo);
+		LoanQueryService loanQueryService = new LoanQueryService(loanRepo);
+
 		 
-		LibraryCLI cli = new LibraryCLI(AuthService.getInstance(), userService, bookService, loanService, cdService, journalService, notificationService, accountService);
+		LibraryCLI cli = new LibraryCLI(AuthService.getInstance(), userService, bookService, loanService, cdService, journalService, notificationService, accountService, loanStatsService, loanQueryService);
 
 		cli.start();
 	}

@@ -54,13 +54,13 @@ public class BookService {
 	 * @throws PermissionDeniedException if the user is not an admin
 	 */
 	public Book addBook(UserDTO userDTO, String title, String author, String isbn, String publisher,
-			int publicationYear, String category, int totalCopies, String language, String shelfLocation)
+			int publicationYear, String category, int totalCopies, String language, String description, String shelfLocation)
 			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
 		Book book = new Book(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
-				shelfLocation);
+				description, shelfLocation);
 
 		boolean added = bookRepo.addBook(book);
 		if (!added)
