@@ -32,7 +32,7 @@ class LoanQueryServiceTest {
 
 		loanRepo.findAll().forEach(l -> {
 			try {
-				loanRepo.delete(l.getLoanId());
+				loanRepo.delete(l.getId());
 			} catch (Exception ignored) {
 			}
 		});

@@ -71,7 +71,7 @@ class LoanTest {
 	@Test
 	void givenValidParameters_whenCreateBookLoan_thenLoanIsInitializedCorrectly() {
 		assertNotNull(bookLoan);
-		assertNotNull(bookLoan.getLoanId());
+		assertNotNull(bookLoan.getId());
 		assertEquals(testUserId, bookLoan.getUserId());
 		assertEquals(testItemId, bookLoan.getItemId());
 		assertEquals("book", bookLoan.getItemType());
@@ -267,7 +267,7 @@ class LoanTest {
 	@Test
 	void givenLoan_whenGetLoanId_thenReturnNonNullUUID() {
 
-		assertNotNull(bookLoan.getLoanId());
+		assertNotNull(bookLoan.getId());
 	}
 
 	@Test
@@ -318,9 +318,9 @@ class LoanTest {
 		Loan loan2 = new Loan(testUserId, testItemId, "book", LocalDate.now());
 		Loan loan3 = new Loan(testUserId, testItemId, "book", LocalDate.now());
 
-		assertFalse(loan1.getLoanId().equals(loan2.getLoanId()));
-		assertFalse(loan2.getLoanId().equals(loan3.getLoanId()));
-		assertFalse(loan1.getLoanId().equals(loan3.getLoanId()));
+		assertFalse(loan1.getId().equals(loan2.getId()));
+		assertFalse(loan2.getId().equals(loan3.getId()));
+		assertFalse(loan1.getId().equals(loan3.getId()));
 	}
 
 	@Test

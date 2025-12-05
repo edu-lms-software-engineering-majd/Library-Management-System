@@ -14,11 +14,11 @@ import lms.domain.exception.PermissionDeniedException;
 
 class AuthorizationServiceTest {
 
-	private final UserDTO adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
+	private final UserDTO adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
 
-	private final UserDTO librarianUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.LIBRARIAN);
+	private final UserDTO librarianUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.LIBRARIAN);
 
-	private final UserDTO memberUser = new UserDTO(UUID.randomUUID(), "user1", "Sara", "Mohammed", Role.MEMBER);
+	private final UserDTO memberUser = new UserDTO(UUID.randomUUID(), "user1", "Sara", "Mohammed", "sara@example.com", Role.MEMBER);
 
 	 
 

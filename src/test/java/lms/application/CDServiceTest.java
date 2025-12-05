@@ -41,8 +41,8 @@ class CDServiceTest {
 	void setUp() {
 		cdService = new CDService(cdRepo);
 
-		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
-		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.MEMBER);
+		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
+		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.MEMBER);
 	}
 
 	@Test

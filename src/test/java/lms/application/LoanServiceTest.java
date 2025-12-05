@@ -72,8 +72,8 @@ class LoanServiceTest {
 	void setUp() {
 		loanService = new LoanService(userRepo, bookRepo, cdRepo, journalRepo, loanRepo, notificationService);
 
-		librarianUser = new UserDTO(UUID.randomUUID(), "libuser", "Lib", "User", Role.LIBRARIAN);
-		memberUser = new UserDTO(UUID.randomUUID(), "member", "Member", "User", Role.MEMBER);
+		librarianUser = new UserDTO(UUID.randomUUID(), "libuser", "Lib", "User", "lib@example.com", Role.LIBRARIAN);
+		memberUser = new UserDTO(UUID.randomUUID(), "member", "Member", "User", "member@example.com", Role.MEMBER);
 	}
 
 	 
@@ -536,7 +536,7 @@ class LoanServiceTest {
 			when(loan.isActive()).thenReturn(true);
 
 			boolean result = loanService
-					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", Role.ADMIN), loanId, 5);
+					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", "admin@example.com", Role.ADMIN), loanId, 5);
 
 			assertTrue(result);
 		}
@@ -555,7 +555,7 @@ class LoanServiceTest {
 			UUID loanId = UUID.randomUUID();
 
 			assertThrows(IllegalArgumentException.class, () -> loanService
-					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", Role.ADMIN), loanId, 0));
+					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", "admin@example.com", Role.ADMIN), loanId, 0));
 		}
 
 		@Test
@@ -568,7 +568,7 @@ class LoanServiceTest {
 			when(loan.isActive()).thenReturn(false);
 
 			assertThrows(IllegalStateException.class, () -> loanService
-					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", Role.ADMIN), loanId, 3));
+					.extendLoan(new UserDTO(UUID.randomUUID(), "admin", "Ahmad", "Salameh", "admin@example.com", Role.ADMIN), loanId, 3));
 		}
 	}
 

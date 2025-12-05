@@ -40,8 +40,8 @@ class UserServiceTest {
 	void setup() {
 		userService = new UserService(userRepo);
 
-		adminDTO = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
-		memberDTO = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.MEMBER);
+		adminDTO = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
+		memberDTO = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.MEMBER);
 	}
 
 	// ==========================================================================

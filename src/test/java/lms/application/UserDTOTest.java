@@ -15,7 +15,7 @@ class UserDTOTest {
 	@Test
 	void testUserDTO_CreationAndGetters() {
 		UUID id = UUID.randomUUID();
-		UserDTO dto = new UserDTO(id, "ahmadsalameh", "Ahmad", "Salameh", Role.ADMIN);
+		UserDTO dto = new UserDTO(id, "ahmadsalameh", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
 
 		assertEquals(id, dto.userID());
 		assertEquals("ahmadsalameh", dto.username());
@@ -27,8 +27,8 @@ class UserDTOTest {
 	@Test
 	void testUserDTO_Equality() {
 		UUID id = UUID.randomUUID();
-		UserDTO dto1 = new UserDTO(id, "ahmad", "Ahmad", "Salameh", Role.MEMBER);
-		UserDTO dto2 = new UserDTO(id, "ahmad", "Ahmad", "Salameh", Role.MEMBER);
+		UserDTO dto1 = new UserDTO(id, "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.MEMBER);
+		UserDTO dto2 = new UserDTO(id, "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.MEMBER);
 
 		assertEquals(dto1, dto2);
 		assertEquals(dto1.hashCode(), dto2.hashCode());
@@ -36,7 +36,7 @@ class UserDTOTest {
 
 	@Test
 	void testUserDTO_ToString_NotNull() {
-		UserDTO dto = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.LIBRARIAN);
+		UserDTO dto = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.LIBRARIAN);
 		assertNotNull(dto.toString());
 	}
 }

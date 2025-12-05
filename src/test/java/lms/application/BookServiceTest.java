@@ -51,9 +51,9 @@ class BookServiceTest {
 	void setUp() {
 		bookService = new BookService(bookRepo);
 
-		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
+		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
 
-		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.MEMBER);
+		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.MEMBER);
 
 		sampleBook = new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
 				"Software Engineering", 5, "English", "A1-01");
