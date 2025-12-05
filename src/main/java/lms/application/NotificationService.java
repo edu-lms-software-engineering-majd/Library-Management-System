@@ -70,10 +70,10 @@ public class NotificationService {
 		if (notification == null)
 			throw new NullPointerException("Notification cannot be null");
 
-		// 1) Save internal notification in the user entity
+		 
 		user.addNotification(notification);
 
-		// 2) Send email if user has email
+		 
 		String email = user.getEmail();
 
 		if (email != null && !email.isBlank()) {

@@ -18,10 +18,6 @@ public class LoanQueryService {
 		this.loanRepo = loanRepo;
 	}
 
-	// ===============================
-	// Basic Filters
-	// ===============================
-
 	public List<Loan> getActiveLoans() {
 		return loanRepo.findAll().stream().filter(l -> !l.isReturned()).collect(Collectors.toList());
 	}

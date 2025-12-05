@@ -254,6 +254,7 @@ class JournalTest {
     void shouldReturnCorrectToStringFormat() {
         String result = journal.toString();
         
+        
         assertTrue(result.contains("Nature"));
         assertTrue(result.contains("Multiple Authors"));
         assertTrue(result.contains("4/4"));

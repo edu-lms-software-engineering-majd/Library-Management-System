@@ -41,14 +41,15 @@ public class Journal implements LoanableItem {
 	}
 
 	/**
-	 * Creates a new {@code Journal} with the required fields and specified number of copies.
-	 * The {@code id} is automatically generated and {@code availableCopies} is 
-	 * initialized to {@code totalCopies}.
+	 * Creates a new {@code Journal} with the required fields and specified number
+	 * of copies. The {@code id} is automatically generated and
+	 * {@code availableCopies} is initialized to {@code totalCopies}.
 	 *
-	 * @param title  the title of the journal
-	 * @param author the author of the journal
+	 * @param title       the title of the journal
+	 * @param author      the author of the journal
 	 * @param totalCopies the total number of copies owned by the library
-	 * @throws IllegalArgumentException if title or author is null or blank, or if totalCopies is less than 1
+	 * @throws IllegalArgumentException if title or author is null or blank, or if
+	 *                                  totalCopies is less than 1
 	 */
 	public Journal(String title, String author, int totalCopies) {
 		JournalValidator.getInstance().validate(title, author, totalCopies);
@@ -116,7 +117,7 @@ public class Journal implements LoanableItem {
 		return availableCopies;
 	}
 
-	// NOTE: Available copies managed through domain methods (decrementAvailableCopies/incrementAvailableCopies)
+	 
 
 	/**
 	 * Checks if any copy is currently borrowed.
@@ -165,15 +166,21 @@ public class Journal implements LoanableItem {
 
 	@Override
 	public String toString() {
-		return String.format(" %s by %s (%d/%d)", title, author, availableCopies, totalCopies);
+		return title + " by " + author + " (" + availableCopies + "/" + totalCopies + ")";
 	}
-	
-	
-	
+
+	/**
+	 * Sets the number of available copies.
+	 *
+	 * @param availableCopies the new number of available copies
+	 * @throws IllegalArgumentException if availableCopies is negative or greater
+	 *                                  than totalCopies
+	 */
+
 	public void setAvailableCopies(int availableCopies) {
-	    if (availableCopies < 0 || availableCopies > this.totalCopies)
-	        throw new IllegalArgumentException("Invalid available copies");
-	    this.availableCopies = availableCopies;
+		if (availableCopies < 0 || availableCopies > this.totalCopies)
+			throw new IllegalArgumentException("Invalid available copies");
+		this.availableCopies = availableCopies;
 	}
 
 }

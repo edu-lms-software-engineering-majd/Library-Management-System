@@ -39,9 +39,7 @@ public class StaticJournalsRepository implements JournalsRepository {
 		journals.put(journal5.getId(), journal5);
 	}
 
-	// ============================================
-	// Validation
-	// ============================================
+	 
 	private void validate(Journal journal) {
 		if (journal == null)
 			throw new IllegalArgumentException("Journal cannot be null");
@@ -56,9 +54,7 @@ public class StaticJournalsRepository implements JournalsRepository {
 			throw new IllegalArgumentException("Total copies cannot be negative");
 	}
 
-	// ============================================
-	// CRUD
-	// ============================================
+	 
 
 	@Override
 	public boolean addJournal(Journal journal) {
@@ -103,9 +99,7 @@ public class StaticJournalsRepository implements JournalsRepository {
 		return Collections.unmodifiableList(new ArrayList<>(journals.values()));
 	}
 
-	// ============================================
-	// Filtering (Allowed minimal search)
-	// ============================================
+	 
 
 	@Override
 	public List<Journal> searchJournals(String keyword) {

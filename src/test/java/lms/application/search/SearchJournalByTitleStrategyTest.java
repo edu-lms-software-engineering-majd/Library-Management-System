@@ -27,7 +27,7 @@ class SearchJournalByTitleStrategyTest {
 	}
 
 	@Test
-	@DisplayName("Should find journals matching exact title")
+	 
 	void shouldMatchExactTitle() {
 		var result = strategy.execute(journals, "AI Research");
 
@@ -36,7 +36,7 @@ class SearchJournalByTitleStrategyTest {
 	}
 
 	@Test
-	@DisplayName("Should find journals by partial match")
+	 
 	void shouldMatchPartial() {
 		var result = strategy.execute(journals, "AI");
 
@@ -45,7 +45,7 @@ class SearchJournalByTitleStrategyTest {
 	}
 
 	@Test
-	@DisplayName("Should return empty when no titles match")
+	 
 	void shouldReturnEmptyWhenNoMatch() {
 		var result = strategy.execute(journals, "Biology");
 
@@ -53,7 +53,7 @@ class SearchJournalByTitleStrategyTest {
 	}
 
 	@Test
-	@DisplayName("Should handle different letter cases")
+	 
 	void shouldIgnoreCase() {
 		var result = strategy.execute(journals, "machine");
 
@@ -62,7 +62,7 @@ class SearchJournalByTitleStrategyTest {
 	}
 
 	@Test
-	@DisplayName("Should handle empty search term")
+	 
 	void shouldHandleEmptySearchTerm() {
 		var result = strategy.execute(journals, "");
 

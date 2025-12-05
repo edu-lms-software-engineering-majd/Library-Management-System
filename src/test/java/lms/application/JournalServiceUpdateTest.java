@@ -37,8 +37,10 @@ class JournalServiceUpdateTest {
 	@BeforeEach
 	void setUp() {
 		journalService = new JournalService(journalRepo, userRepo);
-		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
-		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.MEMBER);
+
+		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
+
+		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.MEMBER);
 	}
 
 	@Test
@@ -59,11 +61,9 @@ class JournalServiceUpdateTest {
 	@Test
 	void shouldRejectUpdateForMember() {
 		UUID id = UUID.randomUUID();
-
 		assertThrows(PermissionDeniedException.class, () -> journalService.updateJournal(memberUser, id, "T", "A", 5));
 	}
 
-	
 	@Test
 	void shouldThrowWhenUpdateTargetMissing() {
 		UUID id = UUID.randomUUID();

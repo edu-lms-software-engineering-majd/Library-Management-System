@@ -40,7 +40,7 @@ public class FineTransaction {
 		this.transactionId = UUID.randomUUID();
 		this.amount = amount;
 		this.description = description;
-		
+
 		this.transactionDate = LocalDate.now();
 		this.type = type;
 	}
@@ -72,6 +72,7 @@ public class FineTransaction {
 	 */
 	public String getSummary() {
 		String sign = amount >= 0 ? "+" : "";
-		return String.format("%s%.2f NIS - %s", sign, amount, description);
+		return String.format(java.util.Locale.US, "%s%.2f NIS - %s", sign, Math.abs(amount), description);
+
 	}
 }

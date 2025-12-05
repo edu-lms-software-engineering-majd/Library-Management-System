@@ -39,9 +39,7 @@ public class StaticCDRepository implements CDRepository {
 		cds.put(cd5.getId(), cd5);
 	}
 
-	// ============================================
-	// Validation
-	// ============================================
+	 
 	private void validate(CD cd) {
 		if (cd == null)
 			throw new IllegalArgumentException("CD cannot be null");
@@ -56,9 +54,7 @@ public class StaticCDRepository implements CDRepository {
 			throw new IllegalArgumentException("Total copies cannot be negative");
 	}
 
-	// ============================================
-	// CRUD
-	// ============================================
+	 
 
 	@Override
 	public boolean addCD(CD cd) {
@@ -103,9 +99,7 @@ public class StaticCDRepository implements CDRepository {
 		return Collections.unmodifiableList(new ArrayList<>(cds.values()));
 	}
 
-	// ============================================
-	// Search / Filter (allowed minimal filtering)
-	// ============================================
+	 
 
 	@Override
 	public List<CD> searchCDs(String keyword) {

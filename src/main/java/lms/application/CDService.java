@@ -48,9 +48,7 @@ public class CDService {
 		this.cdRepo = cdRepo;
 	}
 
-	// =====================================================
-	// Creation
-	// =====================================================
+	 
 
 	/**
 	 * Creates and stores a new CD (admin-only).
@@ -84,9 +82,7 @@ public class CDService {
 		return cd;
 	}
 
-	// =====================================================
-	// Retrieval
-	// =====================================================
+	 
 
 	/** Returns all CDs in the system. */
 	public List<CD> getAllCDs() {
@@ -114,9 +110,7 @@ public class CDService {
 		return matches.get(0);
 	}
 
-	// =====================================================
-	// Update
-	// =====================================================
+	 
 
 	/**
 	 * Updates a CD's details (admin-only).
@@ -146,9 +140,7 @@ public class CDService {
 		return cd;
 	}
 
-	// =====================================================
-	// Delete
-	// =====================================================
+	 
 
 	/**
 	 * Deletes a CD from the system (admin-only).
@@ -162,9 +154,7 @@ public class CDService {
 		return cdRepo.deleteCD(cdId);
 	}
 
-	// =====================================================
-	// Searching
-	// =====================================================
+	 
 
 	public List<CD> searchCDs(String keyword) {
 		if (keyword == null || keyword.isBlank())
@@ -179,9 +169,7 @@ public class CDService {
 		return strategy.execute(cdRepo.getAllCDs(), searchTerm);
 	}
 
-	// =====================================================
-	// Availability
-	// =====================================================
+	 
 
 	public boolean isAvailableCD(UUID cdId) {
 		return cdRepo.getCDById(cdId).map(cd -> cd.getAvailableCopies() > 0).orElse(false);
@@ -191,10 +179,7 @@ public class CDService {
 		return cdRepo.getCDById(cdId).isPresent();
 	}
 
-	// =====================================================
-	// Borrowing
-	// =====================================================
-
+	 
 	/**
 	 * Decreases available copies when a CD is borrowed.
 	 */

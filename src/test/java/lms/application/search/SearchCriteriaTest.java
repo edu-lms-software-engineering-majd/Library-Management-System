@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class SearchCriteriaTest {
 
 	@Test
-	@DisplayName("Each enum constant should create the correct strategy instance")
+	 
 	void shouldCreateCorrectStrategy() {
 		assertTrue(SearchCriteria.ID.createStrategy() instanceof SearchByIdStrategy);
 		assertTrue(SearchCriteria.TITLE.createStrategy() instanceof SearchByTitleStrategy);
@@ -20,7 +20,7 @@ class SearchCriteriaTest {
 	}
 
 	@Test
-	@DisplayName("fromChoice(int) should return correct enum for valid choices")
+	 
 	void shouldReturnEnumFromValidIntChoice() {
 		assertEquals(SearchCriteria.ID, SearchCriteria.fromChoice(1));
 		assertEquals(SearchCriteria.TITLE, SearchCriteria.fromChoice(2));
@@ -28,7 +28,7 @@ class SearchCriteriaTest {
 	}
 
 	@Test
-	@DisplayName("fromChoice(int) should return null for invalid numbers")
+	 
 	void shouldReturnNullForInvalidIntChoices() {
 		assertNull(SearchCriteria.fromChoice(0));
 		assertNull(SearchCriteria.fromChoice(8));
@@ -36,14 +36,14 @@ class SearchCriteriaTest {
 	}
 
 	@Test
-	@DisplayName("fromChoice(String) should parse valid numeric strings")
+	 
 	void shouldReturnEnumFromValidStringChoice() {
 		assertEquals(SearchCriteria.ID, SearchCriteria.fromChoice("1"));
 		assertEquals(SearchCriteria.CATEGORY, SearchCriteria.fromChoice("6"));
 	}
 
 	@Test
-	@DisplayName("fromChoice(String) should return null for invalid strings")
+	 
 	void shouldReturnNullForInvalidStringChoice() {
 		assertNull(SearchCriteria.fromChoice("abc"));
 		assertNull(SearchCriteria.fromChoice(""));
@@ -52,7 +52,7 @@ class SearchCriteriaTest {
 	}
 
 	@Test
-	@DisplayName("DisplayName and Description should not be null")
+	 
 	void shouldHaveValidDisplayNameAndDescription() {
 		for (SearchCriteria c : SearchCriteria.values()) {
 			assertNotNull(c.getDisplayName());

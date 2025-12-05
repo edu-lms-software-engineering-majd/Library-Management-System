@@ -1,6 +1,10 @@
 package lms.application;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +36,7 @@ class LoanQueryServiceTest {
 
 		loanRepo.findAll().forEach(l -> {
 			try {
-				loanRepo.delete(l.getLoanId());
+				loanRepo.delete(l.getId()); 
 			} catch (Exception ignored) {
 			}
 		});

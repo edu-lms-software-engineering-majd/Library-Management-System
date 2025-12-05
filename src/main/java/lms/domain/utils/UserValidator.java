@@ -24,7 +24,7 @@ import lms.domain.Role;
 public class UserValidator {
 
 	
-	//private static final UserValidator INSTANCE = new UserValidator();
+	 
 	
 	private static final int MIN_PASSWORD_LENGTH = 8;
 
@@ -53,7 +53,7 @@ public class UserValidator {
 	
 	
 	
-	public UserValidator() {}  // allow tests to instantiate
+	public UserValidator() {}   
 
 	private static final UserValidator INSTANCE = new UserValidator();
 	public static UserValidator getInstance() { return INSTANCE; }

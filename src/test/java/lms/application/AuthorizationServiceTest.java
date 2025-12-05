@@ -14,13 +14,14 @@ import lms.domain.exception.PermissionDeniedException;
 
 class AuthorizationServiceTest {
 
-	private final UserDTO adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", Role.ADMIN);
+	private final UserDTO adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com",
+			Role.ADMIN);
 
-	private final UserDTO librarianUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", Role.LIBRARIAN);
+	private final UserDTO librarianUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com",
+			Role.LIBRARIAN);
 
-	private final UserDTO memberUser = new UserDTO(UUID.randomUUID(), "user1", "Sara", "Mohammed", Role.MEMBER);
-
-	 
+	private final UserDTO memberUser = new UserDTO(UUID.randomUUID(), "user1", "Sara", "Mohammed", "sara@example.com",
+			Role.MEMBER);
 
 	@Test
 	void shouldAllowAdmin() {
@@ -31,7 +32,6 @@ class AuthorizationServiceTest {
 	void shouldRejectLibrarian() {
 		PermissionDeniedException ex = assertThrows(PermissionDeniedException.class,
 				() -> AuthorizationService.ensureAdmin(librarianUser));
-
 		assertTrue(ex.getMessage().contains("ADMIN") || ex.getMessage().contains("admin"));
 	}
 
@@ -44,8 +44,6 @@ class AuthorizationServiceTest {
 	void shouldRejectNullUser_admin() {
 		assertThrows(PermissionDeniedException.class, () -> AuthorizationService.ensureAdmin(null));
 	}
-
-	 
 
 	@Test
 	void shouldAllowLibrarian() {
@@ -67,8 +65,6 @@ class AuthorizationServiceTest {
 		assertThrows(PermissionDeniedException.class, () -> AuthorizationService.ensureLibrarian(null));
 	}
 
-	 
-
 	@Test
 	void shouldReturnTrueForAdmin() {
 		assertTrue(AuthorizationService.isAdmin(adminUser));
@@ -84,8 +80,6 @@ class AuthorizationServiceTest {
 	void shouldReturnFalseForNull_admin() {
 		assertFalse(AuthorizationService.isAdmin(null));
 	}
-
-	 
 
 	@Test
 	void shouldReturnTrueForLibrarian() {

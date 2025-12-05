@@ -119,6 +119,7 @@ class AccountServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> service.addFineToUser(userId, 10.0, "test"));
 	}
 
+	
 	 
 
 	@Test

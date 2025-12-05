@@ -88,7 +88,7 @@ public class AuthService {
 			throw new InvalidPasswordException("Incorrect password.");
 		}
 
-		// Convert domain user to application-safe DTO
+		 
 		AuthService.currentUser = user.toDTO();
 		return true;
 	}

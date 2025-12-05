@@ -23,7 +23,7 @@ public class FilterByYearStrategy extends BookSearchStrategy {
                     .filter(book -> book.getPublicationYear() == year)
                     .toList();
         } catch (NumberFormatException e) {
-            // Invalid year format
+           
             return List.of();
         }
     }
