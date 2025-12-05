@@ -15,7 +15,7 @@ public class StaticUserRepository implements UserRepository {
 
 	private final static StaticUserRepository INSTANCE = new StaticUserRepository();
 
-	/** Internal in-memory storage */
+	 
 	private static final List<User> users = new ArrayList<>();
 
 	private StaticUserRepository() {
@@ -35,9 +35,7 @@ public class StaticUserRepository implements UserRepository {
 				Role.ADMIN));
 	}
 
-	// ======================================
-	// Validation Helpers
-	// ======================================
+	 
 	private void validateUser(User user) {
 		if (user == null)
 			throw new IllegalArgumentException("User cannot be null");
@@ -60,10 +58,7 @@ public class StaticUserRepository implements UserRepository {
 		return users.stream().anyMatch(u -> u.getUsername().equalsIgnoreCase(username));
 	}
 
-	// ======================================
-	// CRUD Operations
-	// ======================================
-
+	 
 	@Override
 	public boolean add(User user) {
 		validateUser(user);
@@ -84,13 +79,13 @@ public class StaticUserRepository implements UserRepository {
 		for (int i = 0; i < users.size(); i++) {
 			if (users.get(i).getUserID().equals(updatedUser.getUserID())) {
 
-				// Check username duplication (different user)
+				 
 				if (!users.get(i).getUsername().equalsIgnoreCase(updatedUser.getUsername())
 						&& usernameExists(updatedUser.getUsername())) {
 					throw new IllegalArgumentException("Updated username already exists.");
 				}
 
-				// Check email duplication (different user)
+				 
 				if (!users.get(i).getEmail().equalsIgnoreCase(updatedUser.getEmail())
 						&& emailExists(updatedUser.getEmail())) {
 					throw new IllegalArgumentException("Updated email already exists.");
@@ -112,9 +107,7 @@ public class StaticUserRepository implements UserRepository {
 		return users.removeIf(u -> u.getUsername().equalsIgnoreCase(username));
 	}
 
-	// ======================================
-	// Retrieval Methods
-	// ======================================
+	 
 
 	@Override
 	public Optional<User> getByUserName(String username) {

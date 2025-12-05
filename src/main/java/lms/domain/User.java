@@ -27,9 +27,9 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private final String username; // Immutable after creation
+	private final String username;  
 	private String hashedPassword;
-	private final UUID userID; // Immutable
+	private final UUID userID;  
 	private final LocalDate registrationDate;
 	private Role role;
 	private List<Loan> loans;
@@ -51,7 +51,7 @@ public class User {
 	 * @throws IllegalArgumentException if any field fails validation
 	 */
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role) {
-		// Validate all inputs using existing validator
+		 
 		UserValidator validator = UserValidator.getInstance();
 		validator.validateFirstName(firstName);
 		validator.validateLastName(lastName);

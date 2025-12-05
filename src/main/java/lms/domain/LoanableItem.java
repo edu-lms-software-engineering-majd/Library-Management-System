@@ -16,10 +16,6 @@ public interface LoanableItem {
 
 	String getTitle();
 
-	//int getBorrowDurationDays();
-
-	//FineStrategy getFineStrategy();
-
-//	ItemType getItemType();
+	 
 
 }

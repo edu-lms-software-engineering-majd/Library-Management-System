@@ -37,9 +37,7 @@ public final class AuthorizationService {
 		ensureRole(user, Role.LIBRARIAN);
 	}
 
-	// =============================================================
-	// BOOLEAN VERSIONS (USED IN IF CONDITIONS)
-	// =============================================================
+	 
 
 	/**
 	 * Returns true if the user is an ADMIN.
