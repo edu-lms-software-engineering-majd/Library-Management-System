@@ -44,6 +44,32 @@ public class AdminCLI implements CLI {
     private static final String CD_TYPE = "cd";
     private static final String JOURNAL_TYPE = "journal";
     
+    // UI Messages
+    private static final String INVALID_CHOICE = "Invalid choice";
+    private static final String CHOOSE_OPTION = "Choose an option: ";
+    private static final String ENTER_TOTAL_COPIES = "Enter total copies: ";
+    private static final String COPIES = "Copies";
+    private static final String TITLE = "Title";
+    private static final String TOTAL_COPIES_IN_LIBRARY = "Total Copies in Library: ";
+    private static final String AVAILABLE_COPIES = "Available Copies: ";
+    private static final String INVALID_CRITERIA_CHOICE = "Invalid criteria choice";
+    private static final String SEARCH_TERM_EMPTY = "Search term cannot be empty";
+    private static final String ERROR_DURING_SEARCH = "Error during search/filter";
+    private static final String TIP_PARTIAL_ID = "Tip: You can enter partial ID (e.g., first 6-8 characters)";
+    private static final String ENTER_TITLE_SEARCH = "Enter title to search: ";
+    private static final String SEARCH_FILTER_RESULTS = "Search/Filter Results";
+    private static final String TOTAL_RESULTS = "Total results: ";
+    private static final String ENTER_NEW_VALUES = "Enter new values (leave blank to keep current value):";
+    private static final String NEW_TITLE_PREFIX = "New title [";
+    private static final String NEW_TOTAL_COPIES_PREFIX = "New total copies [";
+    private static final String INVALID_COPIES_FORMAT = "Invalid copies format, keeping current value";
+    private static final String TITLE_LABEL = "Title: ";
+    private static final String COPIES_LABEL = "Copies: ";
+    private static final String DELETION_CANCELLED = "Deletion cancelled.";
+    private static final String FORMAT_TABLE_4COL = "%-10s %-40s %-30s %-15s";
+    private static final String TIP_PARTIAL_MATCHES = "Tip: Partial matches work";
+    private static final String FORMAT_TABLE_4COL_WIDE = "%-10s %-50s %-40s %-15s";
+    
     private final Scanner scanner = new Scanner(System.in);
     private final UserService userService;
     private final BookService bookService;
@@ -124,7 +150,7 @@ public class AdminCLI implements CLI {
             case "10": handleViewReports(); break;
             case "11": handleLoanManagement(); break;
             case "12": authService.logout(); return false;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
         return true;
     }
@@ -160,7 +186,7 @@ public class AdminCLI implements CLI {
             case "1": handleAddBook(); break;
             case "2": handleAddCD(); break;
             case "3": handleAddJournal(); break;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
 
@@ -173,7 +199,7 @@ public class AdminCLI implements CLI {
             case "1": handleViewAllBooks(); break;
             case "2": handleViewAllCDs(); break;
             case "3": handleViewAllJournals(); break;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
 
@@ -211,7 +237,7 @@ public class AdminCLI implements CLI {
             case "1": handleUpdateBook(); break;
             case "2": handleUpdateCD(); break;
             case "3": handleUpdateJournal(); break;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
 
@@ -224,7 +250,7 @@ public class AdminCLI implements CLI {
             case "1": handleDeleteBook(); break;
             case "2": handleDeleteCD(); break;
             case "3": handleDeleteJournal(); break;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
 
@@ -233,7 +259,7 @@ public class AdminCLI implements CLI {
         CLILogger.info("1. Book");
         CLILogger.info("2. CD");
         CLILogger.info("3. Journal");
-        CLILogger.info("Choose an option: ");
+        CLILogger.info(CHOOSE_OPTION);
     }
 
     private void handleAddBook() {
@@ -258,7 +284,7 @@ public class AdminCLI implements CLI {
             CLILogger.info("Enter category: ");
             String category = scanner.nextLine().trim();
 
-            CLILogger.info("Enter total copies: ");
+            CLILogger.info(ENTER_TOTAL_COPIES);
             int totalCopies = Integer.parseInt(scanner.nextLine().trim());
 
             CLILogger.info("Enter language: ");
@@ -321,8 +347,8 @@ public class AdminCLI implements CLI {
         int availableCopiesCount = books.stream().mapToInt(Book::getAvailableCopies).sum();
         
         CLILogger.info("Books with Available Copies: " + availableBooks + "/" + books.size());
-        CLILogger.info("Total Copies in Library: " + totalCopiesCount);
-        CLILogger.info("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
+        CLILogger.info(TOTAL_COPIES_IN_LIBRARY + totalCopiesCount);
+        CLILogger.info(AVAILABLE_COPIES + availableCopiesCount + "/" + totalCopiesCount);
     }
 
     private void searchFilterBooks(String criteriaChoice) {
@@ -330,7 +356,7 @@ public class AdminCLI implements CLI {
             SearchCriteria criterion = SearchCriteria.fromChoice(criteriaChoice);
             
             if (criterion == null) {
-                CLIHelper.printError("Invalid criteria choice");
+                CLIHelper.printError(INVALID_CRITERIA_CHOICE);
                 return;
             }
             
@@ -341,7 +367,7 @@ public class AdminCLI implements CLI {
             String searchTerm = scanner.nextLine().trim();
             
             if (searchTerm.isEmpty()) {
-                CLIHelper.printError("Search term cannot be empty");
+                CLIHelper.printError(SEARCH_TERM_EMPTY);
                 return;
             }
             
@@ -351,13 +377,13 @@ public class AdminCLI implements CLI {
             displayBookResults(results);
             
         } catch (Exception e) {
-            CLILogger.error("Error during search/filter", e);
+            CLILogger.error(ERROR_DURING_SEARCH, e);
         }
     }
 
     private void displaySearchHint(SearchCriteria criterion) {
         String hint = switch (criterion) {
-            case ID -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
+            case ID -> TIP_PARTIAL_ID;
             case TITLE -> "Tip: Partial matches work (e.g., 'Clean' finds 'Clean Code')";
             case AUTHOR -> "Tip: Partial matches work (e.g., 'Martin' finds all Martin authors)";
             case ISBN -> "Tip: You can enter partial ISBN numbers";
@@ -371,7 +397,7 @@ public class AdminCLI implements CLI {
     private String getSearchPromptMessage(SearchCriteria criterion) {
         return switch (criterion) {
             case ID -> "Enter Book ID: ";
-            case TITLE -> "Enter title to search: ";
+            case TITLE -> ENTER_TITLE_SEARCH;
             case AUTHOR -> "Enter author to search: ";
             case ISBN -> "Enter ISBN: ";
             case YEAR -> "Enter publication year: ";
@@ -386,7 +412,7 @@ public class AdminCLI implements CLI {
             return;
         }
 
-        CLIHelper.printHeader("Search/Filter Results");
+        CLIHelper.printHeader(SEARCH_FILTER_RESULTS);
         CLILogger.info(String.format("%-10s %-30s %-20s %-15s %-10s %-10s %-10s",
             "ID", "Title", "Author", "ISBN", "Year", "Copies", "Category"));
 
@@ -400,7 +426,7 @@ public class AdminCLI implements CLI {
                 book.getIsbn(), book.getPublicationYear(),
                 book.getAvailableCopies() + "/" + book.getTotalCopies(), book.getCategory()));
         }
-        CLILogger.info("Total results: " + books.size());
+        CLILogger.info(TOTAL_RESULTS + books.size());
     }
 
     private void handleUpdateBook() {
@@ -418,9 +444,9 @@ public class AdminCLI implements CLI {
             CLIHelper.printHeader("Current Book Details");
             displaySingleBook(existingBook);
             
-            CLILogger.info("Enter new values (leave blank to keep current value):");
+            CLILogger.info(ENTER_NEW_VALUES);
 
-            CLILogger.info("New title [" + existingBook.getTitle() + "]: ");
+            CLILogger.info(NEW_TITLE_PREFIX + existingBook.getTitle() + "]: ");
             String title = scanner.nextLine().trim();
             if (title.isBlank()) {
                 title = null;
@@ -461,14 +487,14 @@ public class AdminCLI implements CLI {
                 category = null;
             }
 
-            CLILogger.info("New total copies [" + existingBook.getTotalCopies() + "]: ");
+            CLILogger.info(NEW_TOTAL_COPIES_PREFIX + existingBook.getTotalCopies() + "]: ");
             String copiesStr = scanner.nextLine().trim();
             Integer totalCopies = null;
             if (!copiesStr.isBlank()) {
                 try {
                     totalCopies = Integer.parseInt(copiesStr);
                 } catch (NumberFormatException e) {
-                    CLIHelper.printWarning("Invalid copies format, keeping current value");
+                    CLIHelper.printWarning(INVALID_COPIES_FORMAT);
                 }
             }
 
@@ -508,14 +534,14 @@ public class AdminCLI implements CLI {
     private void displaySingleBook(Book book) {
         CLIHelper.printHeader("Book Details");
         CLILogger.info("ID: " + book.getId());
-        CLILogger.info("Title: " + book.getTitle());
+        CLILogger.info(TITLE_LABEL + book.getTitle());
         CLILogger.info("Author: " + book.getAuthor());
         CLILogger.info("ISBN: " + book.getIsbn());
         CLILogger.info("Publisher: " + book.getPublisher());
         CLILogger.info("Publication Year: " + book.getPublicationYear());
         CLILogger.info("Category: " + book.getCategory());
         CLILogger.info("Language: " + book.getLanguage());
-        CLILogger.info("Copies: " + book.getAvailableCopies() + "/" + book.getTotalCopies());
+        CLILogger.info(COPIES_LABEL + book.getAvailableCopies() + "/" + book.getTotalCopies());
         CLILogger.info("Shelf Location: " + book.getShelfLocation());
     }
 
@@ -534,7 +560,7 @@ public class AdminCLI implements CLI {
             displayBookForDeletion(existingBook);
 
             if (!confirmDeletion(BOOK_TYPE, existingBook.getAvailableCopies(), existingBook.getTotalCopies())) {
-                CLILogger.info("Deletion cancelled.");
+                CLILogger.info(DELETION_CANCELLED);
                 return;
             }
 
@@ -556,9 +582,9 @@ public class AdminCLI implements CLI {
     private void displayBookForDeletion(Book book) {
         CLIHelper.printHeader("Book to be Deleted");
         CLILogger.info("ID: " + book.getId());
-        CLILogger.info("Title: " + book.getTitle());
+        CLILogger.info(TITLE_LABEL + book.getTitle());
         CLILogger.info("Author: " + book.getAuthor());
-        CLILogger.info("Available Copies: " + book.getAvailableCopies() + "/" + book.getTotalCopies());
+        CLILogger.info(AVAILABLE_COPIES + book.getAvailableCopies() + "/" + book.getTotalCopies());
     }
 
     private boolean confirmDeletion(String itemType, int availableCopies, int totalCopies) {
@@ -594,7 +620,7 @@ public class AdminCLI implements CLI {
             CLILogger.info("Enter artist: ");
             String artist = scanner.nextLine().trim();
 
-            CLILogger.info("Enter total copies: ");
+            CLILogger.info(ENTER_TOTAL_COPIES);
             int totalCopies = Integer.parseInt(scanner.nextLine().trim());
 
             CD cd = cdService.addCD(AuthService.getInstance().getCurrentUser(), title, artist, totalCopies);
@@ -643,8 +669,8 @@ public class AdminCLI implements CLI {
         int availableCopiesCount = cds.stream().mapToInt(CD::getAvailableCopies).sum();
         
         CLILogger.info("CDs with Available Copies: " + availableCDs + "/" + cds.size());
-        CLILogger.info("Total Copies in Library: " + totalCopiesCount);
-        CLILogger.info("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
+        CLILogger.info(TOTAL_COPIES_IN_LIBRARY + totalCopiesCount);
+        CLILogger.info(AVAILABLE_COPIES + availableCopiesCount + "/" + totalCopiesCount);
     }
 
     private void searchFilterCDs(String criteriaChoice) {
@@ -652,7 +678,7 @@ public class AdminCLI implements CLI {
             SearchStrategy<CD> strategy = getCDSearchStrategy(criteriaChoice);
             
             if (strategy == null) {
-                CLIHelper.printError("Invalid criteria choice");
+                CLIHelper.printError(INVALID_CRITERIA_CHOICE);
                 return;
             }
             
@@ -663,7 +689,7 @@ public class AdminCLI implements CLI {
             String searchTerm = scanner.nextLine().trim();
             
             if (searchTerm.isEmpty()) {
-                CLIHelper.printError("Search term cannot be empty");
+                CLIHelper.printError(SEARCH_TERM_EMPTY);
                 return;
             }
             
@@ -671,7 +697,7 @@ public class AdminCLI implements CLI {
             displayCDResults(results);
             
         } catch (Exception e) {
-            CLILogger.error("Error during search/filter", e);
+            CLILogger.error(ERROR_DURING_SEARCH, e);
         }
     }
 
@@ -687,9 +713,9 @@ public class AdminCLI implements CLI {
 
     private void displayCDSearchHint(String choice) {
         String hint = switch (choice) {
-            case "1" -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
-            case "2" -> "Tip: Partial matches work";
-            case "3" -> "Tip: Partial matches work";
+            case "1" -> TIP_PARTIAL_ID;
+            case "2" -> TIP_PARTIAL_MATCHES;
+            case "3" -> TIP_PARTIAL_MATCHES;
             case "7" -> "Tip: Enter 'y' or 'yes' to show only available CDs";
             default -> "Tip: Enter your search criteria";
         };
@@ -699,7 +725,7 @@ public class AdminCLI implements CLI {
     private String getCDSearchPromptMessage(String choice) {
         return switch (choice) {
             case "1" -> "Enter CD ID: ";
-            case "2" -> "Enter title to search: ";
+            case "2" -> ENTER_TITLE_SEARCH;
             case "3" -> "Enter artist to search: ";
             case "7" -> "Show only available CDs? (y/n): ";
             default -> "Enter search term: ";
@@ -712,8 +738,8 @@ public class AdminCLI implements CLI {
             return;
         }
 
-        CLIHelper.printHeader("Search/Filter Results");
-        CLILogger.info(String.format("%-10s %-40s %-30s %-15s", "ID", "Title", "Artist", "Copies"));
+        CLIHelper.printHeader(SEARCH_FILTER_RESULTS);
+        CLILogger.info(String.format(FORMAT_TABLE_4COL, "ID", TITLE, "Artist", COPIES));
 
         for (CD cd : cds) {
             String displayId = cd.getId().toString().substring(0, Math.min(8, cd.getId().toString().length()));
@@ -721,10 +747,10 @@ public class AdminCLI implements CLI {
             String displayArtist = CLIHelper.truncate(cd.getArtist(), 28);
             String copies = cd.getAvailableCopies() + "/" + cd.getTotalCopies();
             
-            CLILogger.info(String.format("%-10s %-40s %-30s %-15s",
+            CLILogger.info(String.format(FORMAT_TABLE_4COL,
                 displayId, displayTitle, displayArtist, copies));
         }
-        CLILogger.info("Total results: " + cds.size());
+        CLILogger.info(TOTAL_RESULTS + cds.size());
     }
 
     private void handleUpdateCD() {
@@ -742,9 +768,9 @@ public class AdminCLI implements CLI {
             CLIHelper.printHeader("Current CD Details");
             displaySingleCD(existingCD);
             
-            CLILogger.info("Enter new values (leave blank to keep current value):");
+            CLILogger.info(ENTER_NEW_VALUES);
 
-            CLILogger.info("New title [" + existingCD.getTitle() + "]: ");
+            CLILogger.info(NEW_TITLE_PREFIX + existingCD.getTitle() + "]: ");
             String title = scanner.nextLine().trim();
             if (title.isBlank()) {
                 title = null;
@@ -756,14 +782,14 @@ public class AdminCLI implements CLI {
                 artist = null;
             }
 
-            CLILogger.info("New total copies [" + existingCD.getTotalCopies() + "]: ");
+            CLILogger.info(NEW_TOTAL_COPIES_PREFIX + existingCD.getTotalCopies() + "]: ");
             String copiesStr = scanner.nextLine().trim();
             Integer totalCopies = null;
             if (!copiesStr.isBlank()) {
                 try {
                     totalCopies = Integer.parseInt(copiesStr);
                 } catch (NumberFormatException e) {
-                    CLIHelper.printWarning("Invalid copies format, keeping current value");
+                    CLIHelper.printWarning(INVALID_COPIES_FORMAT);
                 }
             }
 
@@ -790,9 +816,9 @@ public class AdminCLI implements CLI {
     private void displaySingleCD(CD cd) {
         CLIHelper.printHeader("CD Details");
         CLILogger.info("ID: " + cd.getId());
-        CLILogger.info("Title: " + cd.getTitle());
+        CLILogger.info(TITLE_LABEL + cd.getTitle());
         CLILogger.info("Artist: " + cd.getArtist());
-        CLILogger.info("Copies: " + cd.getAvailableCopies() + "/" + cd.getTotalCopies());
+        CLILogger.info(COPIES_LABEL + cd.getAvailableCopies() + "/" + cd.getTotalCopies());
     }
 
     private void handleDeleteCD() {
@@ -810,7 +836,7 @@ public class AdminCLI implements CLI {
             displayCDForDeletion(existingCD);
 
             if (!confirmDeletion(CD_TYPE, existingCD.getAvailableCopies(), existingCD.getTotalCopies())) {
-                CLILogger.info("Deletion cancelled.");
+                CLILogger.info(DELETION_CANCELLED);
                 return;
             }
 
@@ -832,9 +858,9 @@ public class AdminCLI implements CLI {
     private void displayCDForDeletion(CD cd) {
         CLIHelper.printHeader("CD to be Deleted");
         CLILogger.info("ID: " + cd.getId());
-        CLILogger.info("Title: " + cd.getTitle());
+        CLILogger.info(TITLE_LABEL + cd.getTitle());
         CLILogger.info("Artist: " + cd.getArtist());
-        CLILogger.info("Available Copies: " + cd.getAvailableCopies() + "/" + cd.getTotalCopies());
+        CLILogger.info(AVAILABLE_COPIES + cd.getAvailableCopies() + "/" + cd.getTotalCopies());
     }
 
     private CD findCDByIdOrSubId(String cdIdStr) {
@@ -860,7 +886,7 @@ public class AdminCLI implements CLI {
             CLILogger.info("Enter author/publisher: ");
             String author = scanner.nextLine().trim();
 
-            CLILogger.info("Enter total copies: ");
+            CLILogger.info(ENTER_TOTAL_COPIES);
             int totalCopies = Integer.parseInt(scanner.nextLine().trim());
 
             Journal journal = journalService.addJournal(AuthService.getInstance().getCurrentUser(), title, author, totalCopies);
@@ -909,8 +935,8 @@ public class AdminCLI implements CLI {
         int availableCopiesCount = journals.stream().mapToInt(Journal::getAvailableCopies).sum();
         
         CLILogger.info("Journals with Available Copies: " + availableJournals + "/" + journals.size());
-        CLILogger.info("Total Copies in Library: " + totalCopiesCount);
-        CLILogger.info("Available Copies: " + availableCopiesCount + "/" + totalCopiesCount);
+        CLILogger.info(TOTAL_COPIES_IN_LIBRARY + totalCopiesCount);
+        CLILogger.info(AVAILABLE_COPIES + availableCopiesCount + "/" + totalCopiesCount);
     }
 
     private void searchFilterJournals(String criteriaChoice) {
@@ -918,7 +944,7 @@ public class AdminCLI implements CLI {
             SearchStrategy<Journal> strategy = getJournalSearchStrategy(criteriaChoice);
             
             if (strategy == null) {
-                CLIHelper.printError("Invalid criteria choice");
+                CLIHelper.printError(INVALID_CRITERIA_CHOICE);
                 return;
             }
             
@@ -929,7 +955,7 @@ public class AdminCLI implements CLI {
             String searchTerm = scanner.nextLine().trim();
             
             if (searchTerm.isEmpty()) {
-                CLIHelper.printError("Search term cannot be empty");
+                CLIHelper.printError(SEARCH_TERM_EMPTY);
                 return;
             }
             
@@ -937,7 +963,7 @@ public class AdminCLI implements CLI {
             displayJournalResults(results);
             
         } catch (Exception e) {
-            CLILogger.error("Error during search/filter", e);
+            CLILogger.error(ERROR_DURING_SEARCH, e);
         }
     }
 
@@ -953,9 +979,9 @@ public class AdminCLI implements CLI {
 
     private void displayJournalSearchHint(String choice) {
         String hint = switch (choice) {
-            case "1" -> "Tip: You can enter partial ID (e.g., first 6-8 characters)";
-            case "2" -> "Tip: Partial matches work";
-            case "3" -> "Tip: Partial matches work";
+            case "1" -> TIP_PARTIAL_ID;
+            case "2" -> TIP_PARTIAL_MATCHES;
+            case "3" -> TIP_PARTIAL_MATCHES;
             case "7" -> "Tip: Enter 'y' or 'yes' to show only available journals";
             default -> "Tip: Enter your search criteria";
         };
@@ -965,7 +991,7 @@ public class AdminCLI implements CLI {
     private String getJournalSearchPromptMessage(String choice) {
         return switch (choice) {
             case "1" -> "Enter Journal ID: ";
-            case "2" -> "Enter title to search: ";
+            case "2" -> ENTER_TITLE_SEARCH;
             case "3" -> "Enter author/publisher to search: ";
             case "7" -> "Show only available journals? (y/n): ";
             default -> "Enter search term: ";
@@ -978,8 +1004,8 @@ public class AdminCLI implements CLI {
             return;
         }
 
-        CLIHelper.printHeader("Search/Filter Results");
-        CLILogger.info(String.format("%-10s %-50s %-40s %-15s", "ID", "Title", "Author/Publisher", "Copies"));
+        CLIHelper.printHeader(SEARCH_FILTER_RESULTS);
+        CLILogger.info(String.format(FORMAT_TABLE_4COL_WIDE, "ID", TITLE, "Author/Publisher", COPIES));
 
         for (Journal journal : journals) {
             String displayId = journal.getId().toString().substring(0, Math.min(8, journal.getId().toString().length()));
@@ -987,10 +1013,10 @@ public class AdminCLI implements CLI {
             String displayAuthor = CLIHelper.truncate(journal.getAuthor(), 38);
             String copies = journal.getAvailableCopies() + "/" + journal.getTotalCopies();
             
-            CLILogger.info(String.format("%-10s %-50s %-40s %-15s",
+            CLILogger.info(String.format(FORMAT_TABLE_4COL_WIDE,
                 displayId, displayTitle, displayAuthor, copies));
         }
-        CLILogger.info("Total results: " + journals.size());
+        CLILogger.info(TOTAL_RESULTS + journals.size());
     }
 
     private void handleUpdateJournal() {
@@ -1008,9 +1034,9 @@ public class AdminCLI implements CLI {
             CLIHelper.printHeader("Current Journal Details");
             displaySingleJournal(existingJournal);
             
-            CLILogger.info("Enter new values (leave blank to keep current value):");
+            CLILogger.info(ENTER_NEW_VALUES);
 
-            CLILogger.info("New title [" + existingJournal.getTitle() + "]: ");
+            CLILogger.info(NEW_TITLE_PREFIX + existingJournal.getTitle() + "]: ");
             String title = scanner.nextLine().trim();
             if (title.isBlank()) {
                 title = null;
@@ -1022,14 +1048,14 @@ public class AdminCLI implements CLI {
                 author = null;
             }
 
-            CLILogger.info("New total copies [" + existingJournal.getTotalCopies() + "]: ");
+            CLILogger.info(NEW_TOTAL_COPIES_PREFIX + existingJournal.getTotalCopies() + "]: ");
             String copiesStr = scanner.nextLine().trim();
             Integer totalCopies = null;
             if (!copiesStr.isBlank()) {
                 try {
                     totalCopies = Integer.parseInt(copiesStr);
                 } catch (NumberFormatException e) {
-                    CLIHelper.printWarning("Invalid copies format, keeping current value");
+                    CLIHelper.printWarning(INVALID_COPIES_FORMAT);
                 }
             }
 
@@ -1056,9 +1082,9 @@ public class AdminCLI implements CLI {
     private void displaySingleJournal(Journal journal) {
         CLIHelper.printHeader("Journal Details");
         CLILogger.info("ID: " + journal.getId());
-        CLILogger.info("Title: " + journal.getTitle());
+        CLILogger.info(TITLE_LABEL + journal.getTitle());
         CLILogger.info("Author/Publisher: " + journal.getAuthor());
-        CLILogger.info("Copies: " + journal.getAvailableCopies() + "/" + journal.getTotalCopies());
+        CLILogger.info(COPIES_LABEL + journal.getAvailableCopies() + "/" + journal.getTotalCopies());
     }
 
     private void handleDeleteJournal() {
@@ -1076,7 +1102,7 @@ public class AdminCLI implements CLI {
             displayJournalForDeletion(existingJournal);
 
             if (!confirmDeletion(JOURNAL_TYPE, existingJournal.getAvailableCopies(), existingJournal.getTotalCopies())) {
-                CLILogger.info("Deletion cancelled.");
+                CLILogger.info(DELETION_CANCELLED);
                 return;
             }
 
@@ -1098,9 +1124,9 @@ public class AdminCLI implements CLI {
     private void displayJournalForDeletion(Journal journal) {
         CLIHelper.printHeader("Journal to be Deleted");
         CLILogger.info("ID: " + journal.getId());
-        CLILogger.info("Title: " + journal.getTitle());
+        CLILogger.info(TITLE_LABEL + journal.getTitle());
         CLILogger.info("Author/Publisher: " + journal.getAuthor());
-        CLILogger.info("Available Copies: " + journal.getAvailableCopies() + "/" + journal.getTotalCopies());
+        CLILogger.info(AVAILABLE_COPIES + journal.getAvailableCopies() + "/" + journal.getTotalCopies());
     }
 
     private Journal findJournalByIdOrSubId(String journalIdStr) {
@@ -1253,7 +1279,7 @@ public class AdminCLI implements CLI {
                 userService.deleteByUsername(user.username());
                 CLIHelper.printSuccess("User deleted successfully");
             } else {
-                CLILogger.info("Deletion cancelled.");
+                CLILogger.info(DELETION_CANCELLED);
             }
         } catch (UserNotFoundException e) {
             CLIHelper.printError("No user found with username: " + username);
@@ -1268,7 +1294,7 @@ public class AdminCLI implements CLI {
         CLILogger.info("2. User Statistics");
         CLILogger.info("3. Loan Statistics");
         CLILogger.info("0. Back");
-        CLILogger.info("Choose an option: ");
+        CLILogger.info(CHOOSE_OPTION);
         
         String choice = scanner.nextLine().trim();
         
@@ -1277,7 +1303,7 @@ public class AdminCLI implements CLI {
             case "2": displayUserStatistics(); break;
             case "3": displayLoanStatistics(); break;
             case "0": return;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
 
@@ -1361,7 +1387,7 @@ public class AdminCLI implements CLI {
         CLILogger.info("7. Create Loan for User (Admin)");
         CLILogger.info("8. Force Return Item (Admin)");
         CLILogger.info("0. Back");
-        CLILogger.info("Choose an option: ");
+        CLILogger.info(CHOOSE_OPTION);
         
         String choice = scanner.nextLine().trim();
         
@@ -1375,7 +1401,7 @@ public class AdminCLI implements CLI {
             case "7": createLoanForUser(); break;
             case "8": forceReturnItem(); break;
             case "0": return;
-            default: CLIHelper.printError("Invalid choice"); break;
+            default: CLIHelper.printError(INVALID_CHOICE); break;
         }
     }
     
@@ -1463,9 +1489,9 @@ public class AdminCLI implements CLI {
         switch (choice) {
             case "1": itemType = "book"; break;
             case "2": itemType = "cd"; break;
-            case "3": itemType = "journal"; break;
+            case "3": itemType = JOURNAL_TYPE; break;
             default: 
-                CLIHelper.printError("Invalid choice");
+                CLIHelper.printError(INVALID_CHOICE);
                 return;
         }
         
