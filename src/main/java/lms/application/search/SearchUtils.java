@@ -33,7 +33,7 @@ public class SearchUtils {
 
 		String lower = searchTerm.toLowerCase().trim();
 
-		// Try exact UUID match
+		 
 		try {
 			UUID exactId = UUID.fromString(searchTerm);
 			List<T> exactMatch = items.stream().filter(item -> idExtractor.apply(item).equals(exactId)).toList();
@@ -43,10 +43,10 @@ public class SearchUtils {
 			}
 
 		} catch (IllegalArgumentException ignored) {
-			// Not a full UUID → continue to partial matching
+			 
 		}
 
-		// Partial / Prefix match
+		 
 		List<T> matches = items.stream()
 				.filter(item -> idExtractor.apply(item).toString().toLowerCase().startsWith(lower)).toList();
 

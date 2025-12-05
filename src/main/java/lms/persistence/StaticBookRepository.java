@@ -58,9 +58,7 @@ public final class StaticBookRepository implements BookRepository {
 				"Software Design", 2, "English", "Shelf C3"));
 	}
 
-    // ============================================================
-    // Validation
-    // ============================================================
+   
 
     /**
      * Ensures the provided book is valid and ready for persistence.
@@ -93,10 +91,7 @@ public final class StaticBookRepository implements BookRepository {
 				.anyMatch(b -> b.getIsbn().equalsIgnoreCase(isbn));
     }
 
-    // ============================================================
-    // CRUD Operations
-    // ============================================================
-
+   
     @Override
     public boolean addBook(Book book) {
         validate(book);
@@ -140,7 +135,7 @@ public final class StaticBookRepository implements BookRepository {
 
             if (current.getId().equals(updatedBook.getId())) {
 
-                // Prevent using another existing book's ISBN
+                 
                 boolean isbnChanged = !current.getIsbn().equalsIgnoreCase(updatedBook.getIsbn());
                 boolean isbnConflict = isbnChanged && isbnExists(updatedBook.getIsbn());
 

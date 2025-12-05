@@ -359,7 +359,7 @@ public class AdminCLI implements CLI {
 
 	private void searchFilterCDs(String criteriaChoice) {
 		try {
-			// Map criteria choice to appropriate CD search strategy
+		 
 			SearchStrategy<CD> strategy = getCDSearchStrategy(criteriaChoice);
 			
 			if (strategy == null) {
@@ -367,7 +367,7 @@ public class AdminCLI implements CLI {
 				return;
 			}
 			
-			// Display search hint
+		 
 			displayCDSearchHint(criteriaChoice);
 			
 			String promptMessage = getCDSearchPromptMessage(criteriaChoice);
@@ -456,7 +456,7 @@ public class AdminCLI implements CLI {
 
 	private void searchFilterJournals(String criteriaChoice) {
 		try {
-			// Map criteria choice to appropriate Journal search strategy
+		 
 			SearchStrategy<Journal> strategy = getJournalSearchStrategy(criteriaChoice);
 			
 			if (strategy == null) {
@@ -464,7 +464,7 @@ public class AdminCLI implements CLI {
 				return;
 			}
 			
-			// Display search hint
+			 
 			displayJournalSearchHint(criteriaChoice);
 			
 			String promptMessage = getJournalSearchPromptMessage(criteriaChoice);
@@ -1362,13 +1362,13 @@ private void handleViewLoanStats() {
 	 * @throws IllegalArgumentException if no book found
 	 */
 	private Book findBookByIdOrSubId(String idStr) {
-		// Try as full UUID first (more efficient if user provides full ID)
+	 
 		if (isValidUUID(idStr)) {
 			UUID bookId = UUID.fromString(idStr);
 			return bookService.getBookById(bookId);
 		}
 		
-		// Fall back to partial ID search
+	 
 		return bookService.getBookBySubId(idStr);
 	}
 
@@ -1381,13 +1381,13 @@ private void handleViewLoanStats() {
 	 * @throws IllegalArgumentException if no CD found
 	 */
 	private CD findCDByIdOrSubId(String idStr) {
-		// Try as full UUID first (more efficient if user provides full ID)
+		 
 		if (isValidUUID(idStr)) {
 			UUID cdId = UUID.fromString(idStr);
 			return cdService.getCDById(cdId);
 		}
 		
-		// Fall back to partial ID search
+		 
 		return cdService.getCDBySubId(idStr);
 	}
 
@@ -1400,13 +1400,13 @@ private void handleViewLoanStats() {
 	 * @throws IllegalArgumentException if no journal found
 	 */
 	private Journal findJournalByIdOrSubId(String idStr) {
-		// Try as full UUID first (more efficient if user provides full ID)
+		 
 		if (isValidUUID(idStr)) {
 			UUID journalId = UUID.fromString(idStr);
 			return journalService.getJournalById(journalId);
 		}
 		
-		// Fall back to partial ID search
+		 
 		return journalService.getJournalBySubId(idStr);
 	}
 

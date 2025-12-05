@@ -42,12 +42,10 @@ public class LibraryApp {
 	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	public static void main(String[] args) {
-		// Schedule the overdue loan checker to run every 24 hours
+	 
 		scheduler.scheduleAtFixedRate(new LoanOverdueChecker(), 1, 24 * 60, TimeUnit.MINUTES);
 
-		// -------------------------------
-		// Repositories (Singleton Static)
-		// -------------------------------
+		 
 		UserRepository userRepo = StaticUserRepository.getInstance();
 		
 		
@@ -56,10 +54,7 @@ public class LibraryApp {
 		CDRepository cdRepo = StaticCDRepository.getInstance();
 		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();
 		LoanRepository loanRepo = StaticLoanRepository.getInstance();
-
-		// -------------------------------
-		// Core Services
-		// -------------------------------
+ 
 		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
 		BookService bookService = new BookService(bookRepo);
@@ -71,25 +66,17 @@ public class LibraryApp {
 
 		userRepo.add(new User("Ahmad", "Salameh", "ahmad@example.com", "ahmad", pass1, Role.ADMIN));
 		userRepo.add(new User("Majd", "Awwad", "majd@example.com", "majd", pass2, Role.MEMBER));
-		// -------------------------------
-		// REAL Email Service (SMTP Gmail)
-		// -------------------------------
+		 
 		EmailService emailService = EmailService.getInstance();
 
-		// -------------------------------
-		// Notification Service (Now REAL)
-		// -------------------------------
+	 
 		NotificationService notificationService = new NotificationService(emailService);
 
-		// -------------------------------
-		// Loan Service
-		// -------------------------------
+		 
 		LoanService loanService = new LoanService(userRepo, bookRepo, cdRepo, journalsRepo, loanRepo,
 				notificationService);
 
-		// -------------------------------
-		// CLI Layer
-		// -------------------------------
+		 
 		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService, notificationService, accountService);
 
 		cli.start();

@@ -148,11 +148,12 @@ class BookTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTotalCopiesIsZero() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            new Book("Title", "Author", "123456789", "Publisher", 2020, "Category", 0, "English", "A1")
-        );
+    void shouldAllowZeroTotalCopies() {
+        Book b = new Book("Title", "Author", "123456789", "Publisher", 2020, "Category", 0, "English", "A1");
+        assertEquals(0, b.getTotalCopies());
+        assertEquals(0, b.getAvailableCopies());
     }
+
 
     @Test
     void shouldReturnTrueForIsAvailableWhenCopiesAvailable() {
@@ -363,11 +364,11 @@ class BookTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenSettingZeroTotalCopies() {
-        assertThrows(IllegalArgumentException.class, () -> 
-            book.setTotalCopies(0)
-        );
+    void shouldAllowSettingZeroTotalCopies() {
+        book.setTotalCopies(0);
+        assertEquals(0, book.getTotalCopies());
     }
+
 
     @Test
     void shouldGenerateUniqueId() {

@@ -56,9 +56,7 @@ public class JournalService {
 		this.userRepo = userRepo;
 	}
 
-	// ============================================================
-	// CREATE
-	// ============================================================
+	 
 
 	public Journal addJournal(UserDTO userDTO, String title, String author) throws PermissionDeniedException {
 
@@ -87,10 +85,7 @@ public class JournalService {
 		return journal;
 	}
 
-	// ============================================================
-	// READ
-	// ============================================================
-
+	 
 	public List<Journal> getAllJournals() {
 		return journalRepo.getAllJournals();
 	}
@@ -112,9 +107,7 @@ public class JournalService {
 		return matches.get(0);
 	}
 
-	// ============================================================
-	// UPDATE
-	// ============================================================
+	 
 
 	public Journal updateJournal(UserDTO userDTO, UUID journalId, String newTitle, String newAuthor,
 			Integer newTotalCopies) throws PermissionDeniedException {
@@ -142,11 +135,7 @@ public class JournalService {
 
 		return journal;
 	}
-
-	// ============================================================
-	// DELETE
-	// ============================================================
-
+ 
 	public boolean deleteJournal(UserDTO userDTO, UUID journalId) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -156,9 +145,7 @@ public class JournalService {
 		return journalRepo.deleteJournal(journalId);
 	}
 
-	// ============================================================
-	// SEARCH
-	// ============================================================
+	 
 
 	public List<Journal> searchJournals(String keyword) {
 		if (keyword == null || keyword.isBlank())
@@ -173,10 +160,7 @@ public class JournalService {
 		return strategy.execute(journalRepo.getAllJournals(), searchTerm);
 	}
 
-	// ============================================================
-	// BORROW / RETURN
-	// ============================================================
-
+	 
 	public boolean isAvailableJournal(UUID journalId) {
 		return journalRepo.getJournalById(journalId).map(j -> !j.isBorrowed()).orElse(false);
 	}

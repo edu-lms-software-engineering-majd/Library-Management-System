@@ -4,15 +4,14 @@ package lms.domain.strategy;
  * Represents the fine calculation strategy for journals.
  *
  * <p>
- * According to the library policy, journals have a fixed fine rate of
- * 15 NIS for each overdue day. This class implements the
- * {@link FineStrategy} interface and provides the calculation logic
- * specific to journal items.
+ * According to the library policy, journals have a fixed fine rate of 15 NIS
+ * for each overdue day. This class implements the {@link FineStrategy}
+ * interface and provides the calculation logic specific to journal items.
  * </p>
  *
  * <p>
- * This strategy is used by the domain layer when calculating fines
- * for overdue journal loans.
+ * This strategy is used by the domain layer when calculating fines for overdue
+ * journal loans.
  * </p>
  *
  * @author Ahmad Salameh
@@ -20,10 +19,16 @@ package lms.domain.strategy;
  */
 public class JournalFineStrategy implements FineStrategy {
 
-    private static final double JOURNAL_FINE_RATE = 15.0;
+	private static final double JOURNAL_FINE_RATE = 15.0;
 
-    @Override
-    public double calculateFine(long daysOverdue) {
-        return daysOverdue * JOURNAL_FINE_RATE;
-    }
+	@Override
+	public double calculateFine(long daysOverdue) {
+		if (daysOverdue < 0) {
+			throw new IllegalArgumentException("Days overdue cannot be negative");
+		}
+		if (daysOverdue == 0) {
+			return 0.0;
+		}
+		return daysOverdue * JOURNAL_FINE_RATE;
+	}
 }

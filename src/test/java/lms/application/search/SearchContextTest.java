@@ -25,19 +25,19 @@ class SearchContextTest {
 	}
 
 	@Test
-	@DisplayName("Should throw when setting null strategy")
+
 	void shouldThrowWhenSettingNullStrategy() {
 		assertThrows(IllegalArgumentException.class, () -> context.setStrategy(null));
 	}
 
 	@Test
-	@DisplayName("Should throw when executing search without setting strategy")
+
 	void shouldThrowWhenExecutingWithoutStrategy() {
 		assertThrows(IllegalStateException.class, () -> context.executeSearch(books, "Clean"));
 	}
 
 	@Test
-	@DisplayName("Should execute search using current strategy")
+
 	void shouldExecuteSearchCorrectly() {
 		context.setStrategy(new SearchByTitleStrategy());
 		var result = context.executeSearch(books, "Clean");
@@ -46,7 +46,7 @@ class SearchContextTest {
 	}
 
 	@Test
-	@DisplayName("Should allow changing strategies at runtime")
+
 	void shouldSwitchStrategies() {
 		context.setStrategy(new SearchByTitleStrategy());
 		var result1 = context.executeSearch(books, "Clean");
@@ -60,7 +60,7 @@ class SearchContextTest {
 	}
 
 	@Test
-	@DisplayName("Should return description of selected strategy")
+
 	void shouldReturnStrategyDescription() {
 		context.setStrategy(new SearchByAuthorStrategy());
 
@@ -68,7 +68,7 @@ class SearchContextTest {
 	}
 
 	@Test
-	@DisplayName("Should return null description if no strategy set")
+
 	void shouldReturnNullWhenNoStrategy() {
 		assertNull(context.getStrategyDescription());
 	}

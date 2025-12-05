@@ -169,7 +169,6 @@ class BookServiceTest {
 	@Test
 	void givenNoMatchPrefix_whenGetBookBySubId_thenThrow() {
 		when(bookRepo.getAllBooks()).thenReturn(List.of(sampleBook));
-
 		assertThrows(IllegalArgumentException.class, () -> bookService.getBookBySubId("XYZ"));
 	}
 

@@ -37,7 +37,9 @@ class JournalServiceDeleteTest {
 	@BeforeEach
 	void setUp() {
 		journalService = new JournalService(journalRepo, userRepo);
+
 		adminUser = new UserDTO(UUID.randomUUID(), "ahmad", "Ahmad", "Salameh", "ahmad@example.com", Role.ADMIN);
+
 		memberUser = new UserDTO(UUID.randomUUID(), "majd", "Majd", "Awwad", "majd@example.com", Role.MEMBER);
 	}
 
@@ -58,7 +60,6 @@ class JournalServiceDeleteTest {
 	@Test
 	void shouldRejectDeleteForMember() {
 		UUID id = UUID.randomUUID();
-
 		assertThrows(PermissionDeniedException.class, () -> journalService.deleteJournal(memberUser, id));
 	}
 
@@ -66,7 +67,6 @@ class JournalServiceDeleteTest {
 	void shouldThrowWhenDeletingMissingJournal() {
 		UUID id = UUID.randomUUID();
 		when(journalRepo.getJournalById(id)).thenReturn(Optional.empty());
-
 		assertThrows(IllegalArgumentException.class, () -> journalService.deleteJournal(adminUser, id));
 	}
 }

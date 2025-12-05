@@ -167,7 +167,7 @@ public class Book implements LoanableItem {
 		this.isbn = isbn;
 	}
 
-	// NOTE: ISBN is immutable - no setter provided as it's a unique identifier
+	 
 
 	/** @return the publisher of the book */
 	public String getPublisher() {
@@ -298,6 +298,7 @@ public class Book implements LoanableItem {
 		this.shelfLocation = shelfLocation;
 
 	}
+	
 	
 	
 	
