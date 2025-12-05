@@ -71,7 +71,7 @@ public class AdminCLI implements CLI {
 	 * @throws IllegalAccessException if a non-admin tries to start the CLI
 	 */
 	public void start() throws IllegalAccessException {
-		if (AuthService.getCurrentUser().role() != Role.ADMIN) {
+		if (AuthService.getInstance().getCurrentUser().role() != Role.ADMIN) {
 			throw new IllegalAccessException("Only administrators can access this menu.");
 		}
 
@@ -310,6 +310,7 @@ public class AdminCLI implements CLI {
 			}
 			
 			SearchStrategy<Book> strategy = criterion.createStrategy();
+			@SuppressWarnings("unused")
 			SearchContext<Book> searchContext = new SearchContext<>(strategy);
 
 			List<Book> results = bookService.searchBooks(strategy, searchTerm);
@@ -610,7 +611,7 @@ public class AdminCLI implements CLI {
 				return;
 			}
 
-			boolean deleted = bookService.deleteBook(AuthService.getCurrentUser(), existingBook.getId());
+			boolean deleted = bookService.deleteBook(AuthService.getInstance().getCurrentUser(), existingBook.getId());
 
 			System.out.println(deleted ? "Book deleted successfully." : "Failed to delete book.");
 
@@ -691,7 +692,7 @@ public class AdminCLI implements CLI {
 			if (shelfLocation.isBlank()) shelfLocation = null;
 
 			boolean updated = bookService.updateBook(
-				AuthService.getCurrentUser(),
+				AuthService.getInstance().getCurrentUser(),
 				existingBook.getId(),
 				title,
 				author,
@@ -734,7 +735,7 @@ public class AdminCLI implements CLI {
 			System.out.print("Enter total copies: ");
 			int totalCopies = Integer.parseInt(scanner.nextLine().trim());
 
-			CD cd = cdService.addCD(AuthService.getCurrentUser(), title, artist, totalCopies);
+			CD cd = cdService.addCD(AuthService.getInstance().getCurrentUser(), title, artist, totalCopies);
 
 			if (cd != null) {
 				System.out.println("CD '" + title + "' by " + artist + " added successfully.");
@@ -819,7 +820,7 @@ public class AdminCLI implements CLI {
 			}
 
 			CD updated = cdService.updateCD(
-				AuthService.getCurrentUser(),
+				AuthService.getInstance().getCurrentUser(),
 				existingCD.getId(),
 				title,
 				artist,
@@ -870,7 +871,7 @@ public class AdminCLI implements CLI {
 				return;
 			}
 
-			boolean deleted = cdService.deleteCD(AuthService.getCurrentUser(), existingCD.getId());
+			boolean deleted = cdService.deleteCD(AuthService.getInstance().getCurrentUser(), existingCD.getId());
 
 			System.out.println(deleted ? "CD deleted successfully." : "Failed to delete CD.");
 
@@ -896,7 +897,7 @@ public class AdminCLI implements CLI {
 			System.out.print("Enter total copies: ");
 			int totalCopies = Integer.parseInt(scanner.nextLine().trim());
 
-			Journal journal = journalService.addJournal(AuthService.getCurrentUser(), title, author, totalCopies);
+			Journal journal = journalService.addJournal(AuthService.getInstance().getCurrentUser(), title, author, totalCopies);
 
 			if (journal != null) {
 				System.out.println("Journal '" + title + "' by " + author + " added successfully.");
@@ -981,7 +982,7 @@ public class AdminCLI implements CLI {
 			}
 
 			Journal updated = journalService.updateJournal(
-				AuthService.getCurrentUser(),
+				AuthService.getInstance().getCurrentUser(),
 				existingJournal.getId(),
 				title,
 				author,
@@ -1032,7 +1033,7 @@ public class AdminCLI implements CLI {
 				return;
 			}
 
-			boolean deleted = journalService.deleteJournal(AuthService.getCurrentUser(), existingJournal.getId());
+			boolean deleted = journalService.deleteJournal(AuthService.getInstance().getCurrentUser(), existingJournal.getId());
 
 			System.out.println(deleted ? "Journal deleted successfully." : "Failed to delete journal.");
 
@@ -1175,7 +1176,7 @@ private void handleViewLoanStats() {
 			System.out.print("Enter shelf location: ");
 			String shelfLocation = scanner.nextLine().trim();
 
-			Book book = bookService.addBook(AuthService.getCurrentUser(), title, author, isbn, publisher, year,
+			Book book = bookService.addBook(AuthService.getInstance().getCurrentUser(), title, author, isbn, publisher, year,
 					category, totalCopies, language, shelfLocation);
 
 			if (book != null) {
@@ -1321,7 +1322,7 @@ private void handleViewLoanStats() {
 				}
 			}
 
-			boolean updated = userService.updateUser(AuthService.getCurrentUser(), existing.userID(), newUsername,
+			boolean updated = userService.updateUser(AuthService.getInstance().getCurrentUser(), existing.userID(), newUsername,
 					password, email, role);
 
 			if (updated)

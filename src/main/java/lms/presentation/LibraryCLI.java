@@ -161,7 +161,7 @@ public class LibraryCLI implements CLI {
 
 		try {
 			if (authService.login(username, password)) {
-				UserDTO current = AuthService.getCurrentUser();
+				UserDTO current = AuthService.getInstance().getCurrentUser();
 				System.out.println("Login successful! Welcome, " + current.username());
 				CLIFactory.getCLI(this.authService, this.userService, this.bookService, this.loanService, this.cdService, this.journalService, this.notificationService, this.accountService).start();
 			}

@@ -215,7 +215,7 @@ public class LoanService {
 	public boolean returnItem(UUID userID, UUID loanID) throws IllegalArgumentException, IllegalStateException,
 			UserNotFoundException, ItemNotFoundException, LoanNotFoundException, PermissionDeniedException {
 
-		if (!AuthorizationService.isLibrarian(AuthService.getCurrentUser())) {
+		if (!AuthorizationService.isLibrarian(AuthService.getInstance().getCurrentUser())) {
 			throw new IllegalStateException("Only librarians can process returns.");
 		}
 

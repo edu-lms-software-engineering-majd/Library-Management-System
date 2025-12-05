@@ -55,7 +55,6 @@ public class LibraryApp {
 		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();
 		LoanRepository loanRepo = StaticLoanRepository.getInstance();
  
-		AuthService authService = new AuthService(userRepo);
 		UserService userService = new UserService(userRepo);
 		BookService bookService = new BookService(bookRepo);
 		CDService cdService = new CDService(cdRepo);
@@ -77,7 +76,7 @@ public class LibraryApp {
 				notificationService);
 
 		 
-		LibraryCLI cli = new LibraryCLI(authService, userService, bookService, loanService, cdService, journalService, notificationService, accountService);
+		LibraryCLI cli = new LibraryCLI(AuthService.getInstance(), userService, bookService, loanService, cdService, journalService, notificationService, accountService);
 
 		cli.start();
 	}

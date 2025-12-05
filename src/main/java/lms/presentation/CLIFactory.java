@@ -51,7 +51,7 @@ public class CLIFactory {
 	 * @throws IllegalStateException if the user's role is unsupported
 	 */
 	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService,CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService) {
-		switch (AuthService.getCurrentUser().role()) {
+		switch (AuthService.getInstance().getCurrentUser().role()) {
 		case ADMIN:
 			return new AdminCLI(userService, bookService, authService,loanService, cdService, journalService);
 		case MEMBER:
@@ -59,7 +59,7 @@ public class CLIFactory {
 			return new UserCLI(userService, bookService, cdService, journalService, loanService, notificationService, authService, accountService);
 			
 		default:
-			throw new IllegalStateException("Unsupported role: " + AuthService.getCurrentUser().role());
+			throw new IllegalStateException("Unsupported role: " + AuthService.getInstance().getCurrentUser().role());
 		}
 	}
 

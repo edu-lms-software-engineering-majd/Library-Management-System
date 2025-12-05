@@ -38,12 +38,25 @@ import lms.domain.exception.UserNotFoundException;
  * <ul>
  *   <li>Browse and search for items easily</li>
  *   <li>Borrow items using partial names or IDs</li>
- *   <li>Return items with simple selection</li>
+ *   <li>Return items with simple selection (librarians only)</li>
  *   <li>Manage their profile and view notifications</li>
+ *   <li>View account information and pay fines</li>
  * </ul>
  * 
- * @author Enhanced by Claude
- * @version 2.0
+ * <h2>Design Improvements (v2.1):</h2>
+ * <ul>
+ *   <li>Caches current user to avoid repeated AuthService calls</li>
+ *   <li>Separates menu handling logic by user role</li>
+ *   <li>Centralizes user retrieval through helper methods</li>
+ *   <li>Improved separation of concerns and maintainability</li>
+ * </ul>
+ * 
+ * <p><b>Note:</b> This class is optimized for single-user CLI sessions. The current
+ * user is cached on first access and cleared on logout.</p>
+ * 
+ * @author Majd Awwad
+ * @version 2.1
+ * @since December 2025
  */
 public class UserCLI implements CLI {
 
@@ -56,6 +69,9 @@ public class UserCLI implements CLI {
     private final NotificationService notificationService;
     private final AuthService authService;
     private final AccountService accountService;
+    
+    // Cache current user to avoid repeated AuthService calls
+    private UserDTO currentUser;
 
     public UserCLI(UserService userService, BookService bookService, CDService cdService,
                    JournalService journalService, LoanService loanService,
@@ -69,108 +85,161 @@ public class UserCLI implements CLI {
         this.authService = authService;
         this.accountService = accountService;
     }
+    
+    /**
+     * Gets the current authenticated user from cache or AuthService.
+     * This method centralizes user retrieval and reduces repeated calls.
+     * 
+     * @return the currently authenticated user
+     */
+    private UserDTO getCurrentUser() {
+        if (currentUser == null) {
+            currentUser = authService.getCurrentUser();
+        }
+        return currentUser;
+    }
+    
+    /**
+     * Checks if the current user has librarian privileges.
+     * 
+     * @return true if user is a librarian, false otherwise
+     */
+    private boolean isLibrarian() {
+        return getCurrentUser().role() == lms.domain.Role.LIBRARIAN;
+    }
 
     @Override
     public void start() {
-        UserDTO currentUser = AuthService.getCurrentUser();
+        UserDTO user = getCurrentUser();
         System.out.println("\n╔═══════════════════════════════════════════════════╗");
         System.out.println("║        Library Management System - User          ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
-        System.out.println("    Welcome, " + currentUser.firstName() + " " + currentUser.lastName() + "!");
+        System.out.println("    Welcome, " + user.firstName() + " " + user.lastName() + "!");
         
-        
-        try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
-            int unreadCount = user.getUnreadNotificationCount();
-            if (unreadCount > 0) {
-                System.out.println("    📬 You have " + unreadCount + " unread notification(s)!");
-            }
-        } catch (Exception e) {
-           
-        }
+        displayUnreadNotificationCount();
 
         boolean running = true;
         while (running) {
             showUserMenu();
             String choice = scanner.nextLine().trim();
             
-            boolean isLibrarian = currentUser.role() == lms.domain.Role.LIBRARIAN;
-
-            
-            if (isLibrarian) {
-              
-                switch (choice) {
-                    case "1":
-                        handleBrowseAndSearchItems();
-                        break;
-                    case "2":
-                        handleBorrowItem();
-                        break;
-                    case "3":
-                        handleReturnItem();
-                        break;
-                    case "4":
-                        handleViewMyLoans();
-                        break;
-                    case "5":
-                        handleAccountManagement();
-                        break;
-                    case "6":
-                        handleViewMyProfile();
-                        break;
-                    case "7":
-                        handleUpdateMyProfile();
-                        break;
-                    case "8":
-                        handleViewMyNotifications();
-                        break;
-                    case "9":
-                        System.out.println("\n👋 Logging out... Goodbye!");
-                        authService.logout();
-                        running = false;
-                        break;
-                    default:
-                        System.out.println("❌ Invalid choice, try again.");
-                }
-            } else {
-           
-                switch (choice) {
-                    case "1":
-                        handleBrowseAndSearchItems();
-                        break;
-                    case "2":
-                        handleBorrowItem();
-                        break;
-                    case "3":
-                        handleViewMyLoans();
-                        break;
-                    case "4":
-                        handleAccountManagement();
-                        break;
-                    case "5":
-                        handleViewMyProfile();
-                        break;
-                    case "6":
-                        handleUpdateMyProfile();
-                        break;
-                    case "7":
-                        handleViewMyNotifications();
-                        break;
-                    case "8":
-                        System.out.println("\n👋 Logging out... Goodbye!");
-                        authService.logout();
-                        running = false;
-                        break;
-                    default:
-                        System.out.println("❌ Invalid choice, try again.");
-                }
-            }
+            running = handleMenuChoice(choice);
         }
+    }
+    
+    /**
+     * Displays unread notification count for the current user.
+     */
+    private void displayUnreadNotificationCount() {
+        try {
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
+            int unreadCount = user.getUnreadNotificationCount();
+            if (unreadCount > 0) {
+                System.out.println("    📬 You have " + unreadCount + " unread notification(s)!");
+            }
+        } catch (Exception e) {
+            // Silently ignore - notification count is not critical
+        }
+    }
+    
+    /**
+     * Handles menu choice based on user input and role.
+     * 
+     * @param choice the menu option selected
+     * @return false if user wants to logout, true to continue
+     */
+    private boolean handleMenuChoice(String choice) {
+        if (isLibrarian()) {
+            return handleLibrarianMenuChoice(choice);
+        } else {
+            return handleMemberMenuChoice(choice);
+        }
+    }
+    
+    /**
+     * Handles menu choices for librarian users.
+     */
+    private boolean handleLibrarianMenuChoice(String choice) {
+        switch (choice) {
+            case "1":
+                handleBrowseAndSearchItems();
+                break;
+            case "2":
+                handleBorrowItem();
+                break;
+            case "3":
+                handleReturnItem();
+                break;
+            case "4":
+                handleViewMyLoans();
+                break;
+            case "5":
+                handleAccountManagement();
+                break;
+            case "6":
+                handleViewMyProfile();
+                break;
+            case "7":
+                handleUpdateMyProfile();
+                break;
+            case "8":
+                handleViewMyNotifications();
+                break;
+            case "9":
+                performLogout();
+                return false;
+            default:
+                System.out.println("❌ Invalid choice, try again.");
+        }
+        return true;
+    }
+    
+    /**
+     * Handles menu choices for regular member users.
+     */
+    private boolean handleMemberMenuChoice(String choice) {
+        switch (choice) {
+            case "1":
+                handleBrowseAndSearchItems();
+                break;
+            case "2":
+                handleBorrowItem();
+                break;
+            case "3":
+                handleViewMyLoans();
+                break;
+            case "4":
+                handleAccountManagement();
+                break;
+            case "5":
+                handleViewMyProfile();
+                break;
+            case "6":
+                handleUpdateMyProfile();
+                break;
+            case "7":
+                handleViewMyNotifications();
+                break;
+            case "8":
+                performLogout();
+                return false;
+            default:
+                System.out.println("❌ Invalid choice, try again.");
+        }
+        return true;
+    }
+    
+    /**
+     * Performs logout operation.
+     */
+    private void performLogout() {
+        System.out.println("\n👋 Logging out... Goodbye!");
+        authService.logout();
+        currentUser = null; // Clear cached user
     }
 
     private void showUserMenu() {
-        UserDTO currentUser = AuthService.getCurrentUser();
-        boolean isLibrarian = currentUser.role() == lms.domain.Role.LIBRARIAN;
+        boolean isLibrarian = isLibrarian();
         
         System.out.println("\n╔═══════════════════════════════════════════════════╗");
         System.out.println("║                    USER MENU                      ║");
@@ -451,8 +520,7 @@ public class UserCLI implements CLI {
         }
         
         try {
-            UserDTO currentUser = AuthService.getCurrentUser();
-            loanService.loanItem(currentUser, selectedBook.getId(), "book");
+            loanService.loanItem(getCurrentUser(), selectedBook.getId(), "book");
             System.out.println("✅ Book borrowed successfully! Due date: 28 days from today.");
         } catch (Exception e) {
             System.out.println("❌ Error borrowing book: " + e.getMessage());
@@ -497,8 +565,7 @@ public class UserCLI implements CLI {
         }
         
         try {
-            UserDTO currentUser = AuthService.getCurrentUser();
-            loanService.loanItem(currentUser, selectedCD.getId(), "cd");
+            loanService.loanItem(getCurrentUser(), selectedCD.getId(), "cd");
             System.out.println("✅ CD borrowed successfully! Due date: 21 days from today.");
         } catch (Exception e) {
             System.out.println("❌ Error borrowing CD: " + e.getMessage());
@@ -543,8 +610,7 @@ public class UserCLI implements CLI {
         }
         
         try {
-            UserDTO currentUser = AuthService.getCurrentUser();
-            loanService.loanItem(currentUser, selectedJournal.getId(), "journal");
+            loanService.loanItem(getCurrentUser(), selectedJournal.getId(), "journal");
             System.out.println("✅ Journal borrowed successfully! Due date: 7 days from today.");
         } catch (Exception e) {
             System.out.println("❌ Error borrowing journal: " + e.getMessage());
@@ -946,10 +1012,8 @@ public class UserCLI implements CLI {
         System.out.println("║                 My Active Loans                   ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            List<Loan> activeLoans = loanService.getUserActiveLoans(currentUser.userID());
+            List<Loan> activeLoans = loanService.getUserActiveLoans(getCurrentUser().userID());
             
             if (activeLoans.isEmpty()) {
                 System.out.println("📭 You have no active loans.");
@@ -1009,10 +1073,8 @@ public class UserCLI implements CLI {
         System.out.println("║              Account Summary                      ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
             lms.domain.Account account = user.getAccount();
             
             System.out.println("📋 Account ID: " + account.getAccountId().toString().substring(0, 8) + "...");
@@ -1065,10 +1127,8 @@ public class UserCLI implements CLI {
         System.out.println("║           Transaction History                     ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
             lms.domain.Account account = user.getAccount();
             List<lms.domain.FineTransaction> transactions = account.getFineTransactions();
             
@@ -1086,7 +1146,8 @@ public class UserCLI implements CLI {
                 "#", "Date", "Type", "Amount", "Description");
             System.out.println("═".repeat(110));
             
-            double runningBalance = 0.0;
+            @SuppressWarnings("unused")
+			double runningBalance = 0.0;
             for (int i = 0; i < transactions.size(); i++) {
                 lms.domain.FineTransaction transaction = transactions.get(i);
                 
@@ -1129,10 +1190,8 @@ public class UserCLI implements CLI {
         System.out.println("║                  Pay Fines                        ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
             lms.domain.Account account = user.getAccount();
             
             double totalFines = account.getTotalFines();
@@ -1220,10 +1279,8 @@ public class UserCLI implements CLI {
         System.out.println("║           Account Statistics                      ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
             lms.domain.Account account = user.getAccount();
             List<lms.domain.FineTransaction> transactions = account.getFineTransactions();
              
@@ -1298,11 +1355,9 @@ public class UserCLI implements CLI {
         System.out.println("║                  My Profile                       ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            UserDTO user = userService.getUserByUsername(currentUser.username());
-            User domainUser = userService.getDomainUserByUsername(currentUser.username());
+            UserDTO user = getCurrentUser();
+            User domainUser = userService.getDomainUserByUsername(user.username());
             
             System.out.println("👤 Username: " + user.username());
             System.out.println("📝 Name: " + user.firstName() + " " + user.lastName());
@@ -1325,12 +1380,10 @@ public class UserCLI implements CLI {
         System.out.println("\n╔═══════════════════════════════════════════════════╗");
         System.out.println("║                Update My Profile                  ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
-        
-        UserDTO currentUser = AuthService.getCurrentUser();
 
         System.out.println("📝 Leave fields blank to keep current values\n");
 
-        System.out.print("Enter new email (current: '" + currentUser.email() + "'): ");
+        System.out.print("Enter new email (current: '" + getCurrentUser().email() + "'): ");
         String email = scanner.nextLine().trim();
         if (email.isEmpty()) {
             email = null;
@@ -1359,7 +1412,8 @@ public class UserCLI implements CLI {
         }
 
         try {
-            userService.updateUser(currentUser, currentUser.userID(), null, email, password, null);
+            UserDTO user = getCurrentUser();
+            userService.updateUser(user, user.userID(), null, email, password, null);
             System.out.println("✅ Profile updated successfully!");
             
             if (password != null) {
@@ -1376,10 +1430,8 @@ public class UserCLI implements CLI {
         System.out.println("║                My Notifications                   ║");
         System.out.println("╚═══════════════════════════════════════════════════╝");
         
-        UserDTO currentUser = AuthService.getCurrentUser();
-        
         try {
-            User user = userService.getDomainUserByUsername(currentUser.username());
+            User user = userService.getDomainUserByUsername(getCurrentUser().username());
             List<Notification> unreadNotifications = user.getUnreadNotifications();
             List<Notification> readNotifications = user.getReadNotifications();
             

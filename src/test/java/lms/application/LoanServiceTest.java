@@ -212,8 +212,11 @@ class LoanServiceTest {
 	void shouldRejectReturnWhenNotLibrarian() {
 		UUID loanId = UUID.randomUUID();
 
+		AuthService authServiceMock = mock(AuthService.class);
+		when(authServiceMock.getCurrentUser()).thenReturn(memberUser);
+
 		try (MockedStatic<AuthService> authMock = mockStatic(AuthService.class)) {
-			authMock.when(AuthService::getCurrentUser).thenReturn(memberUser);
+			authMock.when(AuthService::getInstance).thenReturn(authServiceMock);
 
 			assertThrows(IllegalStateException.class, () -> loanService.returnItem(memberUser.userID(), loanId));
 		}
@@ -223,8 +226,11 @@ class LoanServiceTest {
 	void shouldThrowWhenLoanNotFound() {
 		UUID loanId = UUID.randomUUID();
 
+		AuthService authServiceMock = mock(AuthService.class);
+		when(authServiceMock.getCurrentUser()).thenReturn(librarianUser);
+
 		try (MockedStatic<AuthService> authMock = mockStatic(AuthService.class)) {
-			authMock.when(AuthService::getCurrentUser).thenReturn(librarianUser);
+			authMock.when(AuthService::getInstance).thenReturn(authServiceMock);
 
 			when(loanRepo.findById(loanId)).thenReturn(Optional.empty());
 
@@ -237,8 +243,11 @@ class LoanServiceTest {
 		UUID loanId = UUID.randomUUID();
 		Loan loan = mock(Loan.class);
 
+		AuthService authServiceMock = mock(AuthService.class);
+		when(authServiceMock.getCurrentUser()).thenReturn(librarianUser);
+
 		try (MockedStatic<AuthService> authMock = mockStatic(AuthService.class)) {
-			authMock.when(AuthService::getCurrentUser).thenReturn(librarianUser);
+			authMock.when(AuthService::getInstance).thenReturn(authServiceMock);
 
 			when(loanRepo.findById(loanId)).thenReturn(Optional.of(loan));
 			when(loan.isActive()).thenReturn(false);
@@ -257,8 +266,11 @@ class LoanServiceTest {
 		Book book = mock(Book.class);
 		User user = mock(User.class);
 
+		AuthService authServiceMock = mock(AuthService.class);
+		when(authServiceMock.getCurrentUser()).thenReturn(librarianUser);
+
 		try (MockedStatic<AuthService> authMock = mockStatic(AuthService.class)) {
-			authMock.when(AuthService::getCurrentUser).thenReturn(librarianUser);
+			authMock.when(AuthService::getInstance).thenReturn(authServiceMock);
 
 			when(loanRepo.findById(loanId)).thenReturn(Optional.of(loan));
 			when(loan.isActive()).thenReturn(true);
@@ -296,8 +308,11 @@ class LoanServiceTest {
 		User user = mock(User.class);
 		Account account = mock(Account.class);
 
+		AuthService authServiceMock = mock(AuthService.class);
+		when(authServiceMock.getCurrentUser()).thenReturn(librarianUser);
+
 		try (MockedStatic<AuthService> authMock = mockStatic(AuthService.class)) {
-			authMock.when(AuthService::getCurrentUser).thenReturn(librarianUser);
+			authMock.when(AuthService::getInstance).thenReturn(authServiceMock);
 
 			when(loanRepo.findById(loanId)).thenReturn(Optional.of(loan));
 			when(loan.isActive()).thenReturn(true);
