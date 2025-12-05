@@ -51,20 +51,23 @@ public class BookService {
 	/**
 	 * Creates and persists a new book if the user has admin privileges.
 	 *
+	 * @param userDTO the user attempting to add the book
+	 * @param bookDTO the book data transfer object containing all book information
+	 * @return the created Book entity
 	 * @throws PermissionDeniedException if the user is not an admin
 	 */
-	public Book addBook(UserDTO userDTO, String title, String author, String isbn, String publisher,
-			int publicationYear, String category, int totalCopies, String language, String description, String shelfLocation)
+	public Book addBook(UserDTO userDTO, BookDTO bookDTO)
 			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
 
-		Book book = new Book(title, author, isbn, publisher, publicationYear, category, totalCopies, language,
-				description, shelfLocation);
+		Book book = new Book(bookDTO.title(), bookDTO.author(), bookDTO.isbn(), bookDTO.publisher(), 
+				bookDTO.publicationYear(), bookDTO.category(), bookDTO.totalCopies(), bookDTO.language(),
+				bookDTO.description(), bookDTO.shelfLocation());
 
 		boolean added = bookRepo.addBook(book);
 		if (!added)
-			throw new IllegalStateException("Book with ISBN already exists: " + isbn);
+			throw new IllegalStateException("Book with ISBN already exists: " + bookDTO.isbn());
 
 		return book;
 	}
@@ -122,10 +125,13 @@ public class BookService {
 	/**
 	 * Updates an existing book's fields (admin-only).
 	 *
+	 * @param userDTO the user attempting to update the book
+	 * @param bookId the ID of the book to update
+	 * @param bookDTO the book data transfer object containing updated information (null fields are ignored)
+	 * @return true if the book was successfully updated
 	 * @throws PermissionDeniedException if user is not admin
 	 */
-	public boolean updateBook(UserDTO userDTO, UUID bookId, String title, String author, String isbn, String publisher,
-			Integer publicationYear, String category, Integer totalCopies, String language, String shelfLocation)
+	public boolean updateBook(UserDTO userDTO, UUID bookId, BookDTO bookDTO)
 			throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -133,30 +139,30 @@ public class BookService {
 		Book book = bookRepo.getBookById(bookId)
 				.orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
 
-		if (title != null)
-			book.setTitle(title);
-		if (author != null)
-			book.setAuthor(author);
-		if (isbn != null)
-			book.setIsbn(isbn);
-		if (publisher != null)
-			book.setPublisher(publisher);
-		if (publicationYear != null)
-			book.setPublicationYear(publicationYear);
-		if (category != null)
-			book.setCategory(category);
+		if (bookDTO.title() != null)
+			book.setTitle(bookDTO.title());
+		if (bookDTO.author() != null)
+			book.setAuthor(bookDTO.author());
+		if (bookDTO.isbn() != null)
+			book.setIsbn(bookDTO.isbn());
+		if (bookDTO.publisher() != null)
+			book.setPublisher(bookDTO.publisher());
+		if (bookDTO.publicationYear() != null)
+			book.setPublicationYear(bookDTO.publicationYear());
+		if (bookDTO.category() != null)
+			book.setCategory(bookDTO.category());
 
-		if (totalCopies != null) {
-			if (totalCopies < book.getAvailableCopies())
-				throw new IllegalArgumentException("New total copies (" + totalCopies
+		if (bookDTO.totalCopies() != null) {
+			if (bookDTO.totalCopies() < book.getAvailableCopies())
+				throw new IllegalArgumentException("New total copies (" + bookDTO.totalCopies()
 						+ ") cannot be less than available copies (" + book.getAvailableCopies() + ")");
-			book.setTotalCopies(totalCopies);
+			book.setTotalCopies(bookDTO.totalCopies());
 		}
 
-		if (language != null)
-			book.setLanguage(language);
-		if (shelfLocation != null)
-			book.setShelfLocation(shelfLocation);
+		if (bookDTO.language() != null)
+			book.setLanguage(bookDTO.language());
+		if (bookDTO.shelfLocation() != null)
+			book.setShelfLocation(bookDTO.shelfLocation());
 
 		return bookRepo.updateBook(book);
 	}

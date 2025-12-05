@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 import lms.application.AuthService;
+import lms.application.BookDTO;
 import lms.application.BookService;
 import lms.application.CDService;
 import lms.application.JournalService;
@@ -296,9 +297,10 @@ public class AdminCLI implements CLI {
             CLILogger.info("Enter description: ");
             String description = scanner.nextLine().trim();
 
+            BookDTO bookDTO = new BookDTO(title, author, isbn, publisher, year, category, totalCopies, language, description, shelfLocation);
             Book book = bookService.addBook(
                 AuthService.getInstance().getCurrentUser(),
-                title, author, isbn, publisher, year, category, totalCopies, language, description, shelfLocation
+                bookDTO
             );
 
             if (book != null) {
@@ -510,10 +512,11 @@ public class AdminCLI implements CLI {
                 shelfLocation = null;
             }
 
+            BookDTO bookDTO = new BookDTO(title, author, isbn, publisher, year, category, totalCopies, language, null, shelfLocation);
             boolean updated = bookService.updateBook(
                 AuthService.getInstance().getCurrentUser(),
                 existingBook.getId(),
-                title, author, isbn, publisher, year, category, totalCopies, language, shelfLocation
+                bookDTO
             );
 
             if (updated) {

@@ -75,8 +75,9 @@ class BookServiceTest {
 	void givenAdmin_whenAddBook_thenBookCreatedAndSaved() throws Exception {
 		when(bookRepo.addBook(any(Book.class))).thenReturn(true);
 
-		Book result = bookService.addBook(adminUser, "Domain-Driven Design", "Eric Evans", "9780321125217",
+		BookDTO bookDTO = new BookDTO("Domain-Driven Design", "Eric Evans", "9780321125217",
 				"Addison-Wesley", 2003, "Software Engineering", 3, "English", "A book about strategic design in complex systems", "B2-05");
+		Book result = bookService.addBook(adminUser, bookDTO);
 
 		assertNotNull(result);
 		assertEquals("Domain-Driven Design", result.getTitle());
@@ -85,17 +86,19 @@ class BookServiceTest {
 
 	@Test
 	void givenMember_whenAddBook_thenPermissionDenied() {
-		assertThrows(PermissionDeniedException.class, () -> bookService.addBook(memberUser, "Test Title", "Test Author",
-				"1111111111", "Some Publisher", 2024, "Category", 2, "English", "Test description", "C1-01"));
+		BookDTO bookDTO = new BookDTO("Test Title", "Test Author",
+				"1111111111", "Some Publisher", 2024, "Category", 2, "English", "Test description", "C1-01");
+		assertThrows(PermissionDeniedException.class, () -> bookService.addBook(memberUser, bookDTO));
 	}
 
 	@Test
 	void givenDuplicateIsbn_whenAddBook_thenThrowIllegalState() throws Exception {
 		when(bookRepo.addBook(any(Book.class))).thenReturn(false);
 
+		BookDTO bookDTO = new BookDTO("Clean Architecture", "Robert C. Martin", "9780134494166",
+						"Prentice Hall", 2017, "Software Engineering", 4, "English", "A guide to software architecture", "A1-02");
 		assertThrows(IllegalStateException.class,
-				() -> bookService.addBook(adminUser, "Clean Architecture", "Robert C. Martin", "9780134494166",
-						"Prentice Hall", 2017, "Software Engineering", 4, "English", "A guide to software architecture", "A1-02"));
+				() -> bookService.addBook(adminUser, bookDTO));
 	}
 
 	@Test
@@ -235,16 +238,16 @@ class BookServiceTest {
 
 	@Test
 	void givenMember_whenUpdateBook_thenPermissionDenied() {
-		assertThrows(PermissionDeniedException.class, () -> bookService.updateBook(memberUser, sampleBookId,
-				"New Title", null, null, null, null, null, null, null, null));
+		BookDTO bookDTO = new BookDTO("New Title", null, null, null, null, null, null, null, null, null);
+		assertThrows(PermissionDeniedException.class, () -> bookService.updateBook(memberUser, sampleBookId, bookDTO));
 	}
 
 	@Test
 	void givenAdminAndMissingBook_whenUpdateBook_thenThrow() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.empty());
 
-		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, "New Title",
-				null, null, null, null, null, null, null, null));
+		BookDTO bookDTO = new BookDTO("New Title", null, null, null, null, null, null, null, null, null);
+		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, bookDTO));
 	}
 
 	@Test
@@ -252,8 +255,9 @@ class BookServiceTest {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 		when(bookRepo.updateBook(sampleBook)).thenReturn(true);
 
-		boolean result = bookService.updateBook(adminUser, sampleBookId, "Refactored Code", "Ahmad Salameh",
-				"9780132350884", "Najah Press", 2025, "Computer Engineering", 7, "Arabic", "C3-10");
+		BookDTO bookDTO = new BookDTO("Refactored Code", "Ahmad Salameh",
+				"9780132350884", "Najah Press", 2025, "Computer Engineering", 7, "Arabic", null, "C3-10");
+		boolean result = bookService.updateBook(adminUser, sampleBookId, bookDTO);
 
 		assertTrue(result);
 		assertEquals("Refactored Code", sampleBook.getTitle());
@@ -276,8 +280,8 @@ class BookServiceTest {
 		String oldAuthor = sampleBook.getAuthor();
 		String oldIsbn = sampleBook.getIsbn();
 
-		boolean result = bookService.updateBook(adminUser, sampleBookId, "New Title Only", null, null, null, null, null,
-				null, null, null);
+		BookDTO bookDTO = new BookDTO("New Title Only", null, null, null, null, null, null, null, null, null);
+		boolean result = bookService.updateBook(adminUser, sampleBookId, bookDTO);
 
 		assertTrue(result);
 		assertEquals("New Title Only", sampleBook.getTitle());
@@ -289,8 +293,8 @@ class BookServiceTest {
 	void givenLowerTotalCopiesThanAvailable_whenUpdateBook_thenThrow() {
 		when(bookRepo.getBookById(sampleBookId)).thenReturn(Optional.of(sampleBook));
 
-		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, null, null,
-				null, null, null, null, 4, null, null));
+		BookDTO bookDTO = new BookDTO(null, null, null, null, null, null, 4, null, null, null);
+		assertThrows(IllegalArgumentException.class, () -> bookService.updateBook(adminUser, sampleBookId, bookDTO));
 	}
 
 	@Test
