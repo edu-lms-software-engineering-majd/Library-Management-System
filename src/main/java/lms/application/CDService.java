@@ -27,9 +27,10 @@ import lms.domain.exception.PermissionDeniedException;
  * </p>
  *
  * <p>
- * Original Author: Majd Refactored by: Ahmad Salameh (2025)
+ * Original Author: Majd Refactored by: Ahmad Salameh
  * </p>
  *
+ * @author Majd Awwad
  * @version 2.0
  */
 public class CDService {
@@ -53,7 +54,14 @@ public class CDService {
 	 
 
 	/**
-	 * Creates and stores a new CD (admin-only).
+	 * Creates and persists a new CD (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to add the CD
+	 * @param title the CD title
+	 * @param artist the CD artist
+	 * @return the created CD entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalStateException if addition fails
 	 */
 	public CD addCD(UserDTO userDTO, String title, String artist) throws PermissionDeniedException {
 
@@ -69,7 +77,15 @@ public class CDService {
 	}
 
 	/**
-	 * Creates and stores a new CD with total copies (admin-only).
+	 * Creates and persists a new CD with specified total copies (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to add the CD
+	 * @param title the CD title
+	 * @param artist the CD artist
+	 * @param totalCopies the total number of copies
+	 * @return the created CD entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalStateException if addition fails
 	 */
 	public CD addCD(UserDTO userDTO, String title, String artist, int totalCopies) throws PermissionDeniedException {
 
@@ -84,20 +100,32 @@ public class CDService {
 		return cd;
 	}
 
-	 
-
-	/** Returns all CDs in the system. */
+	/**
+	 * Retrieves all CDs in the system.
+	 *
+	 * @return a list of all CDs
+	 */
 	public List<CD> getAllCDs() {
 		return cdRepo.getAllCDs();
 	}
 
-	/** Retrieves a CD by ID or throws an error. */
+	/**
+	 * Retrieves a CD by its unique identifier.
+	 *
+	 * @param cdId the CD's unique identifier
+	 * @return the CD entity
+	 * @throws IllegalArgumentException if CD not found
+	 */
 	public CD getCDById(UUID cdId) {
 		return cdRepo.getCDById(cdId).orElseThrow(() -> new IllegalArgumentException(CD_NOT_FOUND_MSG + cdId));
 	}
 
 	/**
-	 * Retrieves a CD by ID prefix (substring match).
+	 * Retrieves a CD using a partial ID match (prefix).
+	 *
+	 * @param subId the ID prefix to search for
+	 * @return the matching CD entity
+	 * @throws IllegalArgumentException if no match or multiple matches exist
 	 */
 	public CD getCDBySubId(String subId) {
 		List<CD> matches = cdRepo.getAllCDs().stream().filter(cd -> cd.getId().toString().startsWith(subId)).toList();
@@ -115,7 +143,17 @@ public class CDService {
 	 
 
 	/**
-	 * Updates a CD's details (admin-only).
+	 * Updates an existing CD's details (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to update the CD
+	 * @param cdId the ID of the CD to update
+	 * @param newTitle the new title (null to keep unchanged)
+	 * @param newArtist the new artist (null to keep unchanged)
+	 * @param newTotalCopies the new total copies (null to keep unchanged)
+	 * @return the updated CD entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalArgumentException if CD not found or invalid update
+	 * @throws IllegalStateException if update fails
 	 */
 	public CD updateCD(UserDTO userDTO, UUID cdId, String newTitle, String newArtist, Integer newTotalCopies)
 			throws PermissionDeniedException {
@@ -142,10 +180,14 @@ public class CDService {
 		return cd;
 	}
 
-	 
-
 	/**
-	 * Deletes a CD from the system (admin-only).
+	 * Deletes a CD from the system (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to delete the CD
+	 * @param cdId the ID of the CD to delete
+	 * @return {@code true} if deletion succeeded
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalArgumentException if CD not found
 	 */
 	public boolean deleteCD(UserDTO userDTO, UUID cdId) throws PermissionDeniedException {
 

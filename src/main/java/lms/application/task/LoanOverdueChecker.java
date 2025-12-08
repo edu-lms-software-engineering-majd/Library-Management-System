@@ -12,6 +12,30 @@ import lms.domain.UserRepository;
 import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
 
+/**
+ * Background task that checks for overdue loans and notifies affected users.
+ * 
+ * <p>
+ * This class implements {@link Runnable} to support scheduled execution by
+ * a timer or scheduler service. When executed, it:
+ * </p>
+ * <ul>
+ * <li>Finds all loans that are overdue and have not been notified</li>
+ * <li>Sends email notifications to users with overdue items</li>
+ * <li>Creates in-system notifications for tracking</li>
+ * <li>Marks loans as notified to prevent duplicate notifications</li>
+ * </ul>
+ * 
+ * <p>
+ * This task is typically scheduled to run periodically (e.g., daily) to ensure
+ * timely notification of overdue items.
+ * </p>
+ * 
+ * @author Majd Awwad
+ * @version 1.0
+ * @see lms.application.SchedulerService
+ * @see lms.application.NotificationService
+ */
 public class LoanOverdueChecker implements Runnable {
 
     private final LoanRepository loanRepository;
@@ -19,6 +43,10 @@ public class LoanOverdueChecker implements Runnable {
     private final EmailService emailService;
     private final NotificationService notificationService;
 
+    /**
+     * Constructs a new overdue checker with default repository instances.
+     * Uses singleton instances of the repositories and services.
+     */
     public LoanOverdueChecker() {
         this.loanRepository = StaticLoanRepository.getInstance();
         this.userRepository = StaticUserRepository.getInstance();

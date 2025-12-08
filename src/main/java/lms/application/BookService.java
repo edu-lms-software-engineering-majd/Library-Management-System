@@ -72,12 +72,23 @@ public class BookService {
 		return book;
 	}
 
-	/** Returns all books in the system. */
+	/**
+	 * Retrieves all books in the system.
+	 *
+	 * @return a list of all books
+	 */
 	public List<Book> getAllBooks() {
 		return bookRepo.getAllBooks();
 	}
 
-	/** Executes a search operation using a provided strategy. */
+	/**
+	 * Searches for books using a specified search strategy.
+	 *
+	 * @param strategy the search strategy to apply
+	 * @param searchTerm the search term to filter by
+	 * @return a list of books matching the search criteria
+	 * @throws IllegalArgumentException if strategy is null
+	 */
 	public List<Book> searchBooks(SearchStrategy<Book> strategy, String searchTerm) {
 		if (strategy == null)
 			throw new IllegalArgumentException("Search strategy cannot be null");
@@ -85,7 +96,13 @@ public class BookService {
 		return strategy.execute(bookRepo.getAllBooks(), searchTerm);
 	}
 
-	/** Retrieves a book by ID, or null if nonexistent. */
+	/**
+	 * Retrieves a book by its unique identifier.
+	 *
+	 * @param bookId the book's unique identifier
+	 * @return the Book entity, or null if not found
+	 * @throws IllegalArgumentException if bookId is null
+	 */
 	public Book getBookById(UUID bookId) {
 		if (bookId == null)
 			throw new IllegalArgumentException("Book ID cannot be null");
@@ -94,8 +111,10 @@ public class BookService {
 	}
 
 	/**
-	 * Retrieves a book using an ID prefix (substring).
+	 * Retrieves a book using a partial ID match (prefix).
 	 *
+	 * @param subId the ID prefix to search for
+	 * @return the matching Book entity
 	 * @throws IllegalArgumentException if no match or multiple matches exist
 	 */
 	public Book getBookBySubId(String subId) {
@@ -112,12 +131,22 @@ public class BookService {
 		return matches.get(0);
 	}
 
-	/** Checks if the book exists and has available copies. */
+	/**
+	 * Checks if a book exists and has available copies for borrowing.
+	 *
+	 * @param bookId the book's unique identifier
+	 * @return {@code true} if the book exists and has available copies
+	 */
 	public boolean isAvailableBook(UUID bookId) {
 		return bookRepo.getBookById(bookId).map(b -> b.getAvailableCopies() > 0).orElse(false);
 	}
 
-	/** Checks whether a book exists. */
+	/**
+	 * Checks whether a book exists in the system.
+	 *
+	 * @param bookId the book's unique identifier
+	 * @return {@code true} if the book exists
+	 */
 	public boolean isValidBook(UUID bookId) {
 		return bookRepo.getBookById(bookId).isPresent();
 	}
@@ -168,9 +197,13 @@ public class BookService {
 	}
 
 	/**
-	 * Deletes a book (admin-only).
+	 * Deletes a book from the system (admin-only operation).
 	 *
+	 * @param userDTO the user attempting to delete the book
+	 * @param bookId the ID of the book to delete
+	 * @return {@code true} if deletion succeeded
 	 * @throws PermissionDeniedException if user is not admin
+	 * @throws IllegalArgumentException if book doesn't exist
 	 */
 	public boolean deleteBook(UserDTO userDTO, UUID bookId) throws PermissionDeniedException {
 

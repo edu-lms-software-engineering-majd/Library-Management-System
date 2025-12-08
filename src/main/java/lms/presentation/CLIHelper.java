@@ -9,8 +9,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Reusable CLI helper utilities for clean, professional interface.
- * Can be used by UserCLI, AdminCLI, and other CLI classes.
+ * Utility class providing reusable CLI helper methods for formatting and user interaction.
+ * 
+ * <p>
+ * Contains static methods for printing headers, messages, handling user input,
+ * and displaying search results. Used by {@link UserCLI}, {@link AdminCLI}, and
+ * other CLI classes to maintain consistent formatting.
+ * </p>
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -24,28 +29,60 @@ public final class CLIHelper {
         throw new IllegalStateException("Utility class");
     }
     
+    /**
+     * Prints a formatted header with the given title.
+     * 
+     * @param title the header title to display
+     */
     public static void printHeader(String title) {
         CLILogger.info(SEPARATOR);
         CLILogger.info(title);
         CLILogger.info(SEPARATOR);
     }
     
+    /**
+     * Prints an informational message.
+     * 
+     * @param message the message to display
+     */
     public static void printMessage(String message) {
         CLILogger.info(message);
     }
     
+    /**
+     * Prints an error message with ERROR prefix.
+     * 
+     * @param message the error message to display
+     */
     public static void printError(String message) {
         CLILogger.warning("ERROR: " + message);
     }
     
+    /**
+     * Prints a success message with SUCCESS prefix.
+     * 
+     * @param message the success message to display
+     */
     public static void printSuccess(String message) {
         CLILogger.info("SUCCESS: " + message);
     }
     
+    /**
+     * Prints a warning message with WARNING prefix.
+     * 
+     * @param message the warning message to display
+     */
     public static void printWarning(String message) {
         CLILogger.warning("WARNING: " + message);
     }
     
+    /**
+     * Truncates text to the specified maximum length, appending ".." if truncated.
+     * 
+     * @param text the text to truncate
+     * @param maxLength the maximum length allowed
+     * @return the truncated text, or original if shorter than maxLength
+     */
     public static String truncate(String text, int maxLength) {
         if (text == null) {
             return EMPTY_STRING;
@@ -53,6 +90,12 @@ public final class CLIHelper {
         return text.length() > maxLength ? text.substring(0, maxLength - 2) + ".." : text;
     }
     
+    /**
+     * Capitalizes the first letter of text and lowercases the rest.
+     * 
+     * @param text the text to capitalize
+     * @return the capitalized text
+     */
     public static String capitalizeFirst(String text) {
         if (text == null || text.isEmpty()) {
             return text;
@@ -60,12 +103,28 @@ public final class CLIHelper {
         return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
     }
     
+    /**
+     * Prompts the user for yes/no confirmation.
+     * 
+     * @param scanner the scanner for reading user input
+     * @param prompt the confirmation prompt to display
+     * @return true if user confirms with "yes" or "y", false otherwise
+     */
     public static boolean confirmAction(Scanner scanner, String prompt) {
         CLILogger.info(prompt + " (yes/no): ");
         String confirm = scanner.nextLine().trim().toLowerCase();
         return "yes".equals(confirm) || "y".equals(confirm);
     }
     
+    /**
+     * Gets integer input from the user within the specified range.
+     * 
+     * @param scanner the scanner for reading user input
+     * @param prompt the prompt message to display
+     * @param min the minimum acceptable value
+     * @param max the maximum acceptable value
+     * @return the validated integer input, or -1 if invalid
+     */
     public static int getIntInput(Scanner scanner, String prompt, int min, int max) {
         CLILogger.info(prompt);
         try {
@@ -80,6 +139,13 @@ public final class CLIHelper {
         return -1;
     }
     
+    /**
+     * Gets double input from the user.
+     * 
+     * @param scanner the scanner for reading user input
+     * @param prompt the prompt message to display
+     * @return the parsed double value, or -1.0 if invalid
+     */
     public static double getDoubleInput(Scanner scanner, String prompt) {
         CLILogger.info(prompt);
         try {
@@ -90,6 +156,21 @@ public final class CLIHelper {
         }
     }
     
+    /**
+     * Finds an item from a list by searching through title, author, or ID.
+     * Handles exact matches, partial matches, and multiple match selection.
+     * 
+     * @param <T> the type of items to search
+     * @param items the list of items to search through
+     * @param searchTerm the term to search for
+     * @param itemType the type name for display purposes
+     * @param titleGetter function to extract title from item
+     * @param authorGetter function to extract author from item
+     * @param idGetter function to extract ID from item
+     * @param displayFunction function to display list of items
+     * @param scanner the scanner for reading user input
+     * @return the found item, or null if not found or cancelled
+     */
     public static <T> T findItemBySearchTerm(
             List<T> items,
             String searchTerm,
@@ -135,6 +216,15 @@ public final class CLIHelper {
         return null;
     }
     
+    /**
+     * Displays search results with appropriate messaging.
+     * 
+     * @param <T> the type of items in the results
+     * @param results the list of search results
+     * @param searchTerm the original search term
+     * @param itemType the type name for display purposes
+     * @param displayFunction function to display the results
+     */
     public static <T> void displaySearchResults(List<T> results, String searchTerm, String itemType, 
                                                 Consumer<List<T>> displayFunction) {
         if (results.isEmpty()) {
@@ -145,6 +235,21 @@ public final class CLIHelper {
         }
     }
     
+    /**
+     * Generic method for handling the item borrowing workflow.
+     * Displays available items, searches for selection, confirms, and processes the loan.
+     * 
+     * @param <T> the type of item being borrowed
+     * @param availableItems the list of available items
+     * @param itemType the type name for display purposes
+     * @param dueDays the due date description
+     * @param displayFunction function to display items
+     * @param findFunction function to find item by search term
+     * @param descriptionFunction function to get item description
+     * @param idFunction function to extract item ID
+     * @param scanner the scanner for reading user input
+     * @param loanFunction function to process the loan
+     */
     public static <T> void borrowItemGeneric(
             List<T> availableItems,
             String itemType,

@@ -15,7 +15,7 @@ import lms.domain.User;
  * users and forwarding them as real email messages.
  * </p>
  *
- * <h2>Responsibilities:</h2>
+ * <p><b>Responsibilities:</b></p>
  * <ul>
  * <li>Create Notification domain objects</li>
  * <li>Store notifications inside the User entity</li>

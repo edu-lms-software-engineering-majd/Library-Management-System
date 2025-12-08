@@ -1,18 +1,9 @@
 package lms.domain.strategy;
 
 /**
- * Represents the fine calculation strategy for CDs.
+ * Fine calculation strategy for CDs.
  *
- * <p>
- * According to the library rules, CDs have a fixed fine rate of 20 NIS for each
- * overdue day. This class implements the {@link FineStrategy} interface and
- * provides the specific calculation logic for CD items.
- * </p>
- *
- * <p>
- * This strategy is used by the domain layer when calculating fines for overdue
- * CD loans.
- * </p>
+ * <p>CDs have a fine rate of 20.0 per day overdue.</p>
  *
  * @author Ahmad Salameh
  * @version 1.0

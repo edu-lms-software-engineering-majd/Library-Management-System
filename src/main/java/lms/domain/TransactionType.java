@@ -1,11 +1,15 @@
 package lms.domain;
 
 /**
- * Enum representing the type of fine transaction.
+ * Represents the type of financial transaction in the library system.
+ * 
+ * @author Majd Awwad
+ * @version 1.0
  */
 public enum TransactionType {
-    /** Fine issued to a user (debit). */
+    /** Fine issued to a user */
     FINE,
-    /** Payment made by a user (credit). */
-    PAYMENT,
+    
+    /** Payment made by a user */
+    PAYMENT
 }

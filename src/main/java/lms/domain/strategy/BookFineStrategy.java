@@ -1,18 +1,9 @@
 package lms.domain.strategy;
 
 /**
- * Represents the fine calculation strategy for books.
+ * Fine calculation strategy for books.
  *
- * <p>
- * According to the library rules, books have a fixed fine rate of 10 NIS for
- * each overdue day. This class implements the {@link FineStrategy} interface
- * and provides the specific calculation logic for book items.
- * </p>
- *
- * <p>
- * This strategy is used by the domain layer when calculating fines for overdue
- * book loans.
- * </p>
+ * <p>Books have a fine rate of 0.50 per day overdue.</p>
  *
  * @author Ahmad Salameh
  * @version 1.0

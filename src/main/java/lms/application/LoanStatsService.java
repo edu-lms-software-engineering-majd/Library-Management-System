@@ -11,10 +11,45 @@ import lms.domain.Loan;
 import lms.domain.LoanRepository;
 import lms.domain.exception.UserNotFoundException;
 
+/**
+ * Service providing statistical analysis and reporting for library loans.
+ * 
+ * <p>
+ * This service offers various statistical methods to analyze loan data including:
+ * </p>
+ * <ul>
+ * <li>Counting loans by status (active, returned, overdue)</li>
+ * <li>Analyzing loans by item type and user</li>
+ * <li>Tracking loans over time periods</li>
+ * <li>Identifying top borrowed items</li>
+ * <li>Calculating average loan durations</li>
+ * </ul>
+ * 
+ * <p>
+ * This service is particularly useful for:
+ * </p>
+ * <ul>
+ * <li>Administrative dashboards and reports</li>
+ * <li>Library performance analysis</li>
+ * <li>Identifying popular items and usage patterns</li>
+ * <li>Planning and decision-making</li>
+ * </ul>
+ * 
+ * @author Majd Awwad
+ * @version 2.0
+ * @see LoanQueryService
+ * @see Loan
+ */
 public class LoanStatsService {
 
 	private final LoanRepository loanRepo;
 
+	/**
+	 * Constructs a new statistics service with the required repository.
+	 * 
+	 * @param loanRepo the loan repository for accessing loan data
+	 * @throws IllegalArgumentException if loanRepo is null
+	 */
 	public LoanStatsService(LoanRepository loanRepo) {
 		if (loanRepo == null)
 			throw new IllegalArgumentException("LoanRepository cannot be null");

@@ -20,7 +20,6 @@ import lms.domain.exception.ItemNotFoundException;
  * </p>
  *
  * @author Majd Awwad
- * @refactoredBy Ahmad Salameh
  * @see LoanService
  * @see Timer
  * @version 1.1

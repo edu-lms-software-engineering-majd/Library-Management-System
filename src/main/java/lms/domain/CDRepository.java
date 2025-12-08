@@ -7,47 +7,42 @@ import java.util.UUID;
 /**
  * Repository interface for managing CD entities.
  * 
- * <p>
- * This interface defines the standard CRUD operations for CDs in the Library
- * Management System.
+ * <p>Defines CRUD operations for CDs in the library.</p>
  * 
- * Implementations may store CDs in memory, a database, or any other storage
- * mechanism.
- * 
- * @author Ahmad
+ * @author Ahmad Salameh
  * @version 1.0
  */
 public interface CDRepository {
 
 	/**
-	 * Adds a new CD to the repository.
+	 * Adds a new CD.
 	 * 
 	 * @param cd the CD to add
-	 * @return true if the CD was added successfully, false otherwise
+	 * @return true if added, false otherwise
 	 */
 	boolean addCD(CD cd);
 
 	/**
-	 * Updates an existing CD's information.
+	 * Updates an existing CD.
 	 * 
 	 * @param cd the CD with updated information
-	 * @return true if the CD exists and was updated, false otherwise
+	 * @return true if updated, false otherwise
 	 */
 	boolean updateCD(CD cd);
 
 	/**
-	 * Deletes a CD by its unique identifier.
+	 * Deletes a CD by ID.
 	 * 
-	 * @param id the UUID of the CD to delete
-	 * @return true if the CD was found and deleted, false otherwise
+	 * @param id the CD ID
+	 * @return true if deleted, false otherwise
 	 */
 	boolean deleteCD(UUID id);
 
 	/**
-	 * Retrieves a CD by its unique identifier.
+	 * Retrieves a CD by ID.
 	 * 
-	 * @param id the UUID of the CD
-	 * @return an Optional containing the CD if found, or empty if not found
+	 * @param id the CD ID
+	 * @return Optional containing the CD if found
 	 */
 	Optional<CD> getCDById(UUID id);
 

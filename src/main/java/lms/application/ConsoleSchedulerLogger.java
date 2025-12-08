@@ -9,7 +9,7 @@ package lms.application;
  * demos where simple console logging is sufficient.
  * </p>
  *
- * <h3>Responsibilities:</h3>
+ * <p><b>Responsibilities:</b></p>
  * <ul>
  * <li>Log scheduler start/stop events</li>
  * <li>Log the beginning and completion of scheduled tasks</li>
@@ -20,6 +20,7 @@ package lms.application;
  * Original Author: Majd Refactored by: Ahmad Salameh
  * </p>
  *
+ * @author Majd Awwad
  * @version 1.1
  */
 public class ConsoleSchedulerLogger implements SchedulerLogger {

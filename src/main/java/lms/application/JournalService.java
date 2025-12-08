@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import lms.domain.Journal;
 import lms.domain.JournalsRepository;
-import lms.domain.UserRepository;
 import lms.domain.exception.PermissionDeniedException;
 
 /**
@@ -38,6 +37,7 @@ import lms.domain.exception.PermissionDeniedException;
  * Original Author: Majd Awwad Refactored by: Ahmad Salameh
  * </p>
  *
+ * @author Majd Awwad
  * @version 1.1
  */
 public class JournalService {
@@ -49,12 +49,25 @@ public class JournalService {
 		journalRepo = null;
 	}
 
+	/**
+	 * Constructs a JournalService with the required repository.
+	 *
+	 * @param journalRepo the repository for accessing journal data
+	 */
 	public JournalService(JournalsRepository journalRepo) {
 		this.journalRepo = journalRepo;
 	}
 
-	 
-
+	/**
+	 * Creates and persists a new journal (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to add the journal
+	 * @param title the journal title
+	 * @param author the journal author
+	 * @return the created Journal entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalStateException if addition fails
+	 */
 	public Journal addJournal(UserDTO userDTO, String title, String author) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -68,6 +81,17 @@ public class JournalService {
 		return journal;
 	}
 
+	/**
+	 * Creates and persists a new journal with specified total copies (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to add the journal
+	 * @param title the journal title
+	 * @param author the journal author
+	 * @param totalCopies the total number of copies
+	 * @return the created Journal entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalStateException if addition fails
+	 */
 	public Journal addJournal(UserDTO userDTO, String title, String author, int totalCopies)
 			throws PermissionDeniedException {
 
@@ -82,16 +106,34 @@ public class JournalService {
 		return journal;
 	}
 
-	 
+	/**
+	 * Retrieves all journals in the system.
+	 *
+	 * @return a list of all journals
+	 */
 	public List<Journal> getAllJournals() {
 		return journalRepo.getAllJournals();
 	}
 
+	/**
+	 * Retrieves a journal by its unique identifier.
+	 *
+	 * @param journalId the journal's unique identifier
+	 * @return the Journal entity
+	 * @throws IllegalArgumentException if journal not found
+	 */
 	public Journal getJournalById(UUID journalId) {
 		return journalRepo.getJournalById(journalId)
 				.orElseThrow(() -> new IllegalArgumentException("Journal not found with ID: " + journalId));
 	}
 
+	/**
+	 * Retrieves a journal using a partial ID match (prefix).
+	 *
+	 * @param subId the ID prefix to search for
+	 * @return the matching Journal entity
+	 * @throws IllegalArgumentException if no match or multiple matches exist
+	 */
 	public Journal getJournalBySubId(String subId) {
 		List<Journal> matches = getAllJournals().stream().filter(j -> j.getId().toString().startsWith(subId)).toList();
 
@@ -106,6 +148,19 @@ public class JournalService {
 
 	 
 
+	/**
+	 * Updates an existing journal's details (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to update the journal
+	 * @param journalId the ID of the journal to update
+	 * @param newTitle the new title (null to keep unchanged)
+	 * @param newAuthor the new author (null to keep unchanged)
+	 * @param newTotalCopies the new total copies (null to keep unchanged)
+	 * @return the updated Journal entity
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalArgumentException if journal not found or invalid update
+	 * @throws IllegalStateException if update fails
+	 */
 	public Journal updateJournal(UserDTO userDTO, UUID journalId, String newTitle, String newAuthor,
 			Integer newTotalCopies) throws PermissionDeniedException {
 
@@ -133,6 +188,15 @@ public class JournalService {
 		return journal;
 	}
  
+	/**
+	 * Deletes a journal from the system (admin-only operation).
+	 *
+	 * @param userDTO the user attempting to delete the journal
+	 * @param journalId the ID of the journal to delete
+	 * @return {@code true} if deletion succeeded
+	 * @throws PermissionDeniedException if user is not an admin
+	 * @throws IllegalArgumentException if journal not found
+	 */
 	public boolean deleteJournal(UserDTO userDTO, UUID journalId) throws PermissionDeniedException {
 
 		AuthorizationService.ensureAdmin(userDTO);
@@ -142,8 +206,12 @@ public class JournalService {
 		return journalRepo.deleteJournal(journalId);
 	}
 
-	 
-
+	/**
+	 * Searches for journals by keyword.
+	 *
+	 * @param keyword the search keyword (returns all journals if null or blank)
+	 * @return a list of matching journals
+	 */
 	public List<Journal> searchJournals(String keyword) {
 		if (keyword == null || keyword.isBlank())
 			return getAllJournals();

@@ -6,16 +6,13 @@ import java.util.UUID;
 import lms.domain.utils.NotificationValidator;
 
 /**
- * Represents a notification sent to a user in the library management system.
- * <p>
- * Notifications are used to inform users about important events such as:
- * <ul>
- * <li>Overdue items</li>
- * <li>Upcoming due dates</li>
- * <li>Loan approvals/rejections</li>
- * </ul>
+ * Represents a notification sent to a user.
+ * 
+ * <p>Used to inform users about events such as overdue items, 
+ * due dates, and loan status changes.</p>
  * 
  * @author Majd Awwad
+ * @version 1.0
  */
 public class Notification {
 
@@ -26,13 +23,12 @@ public class Notification {
 	 
 
 	/**
-	 * Constructs a new notification with the specified content and sender. The
-	 * timestamp is automatically set to the current instant.
+	 * Creates a new notification with the current timestamp.
 	 * 
-	 * @param content  the notification message content
-	 * @param senderID the UUID of the sender (e.g., system or admin)
-	 * @param type     the type of notification
-	 * @throws IllegalArgumentException if any parameter is null or content is blank
+	 * @param content  the notification message
+	 * @param senderID the sender's UUID
+	 * @param type     the notification type
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
 	public Notification(String content, UUID senderID, NotificationType type) {
 

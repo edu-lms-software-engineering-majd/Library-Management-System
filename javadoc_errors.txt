@@ -1,0 +1,370 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< edu.najah.eng.software.lms:lms >-------------------
+[INFO] Building Library Management System 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> javadoc:3.12.0:javadoc (default-cli) > generate-sources @ lms >>>
+[INFO] 
+[INFO] --- jacoco:0.8.11:prepare-agent (prepare-agent) @ lms ---
+[INFO] argLine set to "-javaagent:C:\\Users\\echo tech 2022\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.11\\org.jacoco.agent-0.8.11-runtime.jar=destfile=C:\\Users\\echo tech 2022\\softwareEng-workspace\\lms\\target\\jacoco.exec"
+[INFO] 
+[INFO] <<< javadoc:3.12.0:javadoc (default-cli) < generate-sources @ lms <<<
+[INFO] 
+[INFO] 
+[INFO] --- javadoc:3.12.0:javadoc (default-cli) @ lms ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11.101 s
+[INFO] Finished at: 2025-12-08T14:26:35+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin:3.12.0:javadoc (default-cli) on project lms: An error has occurred in Javadoc report generation: 
+[ERROR] Exit code: 1
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ConsoleSchedulerLogger.java:12: error: heading used out of sequence: <H3>, compared to implicit preceding heading: <H1>
+[ERROR]  * <h3>Responsibilities:</h3>
+[ERROR]    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:21: error: unexpected end tag: </p>
+[ERROR]  * </p>
+[ERROR]    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for loanId
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for userId
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for itemId
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for borrowDate
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for dueDate
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for returnDate
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for returned
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for fineApplied
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for overdue
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for overdueDays
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanDTO.java:23: warning: no @param for calculatedFine
+[ERROR] public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanService.java:42: error: heading used out of sequence: <H3>, compared to implicit preceding heading: <H1>
+[ERROR]  * <h3>Key Features:</h3>
+[ERROR]    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanServiceContext.java:12: error: heading used out of sequence: <H3>, compared to implicit preceding heading: <H1>
+[ERROR]  * <h3>Benefits:</h3>
+[ERROR]    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\UserDTO.java:37: warning: no @param for email
+[ERROR] public record UserDTO(UUID userID, String username, String firstName, String lastName, String email, Role role) {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\SearchContext.java:21: error: unexpected end tag: </p>
+[ERROR]  * </p>
+[ERROR]    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\task\LoanOverdueChecker.java:36: error: reference not found
+[ERROR]  * @see SchedulerService
+[ERROR]         ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:139: warning: no main description
+[ERROR] 	/** @return true if the account has fines owed */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:156: warning: no @return
+[ERROR] 	public boolean canBorrow() {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:163: warning: no @param for reason
+[ERROR] 	public void suspendAccount(String reason) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:47: warning: no comment
+[ERROR] 	public UUID getAccountId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:59: warning: no comment
+[ERROR] 	public LocalDate getCreatedAt() {
+[ERROR] 	                 ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:55: warning: no comment
+[ERROR] 	public AccountStatus getStatus() {
+[ERROR] 	                     ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:67: warning: no comment
+[ERROR] 	public double getTotalFines() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:63: warning: no comment
+[ERROR] 	public LocalDate getUpdatedAt() {
+[ERROR] 	                 ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:51: warning: no comment
+[ERROR] 	public UUID getUserId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Account.java:184: warning: no comment
+[ERROR] 	public void setStatus(AccountStatus status) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\AccountService.java:184: warning: no comment
+[ERROR] 	public int getUsersWithFinesCount() 
+[ERROR] 	           ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\utils\AccountValidator.java:15: warning: no comment
+[ERROR] 	public AccountValidator() {} 
+[ERROR] 	       ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:130: warning: no main description
+[ERROR] 	/** @return the author of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:146: warning: no main description
+[ERROR] 	/** @return the ISBN of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:162: warning: no main description
+[ERROR] 	/** @return the publisher of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:178: warning: no main description
+[ERROR] 	/** @return the year the book was published */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:194: warning: no main description
+[ERROR] 	/** @return the category or genre of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:210: warning: no main description
+[ERROR] 	/** @return the total number of copies owned by the library */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:226: warning: no main description
+[ERROR] 	/** @return the number of copies currently available for borrowing */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:249: warning: no main description
+[ERROR] 	/** @return the language of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:265: warning: no main description
+[ERROR] 	/** @return the description of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:270: warning: no main description
+[ERROR] 	/** @param description the new description of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:275: warning: no main description
+[ERROR] 	/** @return the physical shelf location of the book */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Book.java:295: warning: no comment
+[ERROR] 	public void setAvailableCopies(int availableCopies) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\strategy\BookFineStrategy.java:11: warning: use of default constructor, which does not provide a comment
+[ERROR] public class BookFineStrategy implements FineStrategy {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\BookSearchStrategy.java:21: warning: no comment
+[ERROR]     protected BookSearchStrategy(String description) {
+[ERROR]               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\CD.java:92: warning: no main description
+[ERROR] 	 * @param totalCopies the new total number of copies
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\CD.java:100: warning: no main description
+[ERROR] 	 * @return the number of copies currently available for borrowing
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\CD.java:72: warning: no comment
+[ERROR] 	public String getArtist() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\CD.java:87: warning: no comment
+[ERROR] 	public int getTotalCopies() {
+[ERROR] 	           ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\CD.java:159: warning: no comment
+[ERROR] 	public void setAvailableCopies(int availableCopies) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\strategy\CDFineStrategy.java:11: warning: use of default constructor, which does not provide a comment
+[ERROR] public class CDFineStrategy implements FineStrategy {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\CDSearchStrategy.java:15: warning: no comment
+[ERROR]     protected CDSearchStrategy(String description) {
+[ERROR]               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:230: warning: no @param for userDTO
+[ERROR] 	public void borrowCD(UserDTO userDTO, UUID cdId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:230: warning: no @param for cdId
+[ERROR] 	public void borrowCD(UserDTO userDTO, UUID cdId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:246: warning: no @param for userDTO
+[ERROR] 	public void returnCD(UserDTO userDTO, UUID cdId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:246: warning: no @param for cdId
+[ERROR] 	public void returnCD(UserDTO userDTO, UUID cdId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:218: warning: no comment
+[ERROR] 	public boolean isAvailableCD(UUID cdId) {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:222: warning: no comment
+[ERROR] 	public boolean isValidCD(UUID cdId) {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:203: warning: no comment
+[ERROR] 	public List<CD> searchCDs(String keyword) {
+[ERROR] 	                ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\CDService.java:209: warning: no comment
+[ERROR] 	public List<CD> searchCDs(lms.application.search.SearchStrategy<CD> strategy, String searchTerm) {
+[ERROR] 	                ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\presentation\CLIFactory.java:25: warning: use of default constructor, which does not provide a comment
+[ERROR] public class CLIFactory {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\SchedulerLogger.java:30: warning: no @param for message
+[ERROR] 	void logSchedulerStart(String message);
+[ERROR] 	     ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ConsoleSchedulerLogger.java:26: warning: use of default constructor, which does not provide a comment
+[ERROR] public class ConsoleSchedulerLogger implements SchedulerLogger {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\FilterByAvailabilityStrategy.java:14: warning: no comment
+[ERROR]     public FilterByAvailabilityStrategy() {
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\FilterByCategoryStrategy.java:14: warning: no comment
+[ERROR]     public FilterByCategoryStrategy() {
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\FilterByYearStrategy.java:14: warning: no comment
+[ERROR]     public FilterByYearStrategy() {
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\FilterCDByAvailabilityStrategy.java:11: warning: no comment
+[ERROR]     public FilterCDByAvailabilityStrategy() {
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\FilterJournalByAvailabilityStrategy.java:11: warning: no comment
+[ERROR]     public FilterJournalByAvailabilityStrategy() {
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\strategy\FineStrategyFactory.java:12: warning: use of default constructor, which does not provide a comment
+[ERROR] public class FineStrategyFactory {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\strategy\FineStrategyFactory.java:15: warning: no comment
+[ERROR]     public static FineStrategy getStrategy(String itemType) {
+[ERROR]                                ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\FineTransaction.java:42: warning: no comment
+[ERROR] 	public double getAmount() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\FineTransaction.java:46: warning: no comment
+[ERROR] 	public String getDescription() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\FineTransaction.java:50: warning: no comment
+[ERROR] 	public LocalDate getTransactionDate() {
+[ERROR] 	                 ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\FineTransaction.java:38: warning: no comment
+[ERROR] 	public UUID getTransactionId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\FineTransaction.java:54: warning: no comment
+[ERROR] 	public TransactionType getType() {
+[ERROR] 	                       ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ItemManagementServices.java:18: warning: no comment
+[ERROR]     public ItemManagementServices(BookService bookService, CDService cdService, 
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ItemManagementServices.java:26: warning: no comment
+[ERROR]     public BookService getBookService() {
+[ERROR]                        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ItemManagementServices.java:30: warning: no comment
+[ERROR]     public CDService getCdService() {
+[ERROR]                      ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\ItemManagementServices.java:34: warning: no comment
+[ERROR]     public JournalService getJournalService() {
+[ERROR]                           ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Journal.java:90: warning: no main description
+[ERROR] 	 * @param totalCopies the new total number of copies
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Journal.java:98: warning: no main description
+[ERROR] 	 * @return the number of copies currently available for borrowing
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Journal.java:70: warning: no comment
+[ERROR] 	public String getAuthor() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Journal.java:85: warning: no comment
+[ERROR] 	public int getTotalCopies() {
+[ERROR] 	           ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\strategy\JournalFineStrategy.java:11: warning: use of default constructor, which does not provide a comment
+[ERROR] public class JournalFineStrategy implements FineStrategy {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\search\JournalSearchStrategy.java:15: warning: no comment
+[ERROR]     protected JournalSearchStrategy(String description) {
+[ERROR]               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\JournalService.java:237: warning: no comment
+[ERROR] 	public void borrowJournal(UserDTO userDTO, UUID journalId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\JournalService.java:229: warning: no comment
+[ERROR] 	public boolean isAvailableJournal(UUID journalId) {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\JournalService.java:233: warning: no comment
+[ERROR] 	public boolean isValidJournal(UUID journalId) {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\JournalService.java:250: warning: no comment
+[ERROR] 	public void returnJournal(UserDTO userDTO, UUID journalId) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\JournalService.java:221: warning: no comment
+[ERROR] 	public List<Journal> searchJournals(lms.application.search.SearchStrategy<Journal> strategy, String searchTerm) {
+[ERROR] 	                     ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\presentation\LibraryApp.java:53: warning: use of default constructor, which does not provide a comment
+[ERROR] public class LibraryApp {
+[ERROR]        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:138: warning: no main description
+[ERROR] 	/** @return the date the item is due to be returned */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:143: warning: no main description
+[ERROR] 	/** @return the date the item was returned (null if still borrowed) */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:148: warning: no main description
+[ERROR] 	/** @return true if a fine has been applied to this loan */
+[ERROR] 	    ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:134: warning: no comment
+[ERROR] 	public LocalDate getBorrowDate() {
+[ERROR] 	                 ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:118: warning: no comment
+[ERROR] 	public UUID getId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:126: warning: no comment
+[ERROR] 	public UUID getItemId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:130: warning: no comment
+[ERROR] 	public String getItemType() {
+[ERROR] 	              ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:122: warning: no comment
+[ERROR] 	public UUID getUserId() {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:203: warning: no comment
+[ERROR] 	public boolean isNotified() {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:192: warning: no comment
+[ERROR] 	public boolean isReturned() {
+[ERROR] 	               ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:196: warning: no comment
+[ERROR] 	public void returnItem(LocalDate returnDate) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\Loan.java:207: warning: no comment
+[ERROR] 	public void setNotified(boolean notified) {
+[ERROR] 	            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanManagementServices.java:18: warning: no comment
+[ERROR]     public LoanManagementServices(LoanService loanService, 
+[ERROR]            ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanManagementServices.java:35: warning: no comment
+[ERROR]     public LoanQueryService getLoanQueryService() {
+[ERROR]                             ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanManagementServices.java:27: warning: no comment
+[ERROR]     public LoanService getLoanService() {
+[ERROR]                        ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanManagementServices.java:31: warning: no comment
+[ERROR]     public LoanStatsService getLoanStatsService() {
+[ERROR]                             ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanService.java:105: error: unexpected end tag: </p>
+[ERROR] 	 * </p>
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanService.java:209: error: unexpected end tag: </p>
+[ERROR] 	 * </p>
+[ERROR] 	   ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\application\LoanService.java:211: error: @param name not found
+[ERROR] 	 * @param loanId the unique identifier of the loan to return
+[ERROR] 	          ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\UserRepository.java:59: error: unexpected text
+[ERROR] 	 * @throws {@link UserNotFoundException} if the username is not exist.
+[ERROR] 	           ^
+[ERROR] C:\Users\echo tech 2022\softwareEng-workspace\lms\src\main\java\lms\domain\User.java:202: error: unexpected end tag: </p>
+[ERROR] 	 * </p>
+[ERROR] 	   ^
+[ERROR] 11 errors
+[ERROR] 100 warnings
+[ERROR] Command line was: cmd.exe /X /D /C ""C:\Program Files\Java\jdk-21\bin\javadoc.exe" -J-Duser.language= -J-Duser.country= @options @packages"
+[ERROR] 
+[ERROR] Refer to the generated Javadoc files in 'C:\Users\echo tech 2022\softwareEng-workspace\lms\target\reports\apidocs' dir.
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

@@ -5,23 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 /**
- * Utility class for hashing and verifying passwords.
+ * Utility class for password hashing and verification.
  * 
- * <p>
- * This class provides static methods to hash passwords using SHA-512 and to
- * verify raw passwords against stored hashed passwords.
- * </p>
- * 
- * <p>
- * Example usage:
- * </p>
- * 
- * <pre>
- * String hashed = PasswordUtils.hashPassword("myPassword");
- * boolean valid = PasswordUtils.verifyPassword("myPassword", hashed);
- * </pre>
- * 
- * Note: This implementation does not use a salt.
+ * <p>Uses SHA-512 hashing with Base64 encoding. Note: Does not use salt.</p>
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -29,10 +15,10 @@ import java.util.Base64;
 public class PasswordUtils {
 
 	/**
-	 * Hashes a raw password using SHA-512 and encodes it in Base64.
+	 * Hashes a password using SHA-512.
 	 * 
-	 * @param password the raw password to hash
-	 * @return the Base64-encoded hash of the password
+	 * @param password the password to hash
+	 * @return the Base64-encoded hash
 	 */
 	public static String hashPassword(String password) {
 		try {
@@ -45,11 +31,11 @@ public class PasswordUtils {
 	}
 
 	/**
-	 * Verifies if a raw password matches a previously hashed password.
+	 * Verifies if a password matches a hash.
 	 * 
-	 * @param password       the raw password to verify
-	 * @param hashedPassword the previously hashed password
-	 * @return {@code true} if the passwords match, {@code false} otherwise
+	 * @param password       the password to verify
+	 * @param hashedPassword the stored hash
+	 * @return true if passwords match, false otherwise
 	 */
 	public static boolean verifyPassword(String password, String hashedPassword) {
 		return hashPassword(password).equals(hashedPassword);

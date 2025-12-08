@@ -3,20 +3,9 @@ package lms.domain.utils;
 import java.time.Year;
 
 /**
- * Validator class for Book entity fields.
+ * Validator for Book entity fields.
  * 
- * <p>
- * Provides validation methods for all Book constructor parameters to ensure
- * data integrity and business rules are enforced before object creation.
- * This validator is stateless and uses a singleton pattern for reuse.
- * </p>
- * 
- * <p><b>Validation Principles Applied:</b></p>
- * <ul>
- * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all Book entities</li>
- * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
- * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
- * </ul>
+ * <p>Validates book data before object creation. Uses singleton pattern.</p>
  * 
  * @author Majd Awwad
  * @version 2.0
@@ -25,34 +14,31 @@ public class BookValidator {
 
 	private static final BookValidator INSTANCE = new BookValidator();
 
-	/**
-	 * Private constructor to prevent instantiation.
-	 */
 	private BookValidator() {
 	}
 
 	/**
-	 * Returns the singleton instance of the validator.
+	 * Returns the singleton instance.
 	 * 
-	 * @return the shared BookValidator instance
+	 * @return the validator instance
 	 */
 	public static BookValidator getInstance() {
 		return INSTANCE;
 	}
 
 	/**
-	 * Validates all book fields at once (Fail Fast principle).
+	 * Validates all book fields.
 	 * 
-	 * @param title           the title of the book
-	 * @param author          the author of the book
-	 * @param isbn            the unique ISBN identifier
-	 * @param publisher       the publisher of the book
-	 * @param publicationYear the year the book was published
-	 * @param category        the category or genre of the book
-	 * @param totalCopies     the total number of copies owned by the library
-	 * @param language        the language the book is written in
-	 * @param shelfLocation   the physical location of the book in the library
-	 * @throws IllegalArgumentException if any field fails validation
+	 * @param title           the title
+	 * @param author          the author
+	 * @param isbn            the ISBN
+	 * @param publisher       the publisher
+	 * @param publicationYear the publication year
+	 * @param category        the category
+	 * @param totalCopies     the total copies
+	 * @param language        the language
+	 * @param shelfLocation   the shelf location
+	 * @throws IllegalArgumentException if any field is invalid
 	 */
 	public void validate(String title, String author, String isbn, String publisher, int publicationYear,
 			String category, int totalCopies, String language, String shelfLocation) {
@@ -71,8 +57,8 @@ public class BookValidator {
 	/**
 	 * Validates the book title.
 	 * 
-	 * @param title the title to validate
-	 * @throws IllegalArgumentException if title is null, empty, or blank
+	 * @param title the title
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateTitle(String title) {
 		if (title == null || title.isBlank()) {

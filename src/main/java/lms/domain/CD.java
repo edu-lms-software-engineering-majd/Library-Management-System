@@ -8,17 +8,9 @@ import lms.domain.utils.CDValidator;
 /**
  * Represents a CD in the library collection.
  *
- * <p>
- * This entity contains metadata about a CD, including title, artist, and
- * borrowing status. Each CD is uniquely identified by a generated UUID.
- * </p>
+ * <p>Contains metadata including title, artist, and copy availability.</p>
  *
- * <p>
- * The constructor enforces validation rules to ensure data integrity. All
- * required fields must be non-null and non-blank.
- * </p>
- *
- * @author Ahmad & Majd Awwad
+ * @author Ahmad Salameh
  * @version 2.0
  */
 public class CD implements LoanableItem {
@@ -29,28 +21,23 @@ public class CD implements LoanableItem {
 	private int availableCopies;
 
 	/**
-	 * Creates a new {@code CD} with the required fields. The {@code id} is
-	 * automatically generated and {@code availableCopies} is initialized to
-	 * {@code totalCopies}.
+	 * Creates a new CD with one copy.
 	 *
-	 * @param title  the title of the CD
-	 * @param artist the artist of the CD
-	 * @throws IllegalArgumentException if title or artist is null or blank
+	 * @param title  the CD title
+	 * @param artist the CD artist
+	 * @throws IllegalArgumentException if title or artist is invalid
 	 */
 	public CD(String title, String artist) {
 		this(title, artist, 1);
 	}
 
 	/**
-	 * Creates a new {@code CD} with the required fields and specified number of
-	 * copies. The {@code id} is automatically generated and {@code availableCopies}
-	 * is initialized to {@code totalCopies}.
+	 * Creates a new CD with the specified number of copies.
 	 *
-	 * @param title       the title of the CD
-	 * @param artist      the artist of the CD
-	 * @param totalCopies the total number of copies owned by the library
-	 * @throws IllegalArgumentException if title or artist is null or blank, or if
-	 *                                  totalCopies is less than 1
+	 * @param title       the CD title
+	 * @param artist      the CD artist
+	 * @param totalCopies the total number of copies
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
 	public CD(String title, String artist, int totalCopies) {
 
@@ -72,10 +59,10 @@ public class CD implements LoanableItem {
 	}
 
 	/**
-	 * Sets the title of the CD.
+	 * Sets the CD title.
 	 *
 	 * @param title the new title
-	 * @throws IllegalArgumentException if title is null or blank
+	 * @throws IllegalArgumentException if title is invalid
 	 */
 	public void setTitle(String title) {
 		CDValidator.getInstance().validateTitle(title);
@@ -87,19 +74,16 @@ public class CD implements LoanableItem {
 	}
 
 	/**
-	 * Sets the artist of the CD.
+	 * Sets the CD artist.
 	 *
 	 * @param artist the new artist
-	 * @throws IllegalArgumentException if artist is null or blank
+	 * @throws IllegalArgumentException if artist is invalid
 	 */
 	public void setArtist(String artist) {
 		CDValidator.getInstance().validateArtist(artist);
 		this.artist = artist;
 	}
 
-	/**
-	 * @return the total number of copies owned by the library
-	 */
 	public int getTotalCopies() {
 		return totalCopies;
 	}

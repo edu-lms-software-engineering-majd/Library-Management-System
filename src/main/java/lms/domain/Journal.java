@@ -5,19 +5,11 @@ import java.util.UUID;
 import lms.domain.utils.JournalValidator;
 
 /**
- * Represents a Journal in the library collection.
+ * Represents a journal in the library collection.
  *
- * <p>
- * This entity contains metadata about a journal, including title, author, and
- * borrowing status. Each journal is uniquely identified by a generated UUID.
- * </p>
+ * <p>Contains metadata including title, author, and copy availability.</p>
  *
- * <p>
- * The constructor enforces validation rules to ensure data integrity. All
- * required fields must be non-null and non-blank.
- * </p>
- *
- * @author Ahmad & Majd Awwad
+ * @author Ahmad Salameh
  * @version 2.0
  */
 public class Journal implements LoanableItem {
@@ -28,28 +20,23 @@ public class Journal implements LoanableItem {
 	private int availableCopies;
 
 	/**
-	 * Creates a new {@code Journal} with the required fields. The {@code id} is
-	 * automatically generated and {@code availableCopies} is initialized to
-	 * {@code totalCopies}.
+	 * Creates a new journal with one copy.
 	 *
-	 * @param title  the title of the journal
-	 * @param author the author of the journal
-	 * @throws IllegalArgumentException if title or author is null or blank
+	 * @param title  the journal title
+	 * @param author the journal author
+	 * @throws IllegalArgumentException if title or author is invalid
 	 */
 	public Journal(String title, String author) {
 		this(title, author, 1);
 	}
 
 	/**
-	 * Creates a new {@code Journal} with the required fields and specified number
-	 * of copies. The {@code id} is automatically generated and
-	 * {@code availableCopies} is initialized to {@code totalCopies}.
+	 * Creates a new journal with the specified number of copies.
 	 *
-	 * @param title       the title of the journal
-	 * @param author      the author of the journal
-	 * @param totalCopies the total number of copies owned by the library
-	 * @throws IllegalArgumentException if title or author is null or blank, or if
-	 *                                  totalCopies is less than 1
+	 * @param title       the journal title
+	 * @param author      the journal author
+	 * @param totalCopies the total number of copies
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
 	public Journal(String title, String author, int totalCopies) {
 		JournalValidator.getInstance().validate(title, author, totalCopies);
@@ -70,10 +57,10 @@ public class Journal implements LoanableItem {
 	}
 
 	/**
-	 * Sets the title of the journal.
+	 * Sets the journal title.
 	 *
 	 * @param title the new title
-	 * @throws IllegalArgumentException if title is null or blank
+	 * @throws IllegalArgumentException if title is invalid
 	 */
 	public void setTitle(String title) {
 		JournalValidator.getInstance().validateTitle(title);
@@ -85,19 +72,16 @@ public class Journal implements LoanableItem {
 	}
 
 	/**
-	 * Sets the author of the journal.
+	 * Sets the journal author.
 	 *
 	 * @param author the new author
-	 * @throws IllegalArgumentException if author is null or blank
+	 * @throws IllegalArgumentException if author is invalid
 	 */
 	public void setAuthor(String author) {
 		JournalValidator.getInstance().validateAuthor(author);
 		this.author = author;
 	}
 
-	/**
-	 * @return the total number of copies owned by the library
-	 */
 	public int getTotalCopies() {
 		return totalCopies;
 	}

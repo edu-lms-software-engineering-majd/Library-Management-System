@@ -4,20 +4,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Represents a fine-related financial transaction in the library system.
+ * Represents a financial transaction related to fines in the library system.
  * 
- * <p>
- * This class tracks fines, payments, and refunds linked to user accounts and
- * loans.
- * </p>
+ * <p>Tracks fines, payments, and refunds with amount, description, and transaction type.</p>
  * 
- * <ul>
- * <li><b>FINE</b> – when a user is charged for overdue or damaged items</li>
- * <li><b>PAYMENT</b> – when a user pays part or all of a fine</li>
- * <li><b>REFUND</b> – when the library refunds a previously charged fine</li>
- * </ul>
- * 
- * @author
+ * @author Majd Awwad
  * @version 1.0
  */
 public class FineTransaction {
@@ -29,12 +20,11 @@ public class FineTransaction {
 	private final TransactionType type;
 
 	/**
-	 * Creates a new fine transaction record.
+	 * Creates a new transaction record.
 	 *
-	 * @param amount      the transaction amount (positive for credit, negative for
-	 *                    debit)
-	 * @param description short description or reason for the transaction
-	 * @param type        the type of transaction (FINE, PAYMENT, REFUND)
+	 * @param amount      the transaction amount
+	 * @param description the reason for the transaction
+	 * @param type        the transaction type (FINE or PAYMENT)
 	 */
 	public FineTransaction(double amount, String description, TransactionType type) {
 		this.transactionId = UUID.randomUUID();
@@ -66,9 +56,9 @@ public class FineTransaction {
 	}
 
 	/**
-	 * Returns a formatted summary string for display or logs.
+	 * Returns a formatted summary of the transaction.
 	 *
-	 * @return a human-readable summary of the transaction
+	 * @return human-readable transaction summary
 	 */
 	public String getSummary() {
 		String sign = amount >= 0 ? "+" : "";

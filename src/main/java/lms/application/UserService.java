@@ -16,34 +16,22 @@ import lms.domain.utils.PasswordUtils;
  * Application service for managing users in the Library Management System.
  *
  * <p>
- * This service acts as an intermediary between the domain layer and the
- * presentation layer, providing methods to retrieve, update, and manage user
- * information while enforcing business rules and access control.
+ * This service coordinates user-related operations including retrieval, updates,
+ * registration, and deletion. It enforces authorization rules and returns data
+ * as {@link UserDTO} objects to maintain proper layer separation.
  * </p>
  *
  * <p>
- * Responsibilities of this class include:
+ * Key responsibilities:
  * </p>
  * <ul>
- * <li>Retrieving all users or specific users by username.</li>
- * <li>Updating user information with proper authorization checks.</li>
- * <li>Returning data in the form of {@link UserDTO} to avoid exposing domain
- * entities outside the domain layer.</li>
+ * <li>Retrieve users by username or list all users</li>
+ * <li>Update user information with authorization checks</li>
+ * <li>Register new users with hashed passwords</li>
+ * <li>Check borrowing eligibility</li>
  * </ul>
  * 
- * <p>
- * Example usage:
- * </p>
- * 
- * <pre>
- * UserService userService = new UserService(userRepo);
- * List&lt;UserDTO&gt; users = userService.getAllUsers();
- * UserDTO user = userService.getUserByUsername("john_doe");
- * userService.updateUser(currentUser, userId, "newName", "newEmail@example.com", "newPass123", Role.MEMBER);
- * </pre>
- * 
  * @author Majd Awwad
- * @refactoredBy Ahmad Salameh
  * @version 1.0
  */
 
@@ -51,16 +39,33 @@ public class UserService {
 
 	private final UserRepository userRepo;
 
+	/**
+	 * Constructs a UserService with the required repository.
+	 *
+	 * @param userRepo the repository for accessing user data
+	 */
 	public UserService(UserRepository userRepo) {
 		this.userRepo = userRepo;
 	}
 
+	/**
+	 * Retrieves all users in the system as DTOs.
+	 *
+	 * @return an unmodifiable list of all users
+	 */
 	public List<UserDTO> getAllUsers() {
 		List<User> actualUsers = userRepo.getAllUsers();
 		List<UserDTO> users = actualUsers.stream().map(User::toDTO).collect(Collectors.toList());
 		return Collections.unmodifiableList(users);
 	}
 
+	/**
+	 * Retrieves a user by their username.
+	 *
+	 * @param username the username to search for
+	 * @return the user DTO
+	 * @throws UserNotFoundException if no user exists with the given username
+	 */
 	public UserDTO getUserByUsername(String username) throws UserNotFoundException {
 
 		Optional<User> userOptional = userRepo.getByUserName(username);
@@ -72,11 +77,37 @@ public class UserService {
 		return userOptional.get().toDTO();
 	}
 
+	/**
+	 * Retrieves the domain User entity by username.
+	 *
+	 * @param username the username to search for
+	 * @return the User domain entity
+	 * @throws UserNotFoundException if no user exists with the given username
+	 */
 	public User getDomainUserByUsername(String username) throws UserNotFoundException {
 		return userRepo.getByUserName(username)
 				.orElseThrow(() -> new UserNotFoundException("No such user with this username"));
 	}
 
+	/**
+	 * Updates user information with authorization checks.
+	 *
+	 * <p>
+	 * Only admins or the user themselves can update their information.
+	 * Username cannot be changed after creation.
+	 * </p>
+	 *
+	 * @param currentUser the currently authenticated user
+	 * @param userID the ID of the user to update
+	 * @param newUsername must be null (username changes not allowed)
+	 * @param newEmail the new email (null to keep unchanged)
+	 * @param newPassword the new password (null to keep unchanged)
+	 * @param newRole the new role (null to keep unchanged)
+	 * @return {@code true} if update succeeded
+	 * @throws IllegalAccessException if user lacks permission to update
+	 * @throws UserNotFoundException if the target user doesn't exist
+	 * @throws IllegalArgumentException if attempting to change username
+	 */
 	public boolean updateUser(UserDTO currentUser, UUID userID, String newUsername, String newEmail, String newPassword,
 			Role newRole) throws IllegalAccessException, UserNotFoundException {
 
@@ -100,16 +131,43 @@ public class UserService {
 		return userRepo.update(user);
 	}
 
+	/**
+	 * Deletes a user by their username.
+	 *
+	 * @param username the username of the user to delete
+	 * @return {@code true} if deletion succeeded
+	 * @throws UserNotFoundException if no user exists with the given username
+	 */
 	public boolean deleteByUsername(String username) throws UserNotFoundException {
 		return userRepo.delete(username);
 	}
 
+	/**
+	 * Checks if a user is eligible to borrow items.
+	 *
+	 * @param userID the user's unique identifier
+	 * @return {@code true} if the user can borrow, {@code false} otherwise
+	 * @throws UserNotFoundException if the user doesn't exist
+	 */
 	public boolean canBorrow(UUID userID) throws UserNotFoundException {
 		User user = userRepo.getByID(userID)
 				.orElseThrow(() -> new UserNotFoundException("user with id:" + userID + " is not found"));
 		return user.canBorrow();
 	}
 
+	/**
+	 * Registers a new user in the system.
+	 *
+	 * @param username the username (must be unique)
+	 * @param rawPassword the plain text password (will be hashed)
+	 * @param firstName the user's first name
+	 * @param lastName the user's last name
+	 * @param email the user's email address
+	 * @param role the user's role
+	 * @return the newly created user as a DTO
+	 * @throws IllegalArgumentException if username already exists
+	 * @throws IllegalStateException if registration fails
+	 */
 	public UserDTO registerUser(String username, String rawPassword, String firstName, String lastName, String email, Role role) {
 		
 		if (userRepo.isExist(username)) {

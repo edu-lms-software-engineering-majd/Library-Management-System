@@ -5,19 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repository interface for managing {@link Book} entities.
+ * Repository interface for managing Book entities.
  *
- * <p>
- * This defines the contract for book persistence and retrieval operations,
- * without specifying the storage mechanism. Implementations may use in-memory
- * storage, relational databases, or any other persistence strategy.
- * </p>
- *
- * <p>
- * Following the Repository pattern, this interface abstracts access to the
- * domain model and allows the application layer to interact with books in a
- * consistent way.
- * </p>
+ * <p>Defines operations for book persistence and retrieval.</p>
  *
  * @author Majd Awwad
  * @version 1.0
@@ -25,27 +15,26 @@ import java.util.UUID;
 public interface BookRepository {
 
 	/**
-	 * Adds a new book to the repository.
+	 * Adds a new book.
 	 *
-	 * @param book the {@link Book} to add
-	 * @return {@code true} if the book was added, {@code false} if it already
-	 *         exists
+	 * @param book the book to add
+	 * @return true if added, false if already exists
 	 */
 	boolean addBook(Book book);
 
 	/**
-	 * Retrieves a book by its unique ID.
+	 * Retrieves a book by ID.
 	 *
-	 * @param bookId the {@link UUID} of the book
-	 * @return the {@link Book} if found, otherwise {@code null}
+	 * @param bookId the book ID
+	 * @return Optional containing the book if found
 	 */
 	Optional<Book> getBookById(UUID bookId);
 
 	/**
-	 * Retrieves a book by its ISBN.
+	 * Retrieves a book by ISBN.
 	 *
-	 * @param isbn the ISBN string of the book
-	 * @return the {@link Book} if found, otherwise {@code null}
+	 * @param isbn the ISBN
+	 * @return Optional containing the book if found
 	 */
 	Optional<Book> getBookByIsbn(String isbn);
 

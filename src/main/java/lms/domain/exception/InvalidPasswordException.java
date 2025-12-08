@@ -1,12 +1,7 @@
 package lms.domain.exception;
 
 /**
- * Thrown when a user attempts to log in with an incorrect password.
- * 
- * <p>
- * This exception should be used by the authentication service to signal a
- * failed login attempt due to password mismatch.
- * </p>
+ * Thrown when a user provides an incorrect password.
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -14,10 +9,9 @@ package lms.domain.exception;
 public class InvalidPasswordException extends Exception {
 
 	/**
-	 * Constructs a new {@code InvalidPasswordException} with the specified detail
-	 * message.
+	 * Creates a new exception with the specified message.
 	 * 
-	 * @param message the detail message explaining the reason for the exception
+	 * @param message the detail message
 	 */
 	public InvalidPasswordException(String message) {
 		super(message);

@@ -3,68 +3,34 @@ package lms.domain.utils;
 import lms.domain.Role;
 
 /**
- * Validator class for User entity fields and operations.
+ * Validator for User entity fields.
  * 
- * <p>
- * Provides validation methods for user-related data such as names, email,
- * username, password, and role to ensure data integrity and business rules are
- * enforced.
- * </p>
- * 
- * <p><b>Validation Principles Applied:</b></p>
- * <ul>
- * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all User entities</li>
- * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
- * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
- * </ul>
+ * <p>Validates names, email, username, password, and role. Uses singleton pattern.</p>
  * 
  * @author Majd Awwad
  * @version 2.0
  */
 public class UserValidator {
 
-	
-	 
-	
 	private static final int MIN_PASSWORD_LENGTH = 8;
-
-	/**
-	 * Private constructor to prevent instantiation.
-	 */
-	
-	
-	
-	/*private UserValidator() 
-	 * 
-	 * {
-	}
-	
-	*/
-
-	/**
-	 * Returns the singleton instance of the validator.
-	 * 
-	 * @return the shared UserValidator instance
-	 */
-	/*public static UserValidator getInstance() {
-		return INSTANCE;
-	}
-*/
-	
-	
+	private static final UserValidator INSTANCE = new UserValidator();
 	
 	public UserValidator() {}   
 
-	private static final UserValidator INSTANCE = new UserValidator();
-	public static UserValidator getInstance() { return INSTANCE; }
-
-	
-	
 	/**
-	 * Validates a user's first name.
+	 * Returns the singleton instance.
 	 * 
-	 * @param firstName the first name to validate
-	 * @throws IllegalArgumentException if first name is null or blank
+	 * @return the validator instance
+	 */
+	public static UserValidator getInstance() { 
+		return INSTANCE; 
+	}
+
+	/**
+	 * Validates a first name.
+	 * 
+	 * @param firstName the first name
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateFirstName(String firstName) {
 		if (firstName == null || firstName.isBlank()) {
@@ -73,10 +39,10 @@ public class UserValidator {
 	}
 
 	/**
-	 * Validates a user's last name.
+	 * Validates a last name.
 	 * 
-	 * @param lastName the last name to validate
-	 * @throws IllegalArgumentException if last name is null or blank
+	 * @param lastName the last name
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateLastName(String lastName) {
 		if (lastName == null || lastName.isBlank()) {
@@ -87,8 +53,8 @@ public class UserValidator {
 	/**
 	 * Validates an email address.
 	 * 
-	 * @param email the email to validate
-	 * @throws IllegalArgumentException if email is null or doesn't contain "@"
+	 * @param email the email
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateEmail(String email) {
 		if (email == null || !email.contains("@")) {

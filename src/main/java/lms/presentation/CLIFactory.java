@@ -12,30 +12,11 @@ import lms.application.NotificationService;
 import lms.application.UserService;
 
 /**
- * Factory class for creating the appropriate {@link CLI} implementation based
- * on the currently logged-in user's role.
- *
- * <p>
- * This class centralizes the logic for determining which CLI interface to
- * present to a user, ensuring that users see menus appropriate to their role:
- * </p>
- * <ul>
- * <li>ADMIN – {@link AdminCLI}</li>
- * <li>MEMBER or LIBRARIAN – {@link UserCLI}</li>
- * </ul>
- *
- * <p>
- * Example usage:
- * </p>
- * 
- * <pre>
- * CLI cli = CLIFactory.getCLI(authService, userService, bookService);
- * cli.start();
- * </pre>
+ * Factory class for creating the appropriate CLI implementation based on user role.
  * 
  * <p>
- * Note: The factory relies on {@link AuthService#getCurrentUser()} to determine
- * the user's role, and will throw an exception if the role is unsupported.
+ * Returns {@link AdminCLI} for administrators and {@link UserCLI} for members
+ * and librarians based on the current authenticated user's role.
  * </p>
  * 
  * @author Majd
@@ -49,7 +30,14 @@ public class CLIFactory {
 	 * @param authService the authentication service
 	 * @param userService the user management service
 	 * @param bookService the book management service
-	 * @return a {@link CLI} instance for the current user
+	 * @param loanService the loan management service
+	 * @param cdService the CD management service
+	 * @param journalService the journal management service
+	 * @param notificationService the notification service
+	 * @param accountService the account management service
+	 * @param loanStatsService the loan statistics service
+	 * @param loanQueryService the loan query service
+	 * @return a CLI instance appropriate for the current user's role
 	 * @throws IllegalStateException if the user's role is unsupported
 	 */
 	public static CLI getCLI(AuthService authService, UserService userService, BookService bookService,LoanService loanService,CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService, LoanStatsService loanStatsService, LoanQueryService loanQueryService) {

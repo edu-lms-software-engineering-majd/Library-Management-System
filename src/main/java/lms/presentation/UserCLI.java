@@ -30,8 +30,13 @@ import lms.domain.User;
 import lms.domain.exception.UserNotFoundException;
 
 /**
- * User CLI for Library Management System.
- * Provides clean interface for library users to browse, borrow, and manage their account.
+ * User command-line interface for the Library Management System.
+ * 
+ * <p>
+ * Provides functionality for library members and librarians to browse items,
+ * borrow and return materials, manage their account, pay fines, and view notifications.
+ * Librarians have additional privileges to process returns for any user.
+ * </p>
  * 
  * @author Majd Awwad
  * @version 3.0
@@ -57,6 +62,18 @@ public class UserCLI implements CLI {
     
     private UserDTO currentUser;
 
+    /**
+     * Constructs a UserCLI with all required services.
+     * 
+     * @param userService the user management service
+     * @param bookService the book management service
+     * @param cdService the CD management service
+     * @param journalService the journal management service
+     * @param loanService the loan management service
+     * @param notificationService the notification service
+     * @param authService the authentication service
+     * @param accountService the account management service
+     */
     public UserCLI(UserService userService, BookService bookService, CDService cdService,
                    JournalService journalService, LoanService loanService,
                    NotificationService notificationService, AuthService authService, AccountService accountService) {
@@ -69,6 +86,11 @@ public class UserCLI implements CLI {
         this.accountService = accountService;
     }
     
+    /**
+     * Retrieves the current user, caching the result.
+     * 
+     * @return the current logged-in user
+     */
     private UserDTO getCurrentUser() {
         if (currentUser == null) {
             currentUser = authService.getCurrentUser();
@@ -76,10 +98,19 @@ public class UserCLI implements CLI {
         return currentUser;
     }
     
+    /**
+     * Checks if the current user has librarian privileges.
+     * 
+     * @return true if the user is a librarian, false otherwise
+     */
     private boolean isLibrarian() {
         return getCurrentUser().role() == lms.domain.Role.LIBRARIAN;
     }
 
+    /**
+     * Starts the user menu and handles user interactions.
+     * Displays different menu options based on whether the user is a librarian.
+     */
     @Override
     public void start() {
         UserDTO user = getCurrentUser();
@@ -96,6 +127,9 @@ public class UserCLI implements CLI {
         }
     }
     
+    /**
+     * Displays the count of unread notifications for the current user.
+     */
     private void displayUnreadNotificationCount() {
         try {
             User user = userService.getDomainUserByUsername(getCurrentUser().username());
@@ -190,6 +224,9 @@ public class UserCLI implements CLI {
         currentUser = null;
     }
 
+    /**
+     * Displays the user menu with options appropriate for the user's role.
+     */
     private void showUserMenu() {
         CLIHelper.printHeader("USER MENU");
         CLILogger.info("1. Browse & Search Items");
@@ -216,6 +253,9 @@ public class UserCLI implements CLI {
         CLILogger.info("Enter your choice: ");
     }
 
+    /**
+     * Handles browsing and searching for library items (books, CDs, journals).
+     */
     private void handleBrowseAndSearchItems() {
         CLIHelper.printHeader("Browse & Search Library Items");
         CLILogger.info("1. Browse All Books");
@@ -359,6 +399,9 @@ public class UserCLI implements CLI {
         CLIHelper.displaySearchResults(results, searchTerm, JOURNAL_TYPE, this::displayJournalResultsWithNumbers);
     }
 
+    /**
+     * Handles the borrowing process for library items.
+     */
     private void handleBorrowItem() {
         CLIHelper.printHeader("Borrow an Item");
         CLILogger.info("Choose item type to borrow:");
@@ -475,6 +518,10 @@ public class UserCLI implements CLI {
             this::displayJournalResultsWithNumbers, scanner);
     }
 
+    /**
+     * Handles the return process for library items (librarian only).
+     * Allows librarians to search for users and process returns on their behalf.
+     */
     private void handleReturnItem() {
         CLIHelper.printHeader("Process Returns (Librarian Desk)");
         
@@ -724,6 +771,10 @@ public class UserCLI implements CLI {
         }
     }
 
+    /**
+     * Handles account management operations including viewing balance,
+     * transaction history, paying fines, and viewing statistics.
+     */
     private void handleAccountManagement() {
         CLIHelper.printHeader("My Account & Finances");
         CLILogger.info("1. View Account Summary");
@@ -1100,6 +1151,11 @@ public class UserCLI implements CLI {
         }
     }
     
+    /**
+     * Displays a numbered list of books with their details.
+     * 
+     * @param books the list of books to display
+     */
     private void displayBookResultsWithNumbers(List<Book> books) {
         CLILogger.info(String.format("%-4s %-35s %-25s %-15s %-10s", "#", "Title", "Author", "ISBN", "Status"));
         

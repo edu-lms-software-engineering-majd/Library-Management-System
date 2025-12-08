@@ -13,57 +13,16 @@ import lms.application.LoanStatsService;
 import lms.application.NotificationService;
 import lms.application.UserDTO;
 import lms.application.UserService;
-import lms.domain.Role;
 import lms.domain.exception.InvalidPasswordException;
 import lms.domain.exception.UserNotFoundException;
 
 /**
- * Command-Line Interface (CLI) entry menu for the Library Management System.
+ * Main entry menu for the Library Management System.
  *
  * <p>
- * The {@code LibraryCLI} class represents the main user-facing entry point. It
- * provides the first menu displayed after the program starts, allowing users to
- * log in or exit the system.
- * </p>
- *
- * <h2>Responsibilities:</h2>
- * <ul>
- * <li>Display the initial system menu (login, exit)</li>
- * <li>Delegate login handling to {@link AuthService}</li>
- * <li>Redirect authenticated users to the correct role-specific menu:
- * <ul>
- * <li>{@link AdminCLI} for administrators</li>
- * <li>{@link UserCLI} for regular users</li>
- * </ul>
- * </li>
- * <li>Report login errors caused by invalid credentials</li>
- * </ul>
- *
- * <h2>Usage Example:</h2>
- * 
- * <pre>{@code
- * UserRepo userRepo = new StaticUserRepo();
- * AuthService authService = new AuthService(userRepo);
- * UserService userService = new UserService(userRepo);
- * BookService bookService = new BookService(new StaticBookRepo());
- *
- * LibraryCLI cli = new LibraryCLI(authService, userService, bookService);
- * cli.start();
- * }</pre>
- *
- * <h2>Exceptions:</h2>
- * <ul>
- * <li>{@link UserNotFoundException} – thrown if the username is unknown</li>
- * <li>{@link InvalidPasswordException} – thrown if the password is
- * incorrect</li>
- * <li>{@link IllegalAccessException} – thrown if the user has no valid
- * role</li>
- * </ul>
- *
- * <p>
- * This class belongs to the <b>presentation layer</b> of the LMS architecture.
- * It depends on services from the application layer but has no knowledge of
- * persistence or domain internals.
+ * Provides the initial login interface and redirects authenticated users to
+ * the appropriate role-specific menu ({@link AdminCLI} or {@link UserCLI}).
+ * Uses {@link CLIFactory} to determine the correct CLI based on user role.
  * </p>
  *
  * @author Majd Awwad
@@ -91,12 +50,18 @@ public class LibraryCLI implements CLI {
 	private final LoanQueryService loanQueryService;
 
 	/**
-	 * Constructs a {@code LibraryCLI} with required services.
+	 * Constructs a LibraryCLI with all required services.
 	 *
-	 * @param authService the authentication service used for login/logout
-	 * @param userService the service for user-related operations
-	 * @param bookService the service for book-related operations
-	 * @param loanService 
+	 * @param authService the authentication service
+	 * @param userService the user management service
+	 * @param bookService the book management service
+	 * @param loanService the loan management service
+	 * @param cdService the CD management service
+	 * @param journalService the journal management service
+	 * @param notificationService the notification service
+	 * @param accountService the account management service
+	 * @param loanStatsService the loan statistics service
+	 * @param loanQueryService the loan query service
 	 */
 	public LibraryCLI(AuthService authService, UserService userService, BookService bookService, LoanService loanService, CDService cdService, JournalService journalService, NotificationService notificationService, AccountService accountService, LoanStatsService loanStatsService, LoanQueryService loanQueryService) {
 		this.authService = authService;
@@ -112,17 +77,8 @@ public class LibraryCLI implements CLI {
 	}
 
 	/**
-	 * Starts the main system menu loop.
-	 *
-	 * <p>
-	 * Options available:
-	 * </p>
-	 * <ul>
-	 * <li>1 - Login</li>
-	 * <li>2 - Exit the system</li>
-	 * </ul>
-	 *
-	 * The loop continues until the user chooses to exit.
+	 * Starts the main login menu loop.
+	 * Presents options to login or exit, and continues until the user exits.
 	 */
 	public void start() {
 		while (true) {
@@ -148,13 +104,8 @@ public class LibraryCLI implements CLI {
 	}
 
 	/**
-	 * Handles the login process by prompting the user for credentials and
-	 * delegating authentication to {@link AuthService}.
-	 *
-	 * <p>
-	 * If authentication succeeds, the user is redirected to the appropriate CLI
-	 * menu based on their {@link Role}.
-	 * </p>
+	 * Handles the login process and redirects to the appropriate role-based CLI.
+	 * Prompts for username and password, then authenticates via {@link AuthService}.
 	 */
 	private void handleLogin() {
 		System.out.print("Enter username: ");

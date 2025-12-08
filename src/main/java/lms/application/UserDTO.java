@@ -29,6 +29,7 @@ import lms.domain.Role;
  * @param username  the login username of the user
  * @param firstName the user's first name
  * @param lastName  the user's last name
+ * @param email     the user's email address
  * @param role      the role assigned to the user (e.g., ADMIN, MEMBER)
  * 
  * @author Majd Awwad

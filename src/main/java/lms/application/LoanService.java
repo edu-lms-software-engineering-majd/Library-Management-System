@@ -25,6 +25,41 @@ import lms.domain.exception.LoanNotFoundException;
 import lms.domain.exception.PermissionDeniedException;
 import lms.domain.exception.UserNotFoundException;
 
+/**
+ * Application service coordinating loan operations in the Library Management System.
+ * 
+ * <p>
+ * This service manages the complete lifecycle of library item loans including:
+ * </p>
+ * <ul>
+ * <li>Creating new loans (borrowing items)</li>
+ * <li>Returning items and calculating fines</li>
+ * <li>Extending loan periods</li>
+ * <li>Checking for overdue loans and sending notifications</li>
+ * <li>Managing loan status and history</li>
+ * </ul>
+ * 
+ * <p><b>Key Features:</b></p>
+ * <ul>
+ * <li>Validates user borrowing eligibility (limits, fines, account status)</li>
+ * <li>Manages item availability and copy counts</li>
+ * <li>Automatic fine calculation for overdue items</li>
+ * <li>Email and in-system notifications for overdue items</li>
+ * <li>Support for multiple item types (books, CDs, journals)</li>
+ * </ul>
+ * 
+ * <p>
+ * The service uses {@link LoanServiceContext} to access all necessary repositories
+ * and the notification service, following the Context pattern to reduce constructor
+ * parameter count.
+ * </p>
+ * 
+ * @author Majd Awwad
+ * @version 3.0
+ * @see Loan
+ * @see LoanServiceContext
+ * @see NotificationService
+ */
 public class LoanService {
 
 	private static final Logger logger = Logger.getLogger(LoanService.class.getName());
@@ -36,6 +71,12 @@ public class LoanService {
 	private final LoanRepository loanRepo;
 	private final NotificationService notificationService;
 
+	/**
+	 * Constructs a new LoanService with the required dependencies.
+	 * 
+	 * @param context the service context containing all required repositories and services
+	 * @throws IllegalArgumentException if context is null
+	 */
 	public LoanService(LoanServiceContext context) {
 		if (context == null) {
 			throw new IllegalArgumentException("LoanServiceContext cannot be null");
@@ -54,6 +95,7 @@ public class LoanService {
 	 *
 	 * <p>
 	 * This method performs the following operations:
+	 * </p>
 	 * <ol>
 	 * <li>Validates that the user exists and can borrow items</li>
 	 * <li>Verifies that the requested item is available</li>
@@ -61,7 +103,6 @@ public class LoanService {
 	 * <li>Updates the item's available copy count</li>
 	 * <li>Updates the user's loan records</li>
 	 * </ol>
-	 * </p>
 	 *
 	 * @param userDTO  the user data transfer object containing user information
 	 * @param itemId   the unique identifier of the item to loan
@@ -165,9 +206,9 @@ public class LoanService {
 	 * <li>Calculating and applying late fines if the item is overdue</li>
 	 * <li>Updating all relevant repositories</li>
 	 * </ul>
-	 * </p>
 	 *
-	 * @param loanId the unique identifier of the loan to return
+	 * @param userID the unique identifier of the user returning the item
+	 * @param loanID the unique identifier of the loan to return
 	 * @return true if the return operation is successful
 	 * @throws IllegalArgumentException  if the loan does not exist
 	 * @throws IllegalStateException     if the item has already been returned

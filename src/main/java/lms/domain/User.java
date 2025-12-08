@@ -12,12 +12,10 @@ import lms.domain.utils.PasswordUtils;
 import lms.domain.utils.UserValidator;
 
 /**
- * Domain entity representing a user of the Library Management System.
+ * Represents a user in the Library Management System.
  * 
- * <p>
- * Manages user identity, authentication, borrowing limits, and notifications.
- * Enforces business rules such as maximum borrow limits and fine restrictions.
- * </p>
+ * <p>Manages user identity, authentication, loans, and notifications.
+ * Enforces a maximum borrowing limit of 10 items.</p>
  * 
  * @author Majd Awwad
  * @version 2.0
@@ -40,15 +38,15 @@ public class User {
 	private List<Notification> readNotifications = new ArrayList<>();
 
 	/**
-	 * Creates a new User with validation.
+	 * Creates a new user with the specified details.
 	 * 
-	 * @param firstName      the user's first name
-	 * @param lastName       the user's last name
-	 * @param email          the user's email address
-	 * @param username       the unique username (immutable)
+	 * @param firstName      the first name
+	 * @param lastName       the last name
+	 * @param email          the email address
+	 * @param username       the username (immutable)
 	 * @param hashedPassword the hashed password
-	 * @param role           the user's role (ADMIN or MEMBER)
-	 * @throws IllegalArgumentException if any field fails validation
+	 * @param role           the user role
+	 * @throws IllegalArgumentException if any field is invalid
 	 */
 	public User(String firstName, String lastName, String email, String username, String hashedPassword, Role role) {
 		 
@@ -84,56 +82,36 @@ public class User {
 		this.account = account;
 	}
 
-	/**
-	 * Gets the user's account.
-	 * 
-	 * @return the user's account
-	 */
 	public Account getAccount() {
 		return account;
 	}
 
-	/**
-	 * Gets the user's unique identifier.
-	 * 
-	 * @return the user's UUID
-	 */
 	public UUID getUserID() {
 		return userID;
 	}
 
-	/**
-	 * Gets the user's registration date.
-	 * 
-	 * @return the registration date
-	 */
 	public LocalDate getRegistrationDate() {
 		return registrationDate;
 	}
 
-	/**
-	 * Gets the user's role.
-	 * 
-	 * @return the user's role
-	 */
 	public Role getRole() {
 		return role;
 	}
 
 	/**
-	 * Converts this user to a Data Transfer Object for presentation layer.
+	 * Converts this user to a Data Transfer Object.
 	 * 
-	 * @return a UserDTO containing essential user information
+	 * @return a UserDTO with essential user information
 	 */
 	public UserDTO toDTO() {
 		return new UserDTO(this.userID, this.username, this.firstName, this.lastName, this.email, this.role);
 	}
 
 	/**
-	 * Verifies if the provided password matches the user's stored password.
+	 * Verifies if the provided password matches the stored password.
 	 * 
-	 * @param rawPassword the raw password to verify
-	 * @return {@code true} if the password matches, {@code false} otherwise
+	 * @param rawPassword the password to verify
+	 * @return true if the password matches, false otherwise
 	 */
 	public boolean verifyPassword(String rawPassword) {
 		return PasswordUtils.verifyPassword(rawPassword, this.hashedPassword);
@@ -141,14 +119,8 @@ public class User {
 
 	/**
 	 * Changes the user's password with validation.
+	 * Password must be at least 8 characters and different from the current password.
 	 * 
-	 * <p>
-	 * Enforces password security rules:
-	 * <ul>
-	 * <li>Password must be at least 8 characters long</li>
-	 * <li>New password cannot be the same as the old password</li>
-	 * </ul>
-	 * </p>
 	 * 
 	 * @param newPassword the new password to set
 	 * @throws IllegalArgumentException if password is too weak
@@ -227,7 +199,6 @@ public class User {
 	 * items)</li>
 	 * <li>User must not have any outstanding fines</li>
 	 * </ul>
-	 * </p>
 	 * 
 	 * @return {@code true} if the user can borrow, {@code false} otherwise
 	 */

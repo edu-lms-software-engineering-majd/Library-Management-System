@@ -5,24 +5,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repository interface for managing Journal entities in the Library Management
- * System.
+ * Repository interface for managing Journal entities.
  *
- * <p>
- * This interface defines CRUD operations for journals, allowing implementations
- * to store data in-memory or in a database.
- * </p>
+ * <p>Defines CRUD operations for journals in the library.</p>
  *
- * @author
+ * @author Majd Awwad
  * @version 1.0
  */
 public interface JournalsRepository {
 
 	/**
-	 * Adds a new journal to the repository.
+	 * Adds a new journal.
 	 *
 	 * @param journal the journal to add
-	 * @return true if added successfully, false otherwise
+	 * @return true if added, false otherwise
 	 */
 	boolean addJournal(Journal journal);
 
@@ -30,23 +26,23 @@ public interface JournalsRepository {
 	 * Updates an existing journal.
 	 *
 	 * @param journal the updated journal
-	 * @return true if updated successfully, false otherwise
+	 * @return true if updated, false otherwise
 	 */
 	boolean updateJournal(Journal journal);
 
 	/**
-	 * Deletes a journal by its unique identifier.
+	 * Deletes a journal by ID.
 	 *
-	 * @param id the journal's UUID
-	 * @return true if deleted successfully, false otherwise
+	 * @param id the journal ID
+	 * @return true if deleted, false otherwise
 	 */
 	boolean deleteJournal(UUID id);
 
 	/**
-	 * Retrieves a journal by its unique ID.
+	 * Retrieves a journal by ID.
 	 *
-	 * @param id the UUID of the journal
-	 * @return an Optional containing the found journal, or empty if not found
+	 * @param id the journal ID
+	 * @return Optional containing the journal if found
 	 */
 	Optional<Journal> getJournalById(UUID id);
 

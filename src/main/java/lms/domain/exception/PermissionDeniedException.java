@@ -1,12 +1,7 @@
 package lms.domain.exception;
 
 /**
- * Thrown when a user attempts an action without the required permissions.
- *
- * <p>
- * This exception is typically raised during role-based access control checks,
- * such as when a non-admin tries to add or remove resources.
- * </p>
+ * Thrown when a user attempts an action without required permissions.
  *
  * @author Majd Awwad
  * @version 1.0
@@ -14,9 +9,9 @@ package lms.domain.exception;
 public class PermissionDeniedException extends Exception {
 
 	/**
-	 * Creates a new exception with the specified detail message.
+	 * Creates a new exception with the specified message.
 	 *
-	 * @param message explanation of why the permission was denied
+	 * @param message explanation of the permission denial
 	 */
 	public PermissionDeniedException(String message) {
 		super(message);

@@ -11,38 +11,24 @@ import lms.domain.BookRepository;
 /**
  * In-memory implementation of {@link BookRepository}.
  *
- * <p>
- * Stores {@link Book} objects in a static list for lightweight usage,
- * testing, or prototyping. This repository is NOT thread-safe and should
- * not be used in production.
- * </p>
- *
- * <h3>Key Features:</h3>
- * <ul>
- *   <li>Store, update, delete books in memory</li>
- *   <li>Search by ID or ISBN</li>
- *   <li>Prevent duplicate ISBN values</li>
- *   <li>Validation for all input records</li>
- * </ul>
+ * <p>Stores books in a static list with support for CRUD operations and search by ID or ISBN.
+ * Ensures unique ISBN values and validates all input. This implementation is not thread-safe
+ * and intended for testing purposes.</p>
  *
  * @author Ahmad Salameh
  * @version 2.1
  */
 public final class StaticBookRepository implements BookRepository {
 
-    /** Singleton instance */
     private static final StaticBookRepository INSTANCE = new StaticBookRepository();
-
-    /** Internal in-memory storage */
     private static final List<Book> books = new ArrayList<>();
 
-    /** Private constructor for Singleton */
     private StaticBookRepository() {}
 
     /**
-     * Returns the Singleton instance of the repository.
+     * Returns the singleton instance of the repository.
      *
-     * @return the shared {@link StaticBookRepository} instance
+     * @return the shared StaticBookRepository instance
      */
     public static StaticBookRepository getInstance() {
         return INSTANCE;
@@ -58,12 +44,10 @@ public final class StaticBookRepository implements BookRepository {
 				"Software Design", 2, "English", "Shelf C3"));
 	}
 
-   
-
     /**
-     * Ensures the provided book is valid and ready for persistence.
+     * Validates a book object before persistence operations.
      *
-     * @param book the book object to validate
+     * @param book the book to validate
      * @throws IllegalArgumentException if validation fails
      */
     private void validate(Book book) {
@@ -81,17 +65,23 @@ public final class StaticBookRepository implements BookRepository {
     }
 
     /**
-     * Checks whether an ISBN is already used by any other book.
+     * Checks if an ISBN already exists in the repository.
      *
      * @param isbn the ISBN to check
-     * @return true if exists, false otherwise
+     * @return true if ISBN exists, false otherwise
      */
     private boolean isbnExists(String isbn) {
         return books.stream()
 				.anyMatch(b -> b.getIsbn().equalsIgnoreCase(isbn));
     }
 
-   
+    /**
+     * Adds a new book to the repository.
+     *
+     * @param book the book to add
+     * @return true if added successfully
+     * @throws IllegalArgumentException if book is invalid or ISBN already exists
+     */
     @Override
     public boolean addBook(Book book) {
         validate(book);
@@ -106,6 +96,12 @@ public final class StaticBookRepository implements BookRepository {
         return true;
     }
 
+    /**
+     * Retrieves a book by its unique identifier.
+     *
+     * @param bookId the book ID
+     * @return an Optional containing the book if found, otherwise empty
+     */
     @Override
     public Optional<Book> getBookById(UUID bookId) {
         if (bookId == null)
@@ -116,6 +112,12 @@ public final class StaticBookRepository implements BookRepository {
                 .findFirst();
     }
 
+    /**
+     * Retrieves a book by its ISBN.
+     *
+     * @param isbn the ISBN to search for
+     * @return an Optional containing the book if found, otherwise empty
+     */
     @Override
     public Optional<Book> getBookByIsbn(String isbn) {
         if (isbn == null)
@@ -126,6 +128,13 @@ public final class StaticBookRepository implements BookRepository {
                 .findFirst();
     }
 
+    /**
+     * Updates an existing book in the repository.
+     *
+     * @param updatedBook the book with updated information
+     * @return true if updated successfully, false if book not found
+     * @throws IllegalArgumentException if book is invalid or ISBN conflicts with another book
+     */
     @Override
     public boolean updateBook(Book updatedBook) {
         validate(updatedBook);
@@ -135,7 +144,6 @@ public final class StaticBookRepository implements BookRepository {
 
             if (current.getId().equals(updatedBook.getId())) {
 
-                 
                 boolean isbnChanged = !current.getIsbn().equalsIgnoreCase(updatedBook.getIsbn());
                 boolean isbnConflict = isbnChanged && isbnExists(updatedBook.getIsbn());
 
@@ -155,6 +163,13 @@ public final class StaticBookRepository implements BookRepository {
         return false;
     }
 
+    /**
+     * Deletes a book from the repository.
+     *
+     * @param bookId the ID of the book to delete
+     * @return true if deleted successfully, false if book not found
+     * @throws IllegalArgumentException if bookId is null
+     */
     @Override
     public boolean deleteBook(UUID bookId) {
         if (bookId == null)
@@ -163,6 +178,11 @@ public final class StaticBookRepository implements BookRepository {
         return books.removeIf(b -> b.getId().equals(bookId));
     }
 
+    /**
+     * Retrieves all books in the repository.
+     *
+     * @return an immutable list of all books
+     */
     @Override
     public List<Book> getAllBooks() {
         return List.copyOf(books);

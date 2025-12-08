@@ -7,17 +7,8 @@ import lms.domain.utils.BookValidator;
 /**
  * Represents a book in the Library Management System.
  *
- * <p>
- * This entity contains metadata and inventory information about a book,
- * including title, author, ISBN, publisher, category, language, number of
- * copies, and shelf location. Each book is uniquely identified by a generated
- * UUID.
- * </p>
- *
- * <p>
- * Business operations such as borrowing and returning copies can be implemented
- * as additional methods in this class.
- * </p>
+ * <p>Contains metadata and inventory information including title, author, ISBN,
+ * publisher, category, language, copies, and shelf location.</p>
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -38,22 +29,19 @@ public class Book implements LoanableItem {
 	private String shelfLocation;
 
 	/**
-	 * Creates a new {@code Book} with the required fields. The {@code bookId} is
-	 * automatically generated and {@code availableCopies} is initialized to
-	 * {@code totalCopies}.
+	 * Creates a new book with the specified details.
 	 *
-	 * @param title           the title of the book
-	 * @param author          the author of the book
-	 * @param isbn            the unique ISBN identifier
-	 * @param publisher       the publisher of the book
-	 * @param publicationYear the year the book was published
-	 * @param category        the category or genre of the book
-	 * @param totalCopies     the total number of copies owned by the library
-	 * @param language        the language the book is written in
-	 * @param shelfLocation   the physical location of the book in the library
+	 * @param title           the book title
+	 * @param author          the book author
+	 * @param isbn            the ISBN identifier
+	 * @param publisher       the publisher name
+	 * @param publicationYear the publication year
+	 * @param category        the book category
+	 * @param totalCopies     the total number of copies
+	 * @param language        the book language
+	 * @param shelfLocation   the shelf location in the library
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
-
-	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String shelfLocation) {
 		BookValidator.getInstance().validate(title, author, isbn, publisher, publicationYear, category, totalCopies,
@@ -74,27 +62,20 @@ public class Book implements LoanableItem {
 	}
 
 	/**
-	 * Creates a new {@code Book} with an optional description.
+	 * Creates a new book with a description.
 	 *
-	 * @param title           the title of the book
-	 * @param author          the author of the book
-	 * @param isbn            the unique ISBN identifier
-	 * @param publisher       the publisher of the book
-	 * @param publicationYear the year the book was published
-	 * @param category        the category or genre of the book
-	 * @param totalCopies     the total number of copies owned by the library
-	 * @param language        the language the book is written in
-	 * @param description     a short description or summary of the book
-	 * @param shelfLocation   the physical location of the book in the library
+	 * @param title           the book title
+	 * @param author          the book author
+	 * @param isbn            the ISBN identifier
+	 * @param publisher       the publisher name
+	 * @param publicationYear the publication year
+	 * @param category        the book category
+	 * @param totalCopies     the total number of copies
+	 * @param language        the book language
+	 * @param description     the book description
+	 * @param shelfLocation   the shelf location
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
-	
-	
-	public String getIsbn() {
-		return isbn;
-	}
-
-	
-	
 	public Book(String title, String author, String isbn, String publisher, int publicationYear, String category,
 			int totalCopies, String language, String description, String shelfLocation) {
 		this(title, author, isbn, publisher, publicationYear, category, totalCopies, language, shelfLocation);
@@ -163,11 +144,20 @@ public class Book implements LoanableItem {
 	}
 
 	/** @return the ISBN of the book */
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+	public String getIsbn() {
+		return isbn;
 	}
 
-	 
+	/**
+	 * Sets the ISBN of the book.
+	 * 
+	 * @param isbn the new ISBN of the book
+	 * @throws IllegalArgumentException if ISBN is invalid
+	 */
+	public void setIsbn(String isbn) {
+		BookValidator.getInstance().validateIsbn(isbn);
+		this.isbn = isbn;
+	}
 
 	/** @return the publisher of the book */
 	public String getPublisher() {

@@ -33,18 +33,33 @@ import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
 
 /**
- * Entry point for the Library Management System (LMS).
- *
- * This version injects a REAL EmailService (Gmail SMTP) into the
- * NotificationService, which is then provided to the LoanService for overdue
- * and due notifications.
- *
- * @author Refactored by Ahmad Salameh
+ * Main entry point for the Library Management System application.
+ * 
+ * <p>
+ * Bootstraps the application by initializing repositories, services, email notifications,
+ * background tasks, test users, and launching the CLI interface. A scheduled task checks
+ * for overdue loans every 24 hours.
+ * </p>
+ * 
+ * <p>
+ * Default test users: "ahmad" (ADMIN) and "majd" (MEMBER).
+ * </p>
+ * 
+ * @author Majd Awwad
+ * @version 3.0
+ * @see LibraryCLI
+ * @see LoanOverdueChecker
  */
 public class LibraryApp {
 
+	/** Scheduled executor for background tasks */
 	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
+	/**
+	 * Main method that initializes and starts the Library Management System.
+	 * 
+	 * @param args command-line arguments (not used)
+	 */
 	public static void main(String[] args) {
 	 
 		scheduler.scheduleAtFixedRate(new LoanOverdueChecker(), 1, (long )24 * 60, TimeUnit.MINUTES);

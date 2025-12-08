@@ -4,20 +4,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Validator class for Loan entity fields and operations.
+ * Validator for Loan entity fields.
  * 
- * <p>
- * Provides validation methods for loan-related data such as user ID, item ID,
- * item type, borrow date, and extension days to ensure data integrity and 
- * business rules are enforced.
- * </p>
- * 
- * <p><b>Validation Principles Applied:</b></p>
- * <ul>
- * <li><b>Centralize and Reuse Logic:</b> Single instance shared across all Loan entities</li>
- * <li><b>Fail Fast:</b> Validates early before data enters the domain</li>
- * <li><b>Separate Concerns:</b> Stateless, no I/O operations, purely syntactic validation</li>
- * </ul>
+ * <p>Validates loan data including IDs, item type, and dates. Uses singleton pattern.</p>
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -26,29 +15,26 @@ public class LoanValidator {
 
 	private static final LoanValidator INSTANCE = new LoanValidator();
 
-	/**
-	 * Private constructor to prevent instantiation.
-	 */
 	private LoanValidator() {
 	}
 
 	/**
-	 * Returns the singleton instance of the validator.
+	 * Returns the singleton instance.
 	 * 
-	 * @return the shared LoanValidator instance
+	 * @return the validator instance
 	 */
 	public static LoanValidator getInstance() {
 		return INSTANCE;
 	}
 
 	/**
-	 * Validates all loan fields at once (Fail Fast principle).
+	 * Validates all loan fields.
 	 * 
-	 * @param userId the borrower's user ID
-	 * @param itemId the borrowed item's ID
-	 * @param itemType the type of item (book, cd, journal)
-	 * @param borrowDate the date the item was borrowed
-	 * @throws IllegalArgumentException if any field fails validation
+	 * @param userId the user ID
+	 * @param itemId the item ID
+	 * @param itemType the item type
+	 * @param borrowDate the borrow date
+	 * @throws IllegalArgumentException if any field is invalid
 	 */
 	public void validate(UUID userId, UUID itemId, String itemType, LocalDate borrowDate) {
 		validateUserId(userId);
@@ -60,8 +46,8 @@ public class LoanValidator {
 	/**
 	 * Validates the user ID.
 	 * 
-	 * @param userId the user ID to validate
-	 * @throws IllegalArgumentException if user ID is null
+	 * @param userId the user ID
+	 * @throws IllegalArgumentException if null
 	 */
 	public void validateUserId(UUID userId) {
 		if (userId == null) {
@@ -72,8 +58,8 @@ public class LoanValidator {
 	/**
 	 * Validates the item ID.
 	 * 
-	 * @param itemId the item ID to validate
-	 * @throws IllegalArgumentException if item ID is null
+	 * @param itemId the item ID
+	 * @throws IllegalArgumentException if null
 	 */
 	public void validateItemId(UUID itemId) {
 		if (itemId == null) {
@@ -84,8 +70,8 @@ public class LoanValidator {
 	/**
 	 * Validates the item type.
 	 * 
-	 * @param itemType the item type to validate
-	 * @throws IllegalArgumentException if item type is null or blank
+	 * @param itemType the item type
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateItemType(String itemType) {
 		if (itemType == null || itemType.isBlank()) {
@@ -96,8 +82,8 @@ public class LoanValidator {
 	/**
 	 * Validates the borrow date.
 	 * 
-	 * @param borrowDate the borrow date to validate
-	 * @throws IllegalArgumentException if borrow date is null or in the future
+	 * @param borrowDate the borrow date
+	 * @throws IllegalArgumentException if invalid
 	 */
 	public void validateBorrowDate(LocalDate borrowDate) {
 		if (borrowDate == null) {

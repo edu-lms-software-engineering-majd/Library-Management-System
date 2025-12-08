@@ -8,7 +8,7 @@ package lms.application;
  * scheduled background tasks such as overdue-loan checks.
  * </p>
  *
- * <h2>Responsibilities:</h2>
+ * <p><b>Responsibilities:</b></p>
  * <ul>
  * <li>Log scheduler start and shutdown messages</li>
  * <li>Log the beginning and completion of scheduled tasks</li>
@@ -22,7 +22,6 @@ package lms.application;
  * </p>
  *
  * @author Majd
- * @refactoredBy Ahmad Salameh
  * @version 1.0
  */
 public interface SchedulerLogger {

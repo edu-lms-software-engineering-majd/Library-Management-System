@@ -5,11 +5,16 @@ import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * Utility class providing common search operations for different entity types.
+ * Utility class providing common search operations for library items.
  *
- * This updated version fully supports: - Exact UUID match - Prefix match -
- * Partial match - Handling empty search term - Throwing exception if multiple
- * matches found
+ * <p>
+ * This class offers reusable search functionality that can be applied to different
+ * entity types (Books, CDs, Journals). It supports exact UUID matching, prefix matching,
+ * and handles ambiguous search results.
+ * </p>
+ *
+ * @author Majd Awwad
+ * @version 1.0
  */
 public class SearchUtils {
 
@@ -18,12 +23,24 @@ public class SearchUtils {
 	}
 
 	/**
-	 * Unified ID search with strict rules:
+	 * Performs a flexible ID-based search with multiple matching strategies.
 	 *
-	 * Rules: 1) searchTerm = null or blank → return all items 2) Exact UUID match →
-	 * return exactly 1 result 3) Prefix match (startsWith) 4) If: - 0 matches →
-	 * return empty list - 1 match → return it - > 1 match → throw
-	 * IllegalArgumentException
+	 * <p>
+	 * Search behavior:
+	 * </p>
+	 * <ol>
+	 * <li>If searchTerm is null or blank, returns all items</li>
+	 * <li>Attempts exact UUID match first</li>
+	 * <li>Falls back to prefix matching if exact match fails</li>
+	 * <li>Throws exception if multiple matches are found (ambiguous)</li>
+	 * </ol>
+	 *
+	 * @param <T> the type of items being searched
+	 * @param items the list of items to search through
+	 * @param searchTerm the search term (UUID or prefix)
+	 * @param idExtractor function to extract UUID from an item
+	 * @return list of matching items (empty if no matches)
+	 * @throws IllegalArgumentException if multiple matches are found
 	 */
 	public static <T> List<T> searchById(List<T> items, String searchTerm, Function<T, UUID> idExtractor) {
 

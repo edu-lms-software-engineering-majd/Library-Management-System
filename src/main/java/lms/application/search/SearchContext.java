@@ -13,12 +13,12 @@ import java.util.List;
  * 
  * <p>
  * Usage example:
- * <pre>
- * SearchContext&lt;Book&gt; context = new SearchContext&lt;&gt;();
- * context.setStrategy(new SearchByTitleStrategy());
- * List&lt;Book&gt; results = context.executeSearch(allBooks, "Java");
- * </pre>
  * </p>
+ * <pre>
+ *     SearchContext&lt;Book&gt; context = new SearchContext&lt;&gt;();
+ *     context.setStrategy(new SearchByTitleStrategy());
+ *     List&lt;Book&gt; results = context.executeSearch(allBooks, "Java");
+ * </pre>
  * 
  * @param <T> the type of item to search
  * 

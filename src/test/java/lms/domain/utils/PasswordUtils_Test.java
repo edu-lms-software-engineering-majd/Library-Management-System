@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * used for secure user authentication in the Library Management System.
  * </p>
  *
- * <h2>Test Coverage:</h2>
+ * <p><b>Test Coverage:</b></p>
  * <ul>
  * <li>Password hashing produces non-null, non-empty results</li>
  * <li>Hashed passwords differ from original plain text</li>
@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * <li>Security properties of the hashing algorithm</li>
  * </ul>
  *
- * <h2>Security Notes:</h2>
+ * <p><b>Security Notes:</b></p>
  * <ul>
  * <li>Uses SHA-512 hashing algorithm without salt</li>
  * <li>Hashes are Base64 encoded for storage</li>

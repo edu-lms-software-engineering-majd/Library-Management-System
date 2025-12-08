@@ -4,18 +4,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repository interface for managing {@link Account} entities.
+ * Repository interface for managing Account entities.
  * 
- * <p>
- * This interface defines the core operations for accessing and managing user accounts,
- * including CRUD operations and account lookup by user ID or account ID.
- * Implementations may vary (in-memory, JDBC, JPA, etc.).
- * </p>
- * 
- * <p>
- * Implementations should handle the persistence mechanism internally and
- * provide consistent behavior for the defined methods.
- * </p>
+ * <p>Defines CRUD operations for user accounts. Implementations handle
+ * the persistence mechanism.</p>
  * 
  * @author Majd Awwad
  * @version 1.0
@@ -23,29 +15,26 @@ import java.util.UUID;
 public interface AccountRepository {
 
 	/**
-	 * Retrieves an account by the user ID associated with it.
+	 * Finds an account by user ID.
 	 * 
-	 * @param userId the unique identifier of the user
-	 * @return An {@code Optional} containing the {@link Account} object if found, or
-	 *         an empty {@code Optional} if no account exists for the given user ID.
+	 * @param userId the user ID
+	 * @return Optional containing the account if found
 	 */
 	Optional<Account> findByUserId(UUID userId);
 
 	/**
-	 * Retrieves an account by its unique account identifier.
+	 * Finds an account by account ID.
 	 * 
-	 * @param accountId the unique identifier of the account
-	 * @return An {@code Optional} containing the {@link Account} object if found, or
-	 *         an empty {@code Optional} if no account with the given ID exists.
+	 * @param accountId the account ID
+	 * @return Optional containing the account if found
 	 */
 	Optional<Account> findById(UUID accountId);
 
 	/**
-	 * Saves a new account to the repository.
+	 * Saves a new account.
 	 * 
-	 * @param account the {@link Account} object to save
-	 * @return {@code true} if the account was saved successfully, {@code false}
-	 *         if an account with the same ID or user ID already exists
+	 * @param account the account to save
+	 * @return true if saved successfully, false if already exists
 	 */
 	boolean save(Account account);
 

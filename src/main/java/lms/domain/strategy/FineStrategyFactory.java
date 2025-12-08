@@ -1,26 +1,10 @@
 package lms.domain.strategy;
 
 /**
- * Factory class responsible for returning the appropriate fine calculation
- * strategy based on the type of library item.
+ * Factory for creating fine calculation strategies based on item type.
  *
- * <p>
- * This class is part of the Strategy Pattern implementation used in the
- * Library Management System. Each media type (Book, CD, Journal) has its own
- * fine rule, and this factory provides the correct {@link FineStrategy}
- * implementation according to the provided item type.
- * </p>
- *
- * <p>
- * If the item type does not match any supported type, a default fine rate
- * of 5 NIS per overdue day will be applied.
- * </p>
- *
- * <h3>Example:</h3>
- * <pre>{@code
- * FineStrategy strategy = FineStrategyFactory.getStrategy("book");
- * double fine = strategy.calculateFine(3); 
- * }</pre>
+ * <p>Returns the appropriate strategy for books, CDs, journals, or a default
+ * strategy with 5.0 per day for unknown types.</p>
  *
  * @author Ahmad Salameh
  * @version 1.0

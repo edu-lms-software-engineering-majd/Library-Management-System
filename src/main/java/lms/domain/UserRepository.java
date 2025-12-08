@@ -7,18 +7,9 @@ import java.util.UUID;
 import lms.domain.exception.UserNotFoundException;
 
 /**
- * Repository interface for managing {@link User} entities.
+ * Repository interface for managing User entities.
  * 
- * <p>
- * This interface defines the core operations for accessing and managing users,
- * such as checking existence, retrieving users, and performing CRUD operations.
- * Implementations may vary (in-memory, JDBC, JPA, etc.).
- * </p>
- * 
- * <p>
- * Implementations should handle the persistence mechanism internally and
- * provide consistent behavior for the defined methods.
- * </p>
+ * <p>Defines operations for user persistence and retrieval.</p>
  * 
  * @author Majd Awwad
  * @version 1.1
@@ -26,29 +17,26 @@ import lms.domain.exception.UserNotFoundException;
 public interface UserRepository {
 
 	/**
-	 * Checks whether a user with the given username exists.
+	 * Checks if a user with the given username exists.
 	 * 
-	 * @param userName the username to check
-	 * @return {@code true} if a user with the username exists, {@code false}
-	 *         otherwise
+	 * @param userName the username
+	 * @return true if user exists, false otherwise
 	 */
-	
 	boolean isExist(String userName);
 
 	/**
-	 * Retrieves a user by their username.
+	 * Retrieves a user by username.
 	 * 
-	 * @param userName the username of the user
-	 * @return An {@code Optional} containing the {@link User} object if found, or
-	 *         an empty {@code Optional} if no user with the given ID exists.
+	 * @param userName the username
+	 * @return Optional containing the user if found
 	 */
 	Optional<User> getByUserName(String userName);
 
 	/**
-	 * Adds a new user to the repository.
+	 * Adds a new user.
 	 * 
-	 * @param user the {@link User} object to add
-	 * @return {@code true} if the user was added successfully, {@code false}
+	 * @param user the user to add
+	 * @return true if added successfully, false
 	 *         otherwise
 	 */
 	boolean add(User user);
@@ -68,7 +56,7 @@ public interface UserRepository {
 	 * @param userName the username of the user to delete
 	 * @return {@code true} if deletion was successful, {@code false} if the user
 	 *         was not found
-	 * @throws {@link UserNotFoundException} if the username is not exist.
+	 * @throws UserNotFoundException if the username does not exist
 	 */
 	boolean delete(String userName) throws UserNotFoundException;
 

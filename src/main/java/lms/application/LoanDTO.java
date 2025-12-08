@@ -14,9 +14,21 @@ import lms.domain.Loan;
  * </p>
  *
  * <p>
- * 
  * Refactored by: Ahmad Salameh
  * </p>
+ * 
+ * @author Majd Awwad
+ * @param loanId the unique identifier for the loan
+ * @param userId the unique identifier for the user who borrowed the item
+ * @param itemId the unique identifier for the borrowed item
+ * @param borrowDate the date when the item was borrowed
+ * @param dueDate the date when the item is due to be returned
+ * @param returnDate the date when the item was actually returned (null if not yet returned)
+ * @param returned whether the item has been returned
+ * @param fineApplied whether a fine has been applied to this loan
+ * @param overdue whether the loan is currently overdue
+ * @param overdueDays the number of days the loan is overdue
+ * @param calculatedFine the calculated fine amount for this loan
  */
 public record LoanDTO(UUID loanId, UUID userId, UUID itemId, LocalDate borrowDate, LocalDate dueDate,
 		LocalDate returnDate, boolean returned, boolean fineApplied, boolean overdue, long overdueDays,

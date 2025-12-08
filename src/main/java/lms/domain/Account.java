@@ -11,60 +11,28 @@ import lms.domain.utils.AccountValidator;
 /**
  * Represents a user account in the Library Management System.
  * 
- * <p>
- * The Account class manages financial transactions, fines, and account status
- * for library users. It tracks fine payments, accumulates charges, and
- * automatically handles account suspension when fine thresholds are exceeded.
- * </p>
+ * <p>Manages financial transactions, fines, and account status for library users.
+ * Accounts are automatically suspended when total fines exceed 100.0 and reactivated
+ * when fines are fully paid.</p>
  * 
- * <h2>Key Features:</h2>
- * <ul>
- * <li>Track total fines owed by a user</li>
- * <li>Maintain transaction history for fines and payments</li>
- * <li>Automatic account suspension when fines exceed threshold</li>
- * <li>Account reactivation upon full payment of fines</li>
- * </ul>
- * 
- * <h2>Account Status Management:</h2>
- * <p>
- * Accounts are automatically suspended when total fines exceed the
- * {@code SUSPENSION_THRESHOLD} (100.0). The account is automatically
- * reactivated when all fines are paid.
- * </p>
- * 
- * @author Majd Awwad Refactored by: Ahmad Salameh
+ * @author Ahmad Salameh
  * @version 1.0
  */
 public class Account {
 
-	/** The unique identifier for this account. */
 	private final UUID accountId;
-
-	/** The unique identifier of the user who owns this account. */
 	private final UUID userId;
-
-	/** The total amount of fines owed by the user. */
 	private double totalFines;
-
-	/** The current status of the account (ACTIVE or SUSPENDED). */
 	private AccountStatus status;
-
-	/** The date when this account was created. */
 	private final LocalDate createdAt;
-
-	/** The date when this account was last updated. */
 	private LocalDate updatedAt;
-
-	/** The fine amount threshold that triggers automatic account suspension. */
 	private static final double SUSPENSION_THRESHOLD = 100.0;
-
-	/** List of all fine transactions (fines and payments) for this account. */
 	private List<FineTransaction> fineTransactions;
 
 	/**
-	 * Constructs a new Account for a user.
+	 * Creates a new account for the specified user with zero fines and active status.
 	 * 
-	 * @param userID the unique identifier of the user who owns this account
+	 * @param userID the user's unique identifier
 	 */
 	public Account(UUID userID) {
 		this.userId = userID;
@@ -76,53 +44,54 @@ public class Account {
 		this.fineTransactions = new ArrayList<>();
 	}
 
-	/** @return the account ID */
 	public UUID getAccountId() {
 		return accountId;
 	}
 
-	/** @return the user ID */
 	public UUID getUserId() {
 		return userId;
 	}
 
-	/** @return the account status (ACTIVE or SUSPENDED) */
 	public AccountStatus getStatus() {
 		return status;
 	}
 
-	/** @return the creation date */
 	public LocalDate getCreatedAt() {
 		return createdAt;
 	}
 
-	/** @return the last update date */
 	public LocalDate getUpdatedAt() {
 		return updatedAt;
 	}
 
-	/** @return the total fines amount */
 	public double getTotalFines() {
 		return totalFines;
 	}
 
 	/**
-	 * Wrapper used by AccountService#getUserBalance. In this model, "balance" =
-	 * total fines.
+	 * Returns the account balance (equivalent to total fines).
+	 * 
+	 * @return the current balance
 	 */
 	public double getBalance() {
 		return totalFines;
 	}
 
 	/**
-	 * Gets an unmodifiable list of all fine transactions.
+	 * Returns an unmodifiable view of all fine transactions.
+	 * 
+	 * @return list of fine transactions
 	 */
 	public List<FineTransaction> getFineTransactions() {
 		return Collections.unmodifiableList(fineTransactions);
 	}
 
 	/**
-	 * Adds a fine to the account.
+	 * Adds a fine to the account and suspends it if the threshold is exceeded.
+	 * 
+	 * @param amount the fine amount (must be positive)
+	 * @param reason the reason for the fine
+	 * @throws IllegalArgumentException if amount is not positive
 	 */
 	public void addFine(double amount, String reason) throws IllegalArgumentException {
 
@@ -139,13 +108,18 @@ public class Account {
 		}
 	}
 
-	/** Convenience overload without custom reason. */
+	/**
+	 * Suspends the account with a default reason.
+	 */
 	public void suspendAccount() {
 		suspendAccount("Exceeded fine limit");
 	}
 
 	/**
-	 * Processes a fine payment.
+	 * Processes a payment towards outstanding fines.
+	 * 
+	 * @param amount the payment amount (must be positive and not exceed total fines)
+	 * @throws IllegalArgumentException if amount is invalid
 	 */
 	public void payFine(double amount) {
 

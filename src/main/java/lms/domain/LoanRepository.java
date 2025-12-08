@@ -12,40 +12,29 @@ import lms.domain.exception.LoanNotFoundException;
 import lms.domain.exception.UserNotFoundException;
 
 /**
- * Repository interface for managing {@link Loan} persistence operations.
+ * Repository interface for managing Loan entities.
  *
- * <p>
- * Defines the contract for interacting with the loan data source
- * (e.g., database, file, or in-memory storage).
- * </p>
+ * <p>Defines operations for loan persistence, retrieval, and querying.</p>
  *
- * <h3>Responsibilities:</h3>
- * <ul>
- *   <li>Retrieve loans by ID, user, or item</li>
- *   <li>Find active, overdue, or returned loans</li>
- *   <li>Save, update, or delete loan records</li>
- *   <li>List all stored loans with filtering options</li>
- *   <li>Generate loan statistics and reports</li>
- * </ul>
- *
- * @author
+ * @author Majd Awwad
  * @version 1.1
  */
 public interface LoanRepository {
 
     /**
-     * Finds a loan by its unique ID.
+     * Finds a loan by ID.
      *
      * @param loanId the loan ID
-     * @return an {@link Optional} containing the loan if found, or empty otherwise
+     * @return Optional containing the loan if found
      */
     Optional<Loan> findById(UUID loanId);
 
     /**
-     * Saves a new loan record.
+     * Saves a new loan.
      *
      * @param loan the loan to save
-     * @return true if the save operation was successful
+     * @return true if saved successfully
+     * @throws LoanAlreadyExistsException if loan already exists
      */
     boolean save(Loan loan) throws LoanAlreadyExistsException;
 

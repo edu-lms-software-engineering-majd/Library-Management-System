@@ -28,13 +28,11 @@ import lms.domain.exception.UserNotFoundException;
 /**
  * Administrator command-line interface for the Library Management System.
  * 
- * This interface provides administrators with all the tools they need to manage
- * the library, including adding/updating/deleting books, CDs, and journals,
- * managing user accounts, handling loans, and viewing system reports.
- * 
- * The class has been refactored to use a ServiceContext object instead of
- * receiving 8 individual service parameters. This makes the code cleaner
- * and meets SonarQube's recommendation of keeping constructor parameters at 7 or fewer.
+ * <p>
+ * Provides administrators with functionality to manage library items (books, CDs, journals),
+ * user accounts, loans, and view system reports. Uses {@link ServiceContext} to simplify
+ * dependency injection.
+ * </p>
  * 
  * @author Majd Awwad
  * @version 3.1
@@ -45,7 +43,6 @@ public class AdminCLI implements CLI {
     private static final String CD_TYPE = "cd";
     private static final String JOURNAL_TYPE = "journal";
     
-    // UI Messages
     private static final String INVALID_CHOICE = "Invalid choice";
     private static final String CHOOSE_OPTION = "Choose an option: ";
     private static final String ENTER_TOTAL_COPIES = "Enter total copies: ";
@@ -82,12 +79,9 @@ public class AdminCLI implements CLI {
     private final LoanQueryService loanQueryService;
 
     /**
-     * Creates a new AdminCLI with access to all necessary services.
+     * Constructs an AdminCLI with all required services via ServiceContext.
      * 
-     * By using a ServiceContext object, we keep the constructor simple
-     * with just one parameter instead of passing 8 separate services.
-     * 
-     * @param context contains all the services needed for admin operations
+     * @param context the service context containing all required services
      */
     public AdminCLI(ServiceContext context) {
         this.userService = context.getUserService();
@@ -101,13 +95,17 @@ public class AdminCLI implements CLI {
     }
 
     /**
-     * Old constructor kept for backward compatibility.
+     * Constructs an AdminCLI with individual service parameters.
      * 
-     * This constructor is deprecated because it violates SonarQube's guideline
-     * of having no more than 7 parameters. Please use the new ServiceContext-based
-     * constructor instead.
-     * 
-     * @deprecated Use {@link #AdminCLI(ServiceContext)} instead
+     * @param userService the user management service
+     * @param bookService the book management service
+     * @param authService the authentication service
+     * @param loanService the loan management service
+     * @param cdService the CD management service
+     * @param journalService the journal management service
+     * @param loanStatsService the loan statistics service
+     * @param loanQueryService the loan query service
+     * @deprecated Use {@link #AdminCLI(ServiceContext)} instead to reduce parameter count
      */
     @Deprecated
     public AdminCLI(UserService userService, BookService bookService, AuthService authService,
@@ -123,6 +121,11 @@ public class AdminCLI implements CLI {
         this.loanQueryService = loanQueryService;
     }
 
+    /**
+     * Starts the administrator menu and handles user input.
+     * 
+     * @throws IllegalAccessException if the current user is not an administrator
+     */
     @Override
     public void start() throws IllegalAccessException {
         if (AuthService.getInstance().getCurrentUser().role() != Role.ADMIN) {
@@ -137,6 +140,12 @@ public class AdminCLI implements CLI {
         }
     }
 
+    /**
+     * Handles the user's menu choice and delegates to appropriate handler methods.
+     * 
+     * @param choice the menu option selected by the user
+     * @return true to continue running, false to exit
+     */
     private boolean handleMenuChoice(String choice) {
         switch (choice) {
             case "1": handleAddItem(); break;
@@ -156,6 +165,9 @@ public class AdminCLI implements CLI {
         return true;
     }
 
+    /**
+     * Displays the main administrator menu with all available options.
+     */
     private void showAdminMenu() {
         CLIHelper.printHeader("ADMIN MENU");
         CLILogger.info("Item Management:");
@@ -178,6 +190,9 @@ public class AdminCLI implements CLI {
         CLILogger.info("Enter your choice: ");
     }
 
+    /**
+     * Handles adding a new item (book, CD, or journal) to the library.
+     */
     private void handleAddItem() {
         CLILogger.info("Choose the Type of Item to Add:");
         showItemsMenu();
@@ -191,6 +206,9 @@ public class AdminCLI implements CLI {
         }
     }
 
+    /**
+     * Handles viewing all items of a specific type.
+     */
     private void handleViewAllItems() {
         CLILogger.info("Choose item type to view:");
         showItemsMenu();
@@ -204,6 +222,9 @@ public class AdminCLI implements CLI {
         }
     }
 
+    /**
+     * Handles searching and filtering items by various criteria.
+     */
     private void handleSearchAndFilter() {
         CLILogger.info("Choose item type to search/filter:");
         showItemsMenu();
@@ -263,6 +284,10 @@ public class AdminCLI implements CLI {
         CLILogger.info(CHOOSE_OPTION);
     }
 
+    /**
+     * Handles the process of adding a new book to the library catalog.
+     * Prompts for all book details and validates input.
+     */
     private void handleAddBook() {
         try {
             CLIHelper.printHeader("Add a New Book");
@@ -318,6 +343,9 @@ public class AdminCLI implements CLI {
         }
     }
 
+    /**
+     * Displays all books in the library with their details and availability statistics.
+     */
     private void handleViewAllBooks() {
         CLIHelper.printHeader("All Books");
 
@@ -353,6 +381,11 @@ public class AdminCLI implements CLI {
         CLILogger.info(AVAILABLE_COPIES + availableCopiesCount + "/" + totalCopiesCount);
     }
 
+    /**
+     * Searches and filters books based on the selected criteria.
+     * 
+     * @param criteriaChoice the search criteria selected by the user
+     */
     private void searchFilterBooks(String criteriaChoice) {
         try {
             SearchCriteria criterion = SearchCriteria.fromChoice(criteriaChoice);
@@ -534,6 +567,11 @@ public class AdminCLI implements CLI {
         }
     }
 
+    /**
+     * Displays detailed information for a single book.
+     * 
+     * @param book the book to display
+     */
     private void displaySingleBook(Book book) {
         CLIHelper.printHeader("Book Details");
         CLILogger.info("ID: " + book.getId());
@@ -600,6 +638,12 @@ public class AdminCLI implements CLI {
         return CLIHelper.confirmAction(scanner, "Are you sure you want to delete this " + itemType + "?");
     }
 
+    /**
+     * Finds a book by its full or partial ID.
+     * 
+     * @param bookIdStr the full or partial book ID to search for
+     * @return the matching book, or null if not found
+     */
     private Book findBookByIdOrSubId(String bookIdStr) {
         List<Book> books = bookService.getAllBooks();
         

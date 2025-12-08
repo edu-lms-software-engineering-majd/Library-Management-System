@@ -9,13 +9,10 @@ import lms.domain.strategy.FineStrategyFactory;
 import lms.domain.utils.LoanValidator;
 
 /**
- * Represents a loan in the library system.
+ * Represents a loan of a library item to a user.
  * 
- * <p>
- * Manages the lifecycle of borrowed items including borrow dates, due dates,
- * returns, and fine calculations. Enforces business rules for loan extensions
- * and overdue items.
- * </p>
+ * <p>Manages loan lifecycle including borrow dates, due dates, returns,
+ * and fine calculations based on item type.</p>
  * 
  * @author Majd Awwad
  * @version 2.0
@@ -33,13 +30,13 @@ public class Loan {
 	private boolean notified;
 
 	/**
-	 * Creates a new loan with validation.
+	 * Creates a new loan for the specified user and item.
 	 * 
-	 * @param userId     the borrower's user ID
-	 * @param itemId     the borrowed item's ID
-	 * @param itemType   the type of item (book, cd, journal)
-	 * @param borrowDate the date the item was borrowed
-	 * @throws IllegalArgumentException if any parameter is null or invalid
+	 * @param userId     the borrower's ID
+	 * @param itemId     the item ID
+	 * @param itemType   the item type (book, cd, journal)
+	 * @param borrowDate the borrow date
+	 * @throws IllegalArgumentException if any parameter is invalid
 	 */
 	public Loan(UUID userId, UUID itemId, String itemType, LocalDate borrowDate) {
 
@@ -57,12 +54,8 @@ public class Loan {
 	}
 
 	/**
-	 * Calculates the fine amount for this loan using the Strategy pattern.
-	 * 
-	 * <p>
-	 * Fine calculation depends on the item type and number of days overdue. Returns
-	 * 0.0 if the loan is not overdue or has been returned on time.
-	 * </p>
+	 * Calculates the fine amount based on item type and days overdue.
+	 * Returns 0.0 if not overdue.
 	 * 
 	 * @return the calculated fine amount
 	 */
@@ -76,17 +69,12 @@ public class Loan {
 	}
 
 	/**
-	 * Calculates the due date based on item type and borrow date.
+	 * Calculates the due date based on item type:
+	 * Books (28 days), CDs (21 days), Journals (7 days), Other (14 days).
 	 * 
-	 * <p>
-	 * Business rules:
-	 * </p>
-	 * <ul>
-	 * <li>Books: 28 days</li>
-	 * <li>CDs: 21 days</li>
-	 * <li>Journals: 7 days</li>
-	 * <li>Other: 14 days (default)</li>
-	 * </ul>
+	 * @param itemType   the type of item
+	 * @param borrowDate the borrow date
+	 * @return the calculated due date
 	 */
 	private static LocalDate calculateDueDate(String itemType, LocalDate borrowDate) {
 		return switch (itemType.toLowerCase()) {
@@ -98,9 +86,9 @@ public class Loan {
 	}
 
 	/**
-	 * Gets the number of days the loan is overdue.
+	 * Returns the number of days this loan is overdue.
 	 * 
-	 * @return the number of overdue days, or 0 if not overdue
+	 * @return days overdue, or 0 if not overdue
 	 */
 	public long getDaysOverdue() {
 		if (!isOverdue())
@@ -109,45 +97,40 @@ public class Loan {
 	}
 
 	/**
-	 * Checks if the loan is currently overdue.
+	 * Checks if this loan is overdue.
 	 * 
-	 * @return true if past due date and not yet returned
+	 * @return true if past due and not returned
 	 */
 	public boolean isOverdue() {
 		return LocalDate.now().isAfter(dueDate) && returnDate == null;
 	}
 
 	/**
-	 * Marks the item as returned.
+	 * Marks this loan as returned.
 	 * 
-	 * @throws IllegalStateException if item is already returned
+	 * @throws IllegalStateException if already returned
 	 */
 	public void returnItem() {
 		LoanValidator.getInstance().validateCanReturn(returnDate);
 		this.returnDate = LocalDate.now();
 	}
 
-	/** @return the unique loan identifier */
 	public UUID getId() {
 		return loanId;
 	}
 
-	/** @return the borrower's user ID */
 	public UUID getUserId() {
 		return userId;
 	}
 
-	/** @return the borrowed item's ID */
 	public UUID getItemId() {
 		return itemId;
 	}
 
-	/** @return the type of borrowed item */
 	public String getItemType() {
 		return itemType;
 	}
 
-	/** @return the date the item was borrowed */
 	public LocalDate getBorrowDate() {
 		return borrowDate;
 	}

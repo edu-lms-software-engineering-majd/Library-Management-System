@@ -13,6 +13,31 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+/**
+ * Singleton service for sending email notifications via Gmail SMTP.
+ *
+ * <p>
+ * This service provides email functionality for the Library Management System,
+ * primarily used to send notifications about overdue items, due date reminders,
+ * and other library-related communications to users.
+ * </p>
+ *
+ * <p>
+ * The service uses Gmail's SMTP server with TLS encryption for secure email delivery.
+ * Credentials are loaded from environment variables via a .env file.
+ * </p>
+ *
+ * <p>
+ * Required environment variables:
+ * </p>
+ * <ul>
+ * <li>{@code GMAIL_USERNAME} - The Gmail account email address</li>
+ * <li>{@code GMAIL_APP_PASSWORD} - The Gmail app-specific password</li>
+ * </ul>
+ *
+ * @author Ahmad Salameh
+ * @version 1.0
+ */
 public class EmailService {
 
     private static final Logger logger = Logger.getLogger(EmailService.class.getName());
@@ -20,12 +45,20 @@ public class EmailService {
     private final String username;
     private final String appPassword;
 
+    /**
+     * Private constructor that loads email credentials from environment variables.
+     */
     private EmailService() {
         Dotenv dotenv = Dotenv.load();
         this.username = dotenv.get("GMAIL_USERNAME");
         this.appPassword = dotenv.get("GMAIL_APP_PASSWORD");
     }
 
+    /**
+     * Returns the singleton instance of the email service.
+     *
+     * @return the singleton EmailService instance
+     */
     public static synchronized EmailService getInstance() {
         if (instance == null) {
             instance = new EmailService();
@@ -33,6 +66,19 @@ public class EmailService {
         return instance;
     }
 
+    /**
+     * Sends an email to the specified recipient.
+     *
+     * <p>
+     * This method configures an SMTP session with Gmail and sends a plain text email
+     * message. If sending fails, an exception is logged and a RuntimeException is thrown.
+     * </p>
+     *
+     * @param to the recipient's email address
+     * @param subject the email subject line
+     * @param body the email message body (plain text)
+     * @throws RuntimeException if email sending fails
+     */
     public void sendEmail(String to, String subject, String body) {
 
        
