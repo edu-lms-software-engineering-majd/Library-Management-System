@@ -1,0 +1,10 @@
+lms.application
+lms.application.email
+lms.application.search
+lms.application.task
+lms.domain
+lms.domain.exception
+lms.domain.strategy
+lms.domain.utils
+lms.persistence
+lms.presentation
