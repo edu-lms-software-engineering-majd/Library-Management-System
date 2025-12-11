@@ -66,9 +66,7 @@ public class LibraryApp {
 
 		 
 		UserRepository userRepo = StaticUserRepository.getInstance();
-		
-		
-		
+
 		BookRepository bookRepo = StaticBookRepository.getInstance();
 		CDRepository cdRepo = StaticCDRepository.getInstance();
 		JournalsRepository journalsRepo = StaticJournalsRepository.getInstance();

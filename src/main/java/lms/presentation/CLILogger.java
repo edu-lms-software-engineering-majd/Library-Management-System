@@ -1,9 +1,10 @@
 package lms.presentation;
 
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  * Centralized logger utility for CLI operations.
@@ -24,9 +25,19 @@ public final class CLILogger {
     static {
         LOGGER.setLevel(Level.INFO);
         ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter());
+        handler.setFormatter(new CLIFormatter());
         LOGGER.addHandler(handler);
         LOGGER.setUseParentHandlers(false);
+    }
+    
+    /**
+     * Custom formatter that outputs only the message without timestamp or log level.
+     */
+    private static class CLIFormatter extends Formatter {
+        @Override
+        public String format(LogRecord record) {
+            return record.getMessage() + System.lineSeparator();
+        }
     }
     
     private CLILogger() {

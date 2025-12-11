@@ -1,11 +1,14 @@
 package lms.persistence;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import lms.domain.Book;
+import lms.domain.Loan;
 import lms.domain.Role;
 import lms.domain.User;
 import lms.domain.UserRepository;
@@ -39,9 +42,13 @@ public class StaticUserRepository implements UserRepository {
 	}
 	
 	static {
-		users.add(new User("Admin", "System", "admin@test.com", "admin", PasswordUtils.hashPassword("admi123"),
-				Role.ADMIN));
-
+		User user = new User("User", "System", "mawwad223@gmail.com", "user", PasswordUtils.hashPassword("user123"),
+				Role.MEMBER);
+		users.add(user);
+		Book book = new Book("Clean Code", "Robert C. Martin", "9780132350884", "Prentice Hall", 2008,
+				"Software Engineering", 5, "English", "Shelf A1");
+		Loan loan = new Loan(user.getUserID(), book.getId(), "Book", LocalDate.now().minusDays(30));
+		user.addLoan(loan);
 		users.add(new User("John", "Doe", "user@test.com", "user", PasswordUtils.hashPassword("user123"),
 				Role.LIBRARIAN));
 		users.add(new User("Majd", "Awwad", "majdawwad@gmail.com", "majd04", PasswordUtils.hashPassword("majd123"),
@@ -57,7 +64,7 @@ public class StaticUserRepository implements UserRepository {
 	private void validateUser(User user) {
 		if (user == null)
 			throw new IllegalArgumentException("User cannot be null");
-
+		
 		if (user.getUserID() == null)
 			throw new IllegalArgumentException("User ID cannot be null");
 

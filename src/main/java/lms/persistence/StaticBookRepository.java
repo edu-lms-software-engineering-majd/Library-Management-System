@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import lms.domain.Book;
 import lms.domain.BookRepository;
+import lms.domain.User;
 
 /**
  * In-memory implementation of {@link BookRepository}.
@@ -187,4 +188,10 @@ public final class StaticBookRepository implements BookRepository {
     public List<Book> getAllBooks() {
         return List.copyOf(books);
     }
+
+	public Optional<Book> getBookByName(String string) {
+		return books.stream()
+				.filter(b -> b.getTitle().contains(string))
+				.findFirst();
+	}
 }

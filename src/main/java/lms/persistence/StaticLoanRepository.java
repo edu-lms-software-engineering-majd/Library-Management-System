@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
+import lms.domain.User;
 import lms.domain.exception.ItemNotFoundException;
 import lms.domain.exception.ItemTypeNotFoundException;
 import lms.domain.exception.LoanAlreadyExistsException;
@@ -42,6 +43,15 @@ public class StaticLoanRepository implements LoanRepository {
 	}
 
 	private static final Map<UUID, Loan> loans = new HashMap<>();
+	
+	static {
+		StaticUserRepository userRepo = StaticUserRepository.getInstance();
+		User user = userRepo.getByUserName("user").orElseThrow();
+		StaticBookRepository bookRepo = StaticBookRepository.getInstance();
+		var book = bookRepo.getBookByName("Clean Code").orElseThrow();
+		Loan loan = new Loan(user.getUserID(), book.getId(), "Book", LocalDate.now().minusDays(30));
+		loans.put(loan.getId(), loan);
+	}
 
 	/**
 	 * Validates that a loan exists in the repository.

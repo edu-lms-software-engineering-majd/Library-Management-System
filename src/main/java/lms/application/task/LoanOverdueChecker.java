@@ -1,14 +1,21 @@
 package lms.application.task;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lms.application.NotificationService;
 import lms.application.email.EmailService;
+import lms.domain.Book;
+import lms.domain.CD;
+import lms.domain.Journal;
 import lms.domain.Loan;
 import lms.domain.LoanRepository;
 import lms.domain.User;
 import lms.domain.UserRepository;
+import lms.persistence.StaticBookRepository;
+import lms.persistence.StaticCDRepository;
+import lms.persistence.StaticJournalsRepository;
 import lms.persistence.StaticLoanRepository;
 import lms.persistence.StaticUserRepository;
 
@@ -54,6 +61,33 @@ public class LoanOverdueChecker implements Runnable {
         this.notificationService = new NotificationService();
     }
 
+    /**
+     * Gets the human-readable item name based on item type and ID.
+     *
+     * @param itemId the item UUID
+     * @param itemType the type of item (Book, CD, Journal)
+     * @return the item name or "Unknown Item" if not found
+     */
+    private String getItemName(java.util.UUID itemId, String itemType) {
+        try {
+            switch (itemType.toLowerCase()) {
+                case "book":
+                    Book book = StaticBookRepository.getInstance().getBookById(itemId).orElse(null);
+                    return book != null ? book.getTitle() : "Unknown Book";
+                case "cd":
+                    CD cd = StaticCDRepository.getInstance().getCDById(itemId).orElse(null);
+                    return cd != null ? cd.getTitle() : "Unknown CD";
+                case "journal":
+                    Journal journal = StaticJournalsRepository.getInstance().getJournalById(itemId).orElse(null);
+                    return journal != null ? journal.getTitle() : "Unknown Journal";
+                default:
+                    return "Unknown Item";
+            }
+        } catch (Exception e) {
+            return itemType + " (ID: " + itemId + ")";
+        }
+    }
+
     @Override
     public void run() {
         System.out.println("Running overdue loan check...");
@@ -69,17 +103,35 @@ public class LoanOverdueChecker implements Runnable {
                     continue;
                 }
 
-                String subject = "Overdue Loan Notification";
-                String body = "Dear " + user.getFullName() + ",\n\n"
-                            + "This is a reminder that your loan for item ID '"
-                            + loan.getItemId() + "' was due on "
-                            + loan.getDueDate() + ". Please return it as soon as possible.";
+                String itemName = getItemName(loan.getItemId(), loan.getItemType());
+                long daysOverdue = loan.getDaysOverdue();
+                double fineAmount = loan.calculateFine();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
+                String formattedDueDate = loan.getDueDate().format(dateFormatter);
 
-                emailService.sendEmail(user.getEmail(), subject, body);
-                notificationService.createNotification(user, body);
+                String body = String.format(
+                    "Dear %s,\n\n" +
+                    "This is a friendly reminder that the following item is overdue:\n\n" +
+                    "Item: %s (%s)\n" +
+                    "Due Date: %s\n" +
+                    "Days Overdue: %d\n" +
+                    "Current Fine: $%.2f\n\n" +
+                    "Please return this item to the library as soon as possible to avoid additional fines.\n\n" +
+                    "Thank you for your cooperation.\n\n" +
+                    "Best regards,\n" +
+                    "Library Management System",
+                    user.getFullName(),
+                    itemName,
+                    loan.getItemType(),
+                    formattedDueDate,
+                    daysOverdue,
+                    fineAmount
+                );
+
+                notificationService.createNotification(user, body, lms.domain.NotificationType.OVERDUE);
 
                 loan.setNotified(true);
-                loanRepository.save(loan);
+                loanRepository.update(loan);
 
                 System.out.println("Sent overdue notification for loan ID: " + loan.getId());
 
