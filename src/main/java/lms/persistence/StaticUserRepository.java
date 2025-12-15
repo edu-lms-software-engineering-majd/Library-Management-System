@@ -49,7 +49,7 @@ public class StaticUserRepository implements UserRepository {
 				"Software Engineering", 5, "English", "Shelf A1");
 		Loan loan = new Loan(user.getUserID(), book.getId(), "Book", LocalDate.now().minusDays(30));
 		user.addLoan(loan);
-		users.add(new User("John", "Doe", "user@test.com", "user", PasswordUtils.hashPassword("user123"),
+		users.add(new User("John", "Doe", "user@test.com", "librarian", PasswordUtils.hashPassword("librarian123"),
 				Role.LIBRARIAN));
 		users.add(new User("Majd", "Awwad", "majdawwad@gmail.com", "majd04", PasswordUtils.hashPassword("majd123"),
 				Role.ADMIN));

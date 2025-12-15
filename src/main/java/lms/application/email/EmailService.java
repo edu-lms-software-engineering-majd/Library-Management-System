@@ -2,6 +2,7 @@ package lms.application.email;
 
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.PatternSyntaxException;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.mail.Authenticator;

@@ -3,6 +3,7 @@ package lms.presentation;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import lms.application.AccountService;
@@ -14,6 +15,7 @@ import lms.application.LoanService;
 import lms.application.NotificationService;
 import lms.application.UserDTO;
 import lms.application.UserService;
+import lms.application.email.EmailService;
 import lms.application.search.SearchByAuthorStrategy;
 import lms.application.search.SearchByTitleStrategy;
 import lms.application.search.SearchCDByArtistStrategy;
@@ -59,6 +61,7 @@ public class UserCLI implements CLI {
     private final LoanService loanService;
     private final AuthService authService;
     private final AccountService accountService;
+    private final EmailService emailService;
     
     private UserDTO currentUser;
 
@@ -84,6 +87,7 @@ public class UserCLI implements CLI {
         this.loanService = loanService;
         this.authService = authService;
         this.accountService = accountService;
+		this.emailService = EmailService.getInstance();
     }
     
     /**
@@ -95,6 +99,9 @@ public class UserCLI implements CLI {
         if (currentUser == null) {
             currentUser = authService.getCurrentUser();
         }
+        
+        currentUser = authService.getCurrentUser();
+        
         return currentUser;
     }
     
@@ -767,7 +774,7 @@ public class UserCLI implements CLI {
             displayLoansWithItemDetails(activeLoans);
             
         } catch (UserNotFoundException e) {
-            CLILogger.error("Could not retrieve your loans", e);
+            CLILogger.error("You have no active loans.");
         }
     }
 
@@ -1066,19 +1073,33 @@ public class UserCLI implements CLI {
 
         CLILogger.info("Enter new email (current: '" + getCurrentUser().email() + "'): ");
         String email = scanner.nextLine().trim();
+        
         if (email.isEmpty()) {
             email = null;
         }
+        
+		try {
+			userService.validateEmailFormat(email);
+		} catch (PatternSyntaxException e) {
+			CLIHelper.printError("Invalid email format");
+			return;
+		}
 
         CLILogger.info("Enter new password (min 8 characters): ");
         String password = scanner.nextLine().trim();
         if (password.isEmpty()) {
             password = null;
-        } else if (password.length() < 8) {
-            CLIHelper.printError("Password must be at least 8 characters long");
-            return;
         }
-
+        
+        try {
+			if (password != null) {
+				userService.validatePasswordStrength(password);
+			}
+		} catch (IllegalArgumentException e) {
+			CLIHelper.printError(e.getMessage());
+			return;
+		}
+        
         if (email == null && password == null) {
             CLILogger.info("No changes made.");
             return;
@@ -1099,7 +1120,7 @@ public class UserCLI implements CLI {
             }
             
         } catch (Exception e) {
-            CLILogger.error("Error updating profile", e);
+            CLILogger.error("Error updating profile:", e);
         }
     }
 

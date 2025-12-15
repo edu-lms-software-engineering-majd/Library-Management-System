@@ -16,9 +16,9 @@ import lms.domain.utils.PasswordUtils;
  * Application service for managing users in the Library Management System.
  *
  * <p>
- * This service coordinates user-related operations including retrieval, updates,
- * registration, and deletion. It enforces authorization rules and returns data
- * as {@link UserDTO} objects to maintain proper layer separation.
+ * This service coordinates user-related operations including retrieval,
+ * updates, registration, and deletion. It enforces authorization rules and
+ * returns data as {@link UserDTO} objects to maintain proper layer separation.
  * </p>
  *
  * <p>
@@ -93,19 +93,19 @@ public class UserService {
 	 * Updates user information with authorization checks.
 	 *
 	 * <p>
-	 * Only admins or the user themselves can update their information.
-	 * Username cannot be changed after creation.
+	 * Only admins or the user themselves can update their information. Username
+	 * cannot be changed after creation.
 	 * </p>
 	 *
 	 * @param currentUser the currently authenticated user
-	 * @param userID the ID of the user to update
+	 * @param userID      the ID of the user to update
 	 * @param newUsername must be null (username changes not allowed)
-	 * @param newEmail the new email (null to keep unchanged)
+	 * @param newEmail    the new email (null to keep unchanged)
 	 * @param newPassword the new password (null to keep unchanged)
-	 * @param newRole the new role (null to keep unchanged)
+	 * @param newRole     the new role (null to keep unchanged)
 	 * @return {@code true} if update succeeded
-	 * @throws IllegalAccessException if user lacks permission to update
-	 * @throws UserNotFoundException if the target user doesn't exist
+	 * @throws IllegalAccessException   if user lacks permission to update
+	 * @throws UserNotFoundException    if the target user doesn't exist
 	 * @throws IllegalArgumentException if attempting to change username
 	 */
 	public boolean updateUser(UserDTO currentUser, UUID userID, String newUsername, String newEmail, String newPassword,
@@ -158,32 +158,45 @@ public class UserService {
 	/**
 	 * Registers a new user in the system.
 	 *
-	 * @param username the username (must be unique)
+	 * @param username    the username (must be unique)
 	 * @param rawPassword the plain text password (will be hashed)
-	 * @param firstName the user's first name
-	 * @param lastName the user's last name
-	 * @param email the user's email address
-	 * @param role the user's role
+	 * @param firstName   the user's first name
+	 * @param lastName    the user's last name
+	 * @param email       the user's email address
+	 * @param role        the user's role
 	 * @return the newly created user as a DTO
 	 * @throws IllegalArgumentException if username already exists
-	 * @throws IllegalStateException if registration fails
+	 * @throws IllegalStateException    if registration fails
 	 */
-	public UserDTO registerUser(String username, String rawPassword, String firstName, String lastName, String email, Role role) {
-		
+	public UserDTO registerUser(String username, String rawPassword, String firstName, String lastName, String email,
+			Role role) {
+
 		if (userRepo.isExist(username)) {
 			throw new IllegalArgumentException("Username already exists");
 		}
 
 		String hashedPassword = PasswordUtils.hashPassword(rawPassword);
 		User newUser = new User(firstName, lastName, email, username, hashedPassword, role);
-		
+
 		boolean success = userRepo.add(newUser);
-		
+
 		if (!success) {
 			throw new IllegalStateException("Failed to register user");
 		}
-		
+
 		return newUser.toDTO();
 	}
 
+	public void validateEmailFormat(String email) {
+		String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+		if (!email.matches(emailRegex)) {
+			throw new IllegalArgumentException("Invalid email format");
+		}
+	}
+
+	public void validatePasswordStrength(String password) {
+		if (password.length() < 8) {
+			throw new IllegalArgumentException("Password must be at least 8 characters long");
+		}
+	}
 }

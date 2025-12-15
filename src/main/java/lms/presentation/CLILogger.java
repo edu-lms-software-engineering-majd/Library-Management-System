@@ -78,6 +78,6 @@ public final class CLILogger {
      * @param e the exception that caused the error
      */
     public static void error(String message, Exception e) {
-        LOGGER.log(Level.SEVERE, message, e);
+        LOGGER.log(Level.SEVERE, message + e.getMessage(), e);
     }
 }
