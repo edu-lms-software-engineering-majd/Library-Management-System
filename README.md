@@ -24,7 +24,7 @@ Console-first library tool for admins, librarians, and members. Manage catalogue
 - `src/main/java/lms/application` - services for auth, accounts, catalogue, loans, notifications, search contexts, and scheduled tasks.
 - `src/main/java/lms/presentation` - CLI entry (`LibraryApp`) plus admin or user menus, helpers, and logger or factory utilities.
 - `src/test/java/lms` - unit tests covering domain entities, validators, strategies, and services.
-- `doc/` and `*_SUMMARY.md` - generated Javadocs and package-level documentation.
+- `doc/` - generated Javadocs and package-level documentation.
 
 ## Default Data
 
@@ -76,10 +76,3 @@ Console-first library tool for admins, librarians, and members. Manage catalogue
 - Run `mvn test` to execute the JUnit and Mockito suite (domain, services, validators, search strategies, schedulers).
 - Coverage reports generate at `target/site/jacoco/`.
 
-## Additional Documentation
-
-- `APPLICATION_DOCUMENTATION_SUMMARY.md` - service layer highlights.
-- `PERSISTENCE_DOCUMENTATION_SUMMARY.md` - repository documentation.
-- `DOMAIN_REFACTORING_SUMMARY.md` - domain model refactor notes.
-- `ACCOUNT_MANAGEMENT_FEATURES.md` - User CLI finance features.
-- `USERCLI_REFACTORING_SUMMARY.md`, `USERCLI_SONARQUBE_RESOLVED.md`, `RETURN_NOTIFICATION_IMPLEMENTATION.md` - CLI refactor and notification details.
