@@ -17,6 +17,10 @@ Console-first library tool for admins, librarians, and members. Manage catalogue
 - Testing: JUnit 5, Mockito, Hamcrest; Jacoco (presentation and persistence excluded from coverage)
 - Email (optional): Jakarta Mail plus java-dotenv for .env-based Gmail credentials
 
+## Documentation
+
+Full project documentation (Javadocs) is available online at: https://edu-lms-software-engineering-majd.github.io/Library-Management-System/doc/
+
 ## Project Layout
 
 - `src/main/java/lms/domain` - rich domain model (User, Account, Loan, Book/CD/Journal, Notification) with validators and fine or search strategies.
